@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMailReply } from "@fortawesome/free-solid-svg-icons";
 import styles from "./page.module.css";
 
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const TEST_USER_INFO = { firstName: "First", lastName: "User" };
 
 export default function Home() {
@@ -26,28 +29,79 @@ export default function Home() {
     },
   ]);
 
-  const sendBtn  = async (data: string) => {
+  const sendBtn = async (data: string) => {
     try {
-      console.log("data", data)
-      const res = await fetch("http://127.0.0.1:8000/", {
+      const res = await fetch(`${BACKEND_URL}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ query: data }),
       });
 
       if (!res.ok) {
         console.error("Response error");
-        return "Response error"
+        return "Response error";
       }
-      console.log(res)
-      return res.json();
+
+      const reader = res.body?.getReader();
+      if (!reader) {
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let accumulatedText = "";
+
+      // Set a new conversation for the assistant before the stream starts
+      setChatConversations((conversations) => [
+        ...conversations,
+        {
+          id: (conversations.length + 1).toString(),
+          role: MessageRole.ASSISTANT,
+          message: "", // Start with an empty message for streaming
+        },
+      ]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.trim().split("\n");
+
+        for (let line of lines) {
+          if (line.startsWith("data: ")) {
+            const jsonData = JSON.parse(line.substring(6));
+            const token = jsonData.answer;
+
+            accumulatedText += token; // Accumulate the streamed tokens
+
+            // Update the conversation's last assistant message
+            setChatConversations((conversations) => {
+              const lastMessageIndex = conversations.length - 1;
+              const updatedConversations = [...conversations];
+
+              // Update the last assistant message with the accumulated text
+              updatedConversations[lastMessageIndex] = {
+                ...updatedConversations[lastMessageIndex],
+                message: accumulatedText, // Update the message progressively
+              };
+
+              return updatedConversations;
+            });
+          }
+        }
+      }
+
+      return accumulatedText;
     } catch (error) {
-      console.error("Failed to get response from server");
-      return "Failed to get response from server"
+      console.error("Failed to get response from server", error);
+      return "Failed to get response from server";
     }
-  }
+  };
+
+
+
 
   const handleSubmit = useCallback((value: string) => {
     setIsQuerying(true);
@@ -60,7 +114,7 @@ export default function Home() {
         message: value,
       },
     ]);
-    
+
     sendBtn(value).then((response) => {
       console.log(response)
       setIsQuerying(false);
@@ -69,7 +123,7 @@ export default function Home() {
         {
           id: (conversations.length + 1).toString(),
           role: MessageRole.ASSISTANT,
-          message: response?.answer,
+          message: response || "", // Ensure message is always a string
         },
       ]);
     })

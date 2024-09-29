@@ -1,191 +1,130 @@
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from pathlib import Path
-from urllib.parse import urlparse
 from langchain.chains import RetrievalQAWithSourcesChain
-from langchain.chains import LLMChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.vectorstores import Chroma
-from langchain_community.llms import LlamaCpp
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_chroma import Chroma
 from langchain.prompts import PromptTemplate
-from langchain.embeddings import HuggingFaceEmbeddings
-from typing import Union, Optional, Any
-import requests
+from langchain_huggingface import HuggingFaceEmbeddings
+from huggingface_hub import InferenceClient  
 import os
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Directory where the Chroma database will be stored
-CHROMA_DB_DIRECTORY = "chroma_db/web_docs"
-SCRAPER_LINK_LIMIT = 100
+CHROMA_DB_DIRECTORY = "chroma_db/company_docs"
 
+# Hugging Face API details for Mistral-7B
+HF_API_KEY = os.getenv('HF_API_KEY')
+model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
-class CustomWebBaseLoader(WebBaseLoader):
-    # Custom scraper function to process HTML content
-    def _scrape(self, url: str, parser: Union[str, None] = None, bs_kwargs: Optional[dict] = None) -> Any:
-        # Fetch the HTML content using the parent class method
-        html_content = super()._scrape(url, parser)
-        # Find the <main> tag within the HTML content
-        main_tag = html_content.find('main')
-        # Return the text within the <main> tag, parsed by BeautifulSoup
-        return BeautifulSoup(main_tag.text, "html.parser", **(bs_kwargs or {}))
+# Initialize the Hugging Face Inference Client
+client = InferenceClient(token=HF_API_KEY)
 
-# Check if the database already exists
-
-
+# Check if the Chroma database already exists
 def database_exists():
     return os.path.exists(CHROMA_DB_DIRECTORY)
 
-# Function to build URLs for scraping
-
-
-def web_docs_build_urls():
-    # The root URL of web documentation
-    root_url = "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html"
-    # Fetch the content of the root URL
-    root_response = requests.get(root_url)
-    # Decode the response content
-    root_html = root_response.content.decode("utf-8")
-    # Parse the HTML content using BeautifulSoup
-    soup = BeautifulSoup(root_html, 'html.parser')
-
-    # Parse the root URL to extract components
-    root_url_parts = urlparse(root_url)
-    # Find all links with the specified class attribute
-    root_links = soup.find_all(
-        "a", attrs={"class": "bd-links-link d-inline-block rounded"})
-
-    # Initialize a set to store unique URLs
-    result = set()
-    # Limit the number of links to process
-    counter = 0
-    for root_link in root_links:
-        if counter >= SCRAPER_LINK_LIMIT:
-            break
-        # Get the href attribute of the link
-        path = root_link.get("href")
-        # Resolve relative paths
-        path = str(Path(path).resolve())
-        # Remove URL fragments
-        path = urlparse(path).path
-
-        # Construct the full URL
-        url = f"{root_url_parts.scheme}://{root_url_parts.netloc}{path}"
-
-        # Ensure the URL ends with a slash
-        if not url.endswith("/"):
-            url = url + "/"
-
-        # Add the URL to the set
-        result.add(url)
-    # Return the list of unique URLs
-    return list(result)
-
-# Function to build the database
-
-
 def build_database():
-    # Get the list of URLs to scrape
-    urls = web_docs_build_urls()
-    print(urls)
-    # Initialize the custom web loader with the URLs
-    loader = CustomWebBaseLoader(urls)
-    # Load the documents from the URLs
+    # Load documents from the local 'company_docs' directory
+    loader = DirectoryLoader(
+        '/Users/lsofianos/Downloads/PWC-Docs',  # Replace this with the path to your local docs
+        glob="**/*.*",  # Matches all files (you can restrict it to specific types like **/*.pdf or **/*.txt)
+        recursive=True  # Recursively search through subdirectories
+    )
+
+    # Load the documents from the directory
     documents = loader.load()
-    print("documents")
-    print(documents)
-    # Initialize the text splitter
+
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=1000, chunk_overlap=0)
+    chunk_size=500,  # Try a smaller chunk size to capture finer details
+    chunk_overlap=100  # Overlap to maintain context across chunks
+)
+
     # Split the documents into chunks
     splits = splitter.split_documents(documents)
 
-    # Initialize the embeddings
+    # Initialize embeddings
     model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {"device": "cpu"}
     embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
 
-    # Build the Chroma database with the document splits and embeddings
+    # Create Chroma database without persist
     db = Chroma.from_documents(
         splits,
         embeddings,
-        collection_name="web_docs",
-        persist_directory=CHROMA_DB_DIRECTORY,
+        collection_name="company_docs",
+        persist_directory=CHROMA_DB_DIRECTORY
     )
-    # Persist the database
-    db.persist()
 
-# Function to answer a query using the database
+
 def answer_query(query):
     # Get the vector representation for the user question
     model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {"device": "cpu"}
-    print("B4 Call HuggingFaceEmbeddings")
     embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
-    print("After Call HuggingFaceEmbeddings")
 
-    db = Chroma( # Fetch the vector collection to compare against the question
-        collection_name="web_docs",
+    # Load the Chroma database
+    db = Chroma(
+        collection_name="company_docs",
         embedding_function=embeddings,
         persist_directory=CHROMA_DB_DIRECTORY
     )
 
-    dirspot = os.getcwd()
-    print(dirspot)
+    # Retrieve relevant documents from Chroma database
+    retriever = db.as_retriever()
+    relevant_docs = retriever.invoke(query)
 
-    # Load the LlamaCpp language model, adjust GPU usage based on your hardware
-    llm = LlamaCpp(
-        model_path="djangoapp/models/llama-2-7b-chat.Q4_0.gguf",
-        n_gpu_layers=40,
-        n_batch=512,  # Batch size for model processing
-        n_ctx=2048,
-        verbose=False,  # Enable detailed logging for debugging
-    )
-
-    # Define the prompt template with a placeholder for the question
-    template = """
-    Question: {question}
-
-    Answer:
-    """
-    prompt_template = """
-    Question: {question} 
-    =========
-    Final Answer:
-    =========
-    {summaries}
-    """
-    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-    
-    # chain = LLMChain(prompt=prompt, llm=llm)
-
-    chain = RetrievalQAWithSourcesChain.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=db.as_retriever(),
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True
-    )
-
-    print("query", query)
-    
-    answer = chain({"question": query}, return_only_outputs=True)
-    
-    print("result2", answer)
-
-    result = {}
-    if "text" in result:
-      result["answer"] = answer["text"]
+    if relevant_docs:
+        logger.info(f"Found {len(relevant_docs)} relevant documents for query '{query}'")
+        for doc in relevant_docs:
+            logger.debug(f"Document content: {doc.page_content[:100]}")  # Log first 100 chars of each doc
     else:
-      result["answer"] = answer["answer"]
-    
-    if not answer["sources"]:
-      result["sources"] = 'LLM'
-    else:    
-      result["sources"] = answer["sources"]
-    return result
+        logger.warning(f"No documents found for query '{query}'")
 
+    # Prepare the context from the retrieved documents
+    context = "\n".join([doc.page_content for doc in relevant_docs])
+
+    prompt_template = """
+        You are given the following context, which contains information relevant to the user's query.
+
+        Context: {context}
+
+        Based on the context, answer the following question clearly and concisely:
+
+        Question: {question}
+
+        If the context does not contain the required information, return: "No relevant information found in the provided documents."
+
+        Answer:
+        """
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+
+    # Format the final prompt
+    formatted_prompt = prompt.format(context=context, question=query)
+
+    # Send the prompt to the LLM (e.g., Mistral) model via Hugging Face Inference API
+    messages = [{"role": "user", "content": formatted_prompt}]
+    response = client.chat_completion(messages=messages, model="mistralai/Mistral-7B-Instruct-v0.3", max_tokens=150, stream=True)
+
+    # Extract the response text from the response object
+    generated_text = ""
+    for chunk in response:
+        token = chunk.choices[0].delta.content
+        if token:
+            generated_text += token
+            yield {"answer": token}  # Stream each token as it arrives
+
+    # Finally, yield the full answer and document sources
+    yield {
+        "answer": generated_text,
+        "sources": [doc.metadata.get("source", "Unknown") for doc in relevant_docs]
+    }
+    
 
 
