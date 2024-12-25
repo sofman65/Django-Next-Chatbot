@@ -104,42 +104,21 @@ export default function Home() {
 
 
   const handleSubmit = useCallback((value: string) => {
-    setIsQuerying(true);
-    setChatConversations((conversations) => [
-      ...conversations,
-      {
-        //userInfo: TEST_USER_INFO,
-        id: (conversations.length + 1).toString(),
-        role: MessageRole.USER,
-        message: value,
-      },
-    ]);
+  setIsQuerying(true);
+  setChatConversations((conversations) => [
+    ...conversations,
+    {
+      id: (conversations.length + 1).toString(),
+      role: MessageRole.USER,
+      message: value,
+    },
+  ]);
 
-    sendBtn(value).then((response) => {
-      console.log(response)
-      setIsQuerying(false);
-      setChatConversations((conversations) => [
-        ...conversations,
-        {
-          id: (conversations.length + 1).toString(),
-          role: MessageRole.ASSISTANT,
-          message: response || "", // Ensure message is always a string
-        },
-      ]);
-    })
+  sendBtn(value).finally(() => {
+    setIsQuerying(false); // Stop querying after streaming completes
+  });
+}, []);
 
-    /*setTimeout(() => {
-      setIsQuerying(false);
-      setChatConversations((conversations) => [
-        ...conversations,
-        {
-          id: (conversations.length + 1).toString(),
-          role: MessageRole.ASSISTANT,
-          message: "This is a mocked sample LLM ChatBot response",
-        },
-      ]);
-    }, 3000); */
-  }, []);
 
   return (
     <ChatUI
