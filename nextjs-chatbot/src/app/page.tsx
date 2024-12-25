@@ -16,16 +16,11 @@ export default function Home() {
   const [isQuerying, setIsQuerying] = useState<boolean>(false);
 
   const [chatConversations, setChatConversations] = useState<Conversations>([
+  
     {
       id: "1",
-      role: MessageRole.USER,
-      message: "Who are you?",
-      userInfo: TEST_USER_INFO,
-    },
-    {
-      id: "2",
       role: MessageRole.ASSISTANT,
-      message: "I am a LLM ChatBoT..",
+      message: "I am Nexus, your assistant in paytech. How can I help you today?",
     },
   ]);
 
@@ -38,67 +33,81 @@ export default function Home() {
         },
         body: JSON.stringify({ query: data }),
       });
-
+  
       if (!res.ok) {
         console.error("Response error");
+        setChatConversations((conversations) => [
+          ...conversations,
+          {
+            id: (conversations.length + 1).toString(),
+            role: MessageRole.ASSISTANT,
+            message: "An error occurred while fetching the response.",
+          },
+        ]);
         return "Response error";
       }
-
+  
       const reader = res.body?.getReader();
       if (!reader) {
         return;
       }
-
+  
       const decoder = new TextDecoder();
       let accumulatedText = "";
-
-      // Set a new conversation for the assistant before the stream starts
+  
       setChatConversations((conversations) => [
         ...conversations,
         {
           id: (conversations.length + 1).toString(),
           role: MessageRole.ASSISTANT,
-          message: "", // Start with an empty message for streaming
+          message: "",
         },
       ]);
-
+  
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
+  
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.trim().split("\n");
-
+  
         for (let line of lines) {
           if (line.startsWith("data: ")) {
             const jsonData = JSON.parse(line.substring(6));
             const token = jsonData.answer;
-
-            accumulatedText += token; // Accumulate the streamed tokens
-
-            // Update the conversation's last assistant message
+  
+            accumulatedText += token;
+  
             setChatConversations((conversations) => {
               const lastMessageIndex = conversations.length - 1;
               const updatedConversations = [...conversations];
-
-              // Update the last assistant message with the accumulated text
+  
               updatedConversations[lastMessageIndex] = {
                 ...updatedConversations[lastMessageIndex],
-                message: accumulatedText, // Update the message progressively
+                message: accumulatedText,
               };
-
+  
               return updatedConversations;
             });
           }
         }
       }
-
+  
       return accumulatedText;
     } catch (error) {
       console.error("Failed to get response from server", error);
+      setChatConversations((conversations) => [
+        ...conversations,
+        {
+          id: (conversations.length + 1).toString(),
+          role: MessageRole.ASSISTANT,
+          message: "An error occurred while processing your request.",
+        },
+      ]);
       return "Failed to get response from server";
     }
   };
+  
 
 
 

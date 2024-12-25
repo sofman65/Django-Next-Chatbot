@@ -73,17 +73,17 @@ def build_database():
 def answer_query(query):
     """Answer a user query using the Chroma database and LLM."""
     db = get_db()
-    retriever = db.as_retriever(search_kwargs={"k": 3})  # Limit to top 3 documents
+    retriever = db.as_retriever(search_kwargs={"k": 3})
     relevant_docs = retriever.invoke(query)
 
     if relevant_docs:
         logger.info(f"Found {len(relevant_docs)} relevant documents for query '{query}'")
     else:
         logger.warning(f"No documents found for query '{query}'")
-        yield {"answer": "No relevant information found in the provided documents.", "sources": []}
+        yield {"answer": "No relevant information found in the provided documents."}
         return
 
-    context = "\n".join([doc.page_content[:300] for doc in relevant_docs])  # Limit context size
+    context = "\n".join([doc.page_content[:300] for doc in relevant_docs])
 
     prompt_template = """
         You are given the following context, which contains information relevant to the user's query.
@@ -104,20 +104,14 @@ def answer_query(query):
     messages = [{"role": "user", "content": formatted_prompt}]
     response = client.chat_completion(messages=messages, model="mistralai/Mistral-7B-Instruct-v0.3", max_tokens=150, stream=True)
 
-    generated_text = ""
+    previous_token = None
     try:
         for chunk in response:
             token = chunk.choices[0].delta.content
-            if token:
-                generated_text += token
-                yield {"answer": token}  # Stream each token
+            if token and token != previous_token:
+                yield {"answer": token}
+                previous_token = token
     except Exception as e:
         logger.error(f"Error during LLM response: {e}")
-        yield {"answer": "An error occurred while processing the query.", "sources": []}
+        yield {"answer": "An error occurred while processing the query."}
         return
-
-    # Finally, yield full response and sources
-    yield {
-        "answer": generated_text,
-        "sources": [doc.metadata.get("source", "Unknown") for doc in relevant_docs]
-    }

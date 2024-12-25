@@ -16,7 +16,7 @@ export const ChatConversations = ({
         chatConversationsContainer.scrollHeight
       );
     }
-  }, [conversations]);
+  }, [chatConversationsContainerRef, conversations]);
 
   return (
     <div className="w-2/3">
