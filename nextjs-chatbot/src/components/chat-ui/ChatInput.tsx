@@ -1,62 +1,61 @@
-import { faMagicWandSparkles } from "@fortawesome/free-solid-svg-icons";
-import { useCallback, useRef } from "react";
-import { Button, Textarea } from "react-daisyui";
-import { IChatInputProps } from "../../types";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+"use client"
 
-export const ChatInput = ({
-  disabled,
-  onSubmit,
-  placeholder,
-  customSubmitIcon,
-}: IChatInputProps) => {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+import { SendHorizontal } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { useCallback, useRef } from "react"
+
+interface ChatInputProps {
+  disabled?: boolean
+  onSubmit: (value: string) => void
+  placeholder?: string
+}
+
+export function ChatInput({ disabled, onSubmit, placeholder }: ChatInputProps) {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSubmit = useCallback(
     (e: React.SyntheticEvent) => {
-      e.preventDefault();
-      const textArea = textAreaRef?.current;
+      e.preventDefault()
+      const textArea = textAreaRef?.current
       if (textArea && textArea.value.trim().length > 0) {
-        if (onSubmit) {
-          onSubmit(textArea.value);
-        }
-        textArea.value = "";
+        onSubmit(textArea.value)
+        textArea.value = ""
       }
     },
     [onSubmit]
-  );
+  )
 
-  const handleEnterKey = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
-        handleSubmit(e);
+        e.preventDefault()
+        handleSubmit(e)
       }
     },
     [handleSubmit]
-  );
+  )
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex flex-col sm:flex-row items-center gap-2 p-4 w-full max-w-3xl mx-auto">
       <Textarea
         ref={textAreaRef}
-        bordered
-        className={`resize-none w-2/3 max-h-48 overflow-y-auto`}
-        onKeyUp={handleEnterKey}
-        placeholder={placeholder ? placeholder : "Type here to chat"}
+        placeholder={placeholder ?? "Type your message..."}
+        className="min-h-[60px] w-full resize-none rounded-lg border focus-visible:ring-1"
+        onKeyDown={handleKeyDown}
         disabled={disabled}
-      ></Textarea>
+        rows={1}
+      />
       <Button
-        shape={"square"}
-        className="absolute ml-[58%]"
+        type="submit"
+        size="icon"
         disabled={disabled}
         onClick={handleSubmit}
+        className="h-[60px] w-[60px] shrink-0 bg-[#3333cc] text-white hover:bg-[#3333cc]/90 rounded-full"
       >
-        {customSubmitIcon ? (
-          customSubmitIcon
-        ) : (
-          <FontAwesomeIcon icon={faMagicWandSparkles} />
-        )}
+        <SendHorizontal className="size-5" />
+        <span className="sr-only">Send message</span>
       </Button>
     </div>
-  );
-};
+  )
+}

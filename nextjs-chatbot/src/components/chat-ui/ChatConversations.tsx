@@ -1,35 +1,42 @@
-import { Loading } from "react-daisyui";
-import { IChatConversationsProps } from "../../types";
-import { ChatMessage } from "./ChatMessage";
-import { useEffect } from "react";
+import { useEffect } from "react"
+import { ChatMessage } from "./ChatMessage"
+import type { Conversations } from "../../types"
 
-export const ChatConversations = ({
+interface ChatConversationsProps {
+  conversations: Conversations
+  isQuerying: boolean
+  chatConversationsContainerRef: React.RefObject<HTMLDivElement>
+}
+
+export function ChatConversations({
   conversations,
   isQuerying,
   chatConversationsContainerRef,
-}: IChatConversationsProps) => {
+}: ChatConversationsProps) {
   useEffect(() => {
-    const chatConversationsContainer = chatConversationsContainerRef?.current;
-    if (chatConversationsContainer) {
-      chatConversationsContainer.scrollTo(
-        0,
-        chatConversationsContainer.scrollHeight
-      );
+    if (chatConversationsContainerRef.current) {
+      chatConversationsContainerRef.current.scrollTop =
+        chatConversationsContainerRef.current.scrollHeight
     }
-  }, [chatConversationsContainerRef, conversations]);
+  }, [conversations, chatConversationsContainerRef])
 
   return (
-    <div className="w-2/3">
-      {conversations &&
-        conversations.map((chatEntry) => (
-          <ChatMessage
-            key={`chatbot-message-${chatEntry.id}`}
-            message={chatEntry}
-          />
-        ))}
-      {isQuerying && (
-        <Loading className="mt-4 ml-16" variant="dots" size="lg" />
-      )}
+    <div className="flex w-full max-w-3xl flex-col space-y-4">
+      {conversations.map((conversation, index) => (
+        <ChatMessage
+          key={conversation.id}
+          role={conversation.role}
+          message={conversation.message}
+          isStreaming={
+            isQuerying && 
+            index === conversations.length - 1 && 
+            conversation.role === "assistant"
+          }
+        />
+      ))}
     </div>
-  );
-};
+  )
+}
+
+
+
