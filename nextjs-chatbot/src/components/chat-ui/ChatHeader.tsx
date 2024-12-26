@@ -19,6 +19,7 @@ export function ChatHeader({ onNewChat }: ChatHeaderProps) {
   const isMobile = useIsMobile()
 
   return (
+    
     <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-white px-4">
       {isMobile && (
         <Button
@@ -32,7 +33,7 @@ export function ChatHeader({ onNewChat }: ChatHeaderProps) {
         </Button>
       )}
       
-      {(!isSidebarOpen || isMobile) && (
+      {/* {(!isSidebarOpen || isMobile) && (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -47,7 +48,7 @@ export function ChatHeader({ onNewChat }: ChatHeaderProps) {
           </TooltipTrigger>
           <TooltipContent>New Chat</TooltipContent>
         </Tooltip>
-      )}
+      )} */}
 
       <div className={cn(
         "flex-1 flex items-center",

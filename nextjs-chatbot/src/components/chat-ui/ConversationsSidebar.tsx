@@ -1,11 +1,14 @@
 'use client'
 
-import { MessageSquare, Plus } from 'lucide-react'
-import { useRouter } from "next/navigation"
+import { MessageSquare, Plus, User } from 'lucide-react'
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { useSidebar } from "@/contexts/sidebar-context"
 import { cn } from "@/lib/utils"
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Conversation {
   id: string
@@ -19,6 +22,8 @@ interface ConversationsSidebarProps {
   onNewChat: () => void
   onSelectConversation: (id: string) => void
   className?: string
+  isSidebarOpen?: boolean // Controls visibility on mobile
+  closeSidebar?: () => void // Callback to close sidebar
 }
 
 export function ConversationsSidebar({
@@ -26,51 +31,93 @@ export function ConversationsSidebar({
   currentId,
   onNewChat,
   onSelectConversation,
-  className
+  className,
+  isSidebarOpen = false, // Default to closed
+  closeSidebar, // Callback to close
 }: ConversationsSidebarProps) {
-  const router = useRouter()
-  const { isSidebarOpen } = useSidebar()
-  const isMobile = useIsMobile();
-
-  if (!isSidebarOpen && isMobile) {
-    return null;
-  }
-
   return (
-    <div className={cn(
-      "fixed inset-y-0 z-30 flex w-72 flex-col border-r border-[#3333CC]/20 bg-[#3333CC] text-white",
-      "transition-transform duration-300 ease-in-out",
-      !isMobile && "lg:relative lg:translate-x-0",
-      "shadow-[5px_0_25px_0_rgba(0,0,0,0.3)]",
-      className
-    )}>
-      <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2">
-        <Button
-          onClick={onNewChat}
-          variant="ghost"
-          className="w-full justify-start gap-2 text-white hover:bg-white/10"
-        >
-          <Plus className="h-5 w-5" />
-          New Chat
-        </Button>
-      </div>
-      <div className="flex-1 overflow-auto p-2">
-        {conversations.map((conversation) => (
+    <>
+      {/* Sidebar */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-[#3333CC]/20 bg-[#3333CC] text-white transition-transform duration-300 ease-in-out",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full", // Slide in/out on mobile
+          "lg:relative lg:translate-x-0", // Always visible on large screens
+          className
+        )}
+      >
+        {/* Header with New Chat Button */}
+        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2">
           <Button
-            key={conversation.id}
+            onClick={onNewChat}
             variant="ghost"
-            className={cn(
-              "w-full justify-start gap-2 text-white/80 hover:bg-white/10 hover:text-white",
-              currentId === conversation.id && "bg-white/20 text-white"
-            )}
-            onClick={() => onSelectConversation(conversation.id)}
+            className="w-full justify-start gap-2 text-white hover:bg-white/10"
           >
-            <MessageSquare className="h-5 w-5" />
-            <span className="truncate">{conversation.title}</span>
+            <Plus className="h-5 w-5" />
+            New Chat
           </Button>
-        ))}
+        </div>
+
+        {/* Conversation List */}
+        <div className="flex-1 overflow-auto p-2">
+          <SidebarMenu>
+            {conversations.map((conversation) => (
+              <SidebarMenuItem key={conversation.id}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={currentId === conversation.id}
+                  className={cn(
+                    "w-full justify-start gap-2",
+                    currentId === conversation.id
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  )}
+                  onClick={() => {
+                    onSelectConversation(conversation.id)
+                    if (closeSidebar) closeSidebar() // Close sidebar on mobile after selection
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    <span className="truncate">{conversation.title}</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </div>
+
+        {/* Footer with User Settings */}
+        <div className="border-t border-white/10 p-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-white hover:bg-white/10"
+              >
+                <User className="h-5 w-5" />
+                User Settings
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+              <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </div>
+
+      {/* Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50 lg:hidden" // Visible only on mobile
+          onClick={closeSidebar} // Close sidebar when clicking the backdrop
+        />
+      )}
+    </>
   )
 }
-
