@@ -16,7 +16,8 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
     <div
       className={cn(
         "flex w-full items-start gap-2 p-2 sm:gap-4 sm:p-4 rounded-lg backdrop-blur-sm",
-        "bg-white/80"
+        "bg-white/80",
+        "ml-4 sm:ml-6"
       )}
     >
       <div className={cn(
@@ -36,7 +37,7 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
           </p>
         </div>
         <div className="group prose prose-sm sm:prose-base prose-neutral dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 text-black relative">
-          {message === "" && isStreaming ? (
+          {(message === "" && isStreaming) || message === null ? (
             <CustomSkeleton />
           ) : (
             <>

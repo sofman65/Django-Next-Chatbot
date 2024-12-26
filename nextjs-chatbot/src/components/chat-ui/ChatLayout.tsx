@@ -5,7 +5,7 @@ import { Conversations } from "@/types";
 import { ChatUI } from "@/components/chat-ui/ChatUI";
 import { ChatInput } from "@/components/chat-ui/ChatInput";
 import { ChatConversations } from "@/components/chat-ui/ChatConversations";
-import { Header } from "@/components/chat-ui/header";
+import { ChatHeader} from "@/components/chat-ui/ChatHeader";
 // import { ConversationsSidebar } from "@/components/chat-ui/ConversationSidebar"
 import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context"
 import "@/styles/gradients.css"
@@ -15,15 +15,36 @@ import { useScrollToBottom } from '@/hooks/useScrollToBottom';
 import { ChatMessage } from './ChatMessage';
 import { Suggestion } from '@/components/ui/suggestion';
 import { UISuggestion } from "@/lib/suggestions";
+import { ConversationsSidebar } from "./ConversationsSidebar";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
+// Define the Conversation type with required properties
+type Conversation = {
+  id: string;
+  role: MessageRole;
+  message: string;
+  title: string;
+  createdAt: string;
+};
+
 function ChatLayout() {
+  const isMobile = useIsMobile();
   const { isSidebarOpen, closeSidebar } = useSidebar()
   const chatConversationsContainerRef = useRef<HTMLDivElement>(null)
   const [isQuerying, setIsQuerying] = useState<boolean>(false)
   const [currentConversationId, setCurrentConversationId] = useState<string>("")
-  const [storedConversations, setStoredConversations] = useState<Conversations>([])
+  const [storedConversations, setStoredConversations] = useState<Conversation[]>([
+    {
+      id: "1",
+      role: MessageRole.ASSISTANT,
+      message: "Welcome to the chat!",
+      title: "Initial Conversation",
+      createdAt: new Date().toISOString(),
+    },
+    // Add more conversations as needed
+  ])
   const [chatConversations, setChatConversations] = useState<Conversations>([
     {
       id: "1",
@@ -102,6 +123,16 @@ function ChatLayout() {
   const sendMessage = useCallback(async (data: string) => {
     setIsQuerying(true);
     try {
+      // Add empty assistant message immediately to show loading state
+      setChatConversations((conversations) => [
+        ...conversations,
+        {
+          id: (conversations.length + 1).toString(),
+          role: MessageRole.ASSISTANT,
+          message: "",  // Empty message will trigger loading state
+        },
+      ]);
+
       const res = await fetch(`${BACKEND_URL}`, {
         method: "POST",
         headers: {
@@ -122,15 +153,6 @@ function ChatLayout() {
 
       const decoder = new TextDecoder();
       let accumulatedText = "";
-
-      setChatConversations((conversations) => [
-        ...conversations,
-        {
-          id: (conversations.length + 1).toString(),
-          role: MessageRole.ASSISTANT,
-          message: "",
-        },
-      ]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -189,27 +211,31 @@ function ChatLayout() {
 //   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <div className="flex flex-1 flex-col lg:flex-row">
-        {/* <ConversationsSidebar
+    <div className="flex min-h-screen flex-col">
+      <ChatHeader onNewChat={createNewChat} />
+      <div className="flex flex-1 flex-col lg:flex-row">
+        <ConversationsSidebar
           conversations={storedConversations}
           currentId={currentConversationId}
           onNewChat={createNewChat}
           className={cn(
-            "transition-transform duration-300 ease-in-out lg:transform-none",
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        /> */}
-        <div
-          className={cn(
-            "fixed inset-0 z-20 bg-black/80 opacity-0 transition-opacity lg:hidden",
-            isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-          )}
-          onClick={closeSidebar}
+            "transition-transform duration-300 ease-in-out",
+            isMobile ? (
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            ) : "translate-x-0"
+          )}    
         />
-        <main className="flex flex-1 flex-col nexi-gradient" ref={containerRef}>
+        {/* Overlay for mobile */}
+        {isMobile && isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-black/80 transition-opacity"
+            onClick={closeSidebar}
+          />
+        )}
+        <main className={cn(
+          "flex flex-1 flex-col nexi-gradient bg-opacity-400",
+          isMobile && "w-full"
+        )} ref={containerRef}>
           <div 
             className="flex-1 overflow-y-auto py-4 backdrop-blur-sm" 
             ref={chatConversationsContainerRef}
@@ -221,28 +247,16 @@ function ChatLayout() {
             />
             <div ref={endRef} />
           </div>
-          <div className="text-center bg-white/80 text-black">
-              {suggestions.map((suggestion) => (
-                <Suggestion
-                  key={suggestion.id}
-                  suggestion={suggestion}
-                  onApply={() => handleSubmit(suggestion.originalText)}
-                />
-              ))}
-            </div>
-          <div className="border-t bg-white/80 backdrop-blur-sm">
-          
+          <div className="border-t rounded-lg bg-white backdrop-blur-sm">
             <ChatInput
               disabled={isQuerying}
               onSubmit={handleSubmit}
               placeholder="Ask me anything about Nexi Group..."
             />
-           
           </div>
-          </main>
-        </div>
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   )
 }
 

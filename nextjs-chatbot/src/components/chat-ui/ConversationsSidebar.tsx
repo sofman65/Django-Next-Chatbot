@@ -2,16 +2,10 @@
 
 import { MessageSquare, Plus } from 'lucide-react'
 import { useRouter } from "next/navigation"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-} from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
+import { useSidebar } from "@/contexts/sidebar-context"
+import { cn } from "@/lib/utils"
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Conversation {
   id: string
@@ -23,57 +17,58 @@ interface ConversationsSidebarProps {
   conversations: Conversation[]
   currentId?: string
   onNewChat: () => void
+  className?: string
 }
 
 export function ConversationsSidebar({
   conversations,
   currentId,
   onNewChat,
+  className
 }: ConversationsSidebarProps) {
   const router = useRouter()
+  const { isSidebarOpen } = useSidebar()
+  const isMobile = useIsMobile();
+
+  if (!isSidebarOpen && isMobile) {
+    return null;
+  }
 
   return (
-    <Sidebar className="border-r border-[#3333CC]/20 bg-white/80 backdrop-blur-sm">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={onNewChat} 
-              className="w-full bg-[#3333CC] text-white hover:bg-[#3333CC]/90"
-            >
-              <Plus className="mr-2 size-4" />
-              <span className="hidden sm:inline">New Chat</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>
-          {conversations.map((conversation) => (
-            <SidebarMenuItem key={conversation.id}>
-              <SidebarMenuButton
-                asChild
-                isActive={currentId === conversation.id}
-                className={currentId === conversation.id ? "bg-[#3333CC]/10" : ""}
-              >
-                <button
-                  onClick={() => router.push(`/chat/${conversation.id}`)}
-                  className="w-full"
-                >
-                  <MessageSquare className="mr-2 size-4" />
-                  <span className="truncate">{conversation.title}</span>
-                </button>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter>
-        <div className="p-4 text-xs text-[#3333CC]/70">
-          Powered by Nexi Group
-        </div>
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+    <div className={cn(
+      "fixed inset-y-0 z-30 flex w-72 flex-col border-r border-[#3333CC]/20 bg-[#3333CC] text-white",
+      "transition-transform duration-300 ease-in-out",
+      !isMobile && "lg:relative lg:translate-x-0",
+      "shadow-[5px_0_25px_0_rgba(0,0,0,0.3)]",
+      className
+    )}>
+      <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2">
+        <Button
+          onClick={onNewChat}
+          variant="ghost"
+          className="w-full justify-start gap-2 text-white hover:bg-white/10"
+        >
+          <Plus className="h-5 w-5" />
+          New Chat
+        </Button>
+      </div>
+      <div className="flex-1 overflow-auto p-2">
+        {conversations.map((conversation) => (
+          <Button
+            key={conversation.id}
+            variant="ghost"
+            className={cn(
+              "w-full justify-start gap-2 text-white/80 hover:bg-white/10 hover:text-white",
+              currentId === conversation.id && "bg-white/20 text-white"
+            )}
+            onClick={() => router.push(`/chat/${conversation.id}`)}
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span className="truncate">{conversation.title}</span>
+          </Button>
+        ))}
+      </div>
+    </div>
   )
-} 
+}
+

@@ -37,7 +37,7 @@ export function ChatInput({ disabled, onSubmit, placeholder }: ChatInputProps) {
   )
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-2 p-4 w-full max-w-3xl mx-auto">
+    <div className="flex flex-col sm:flex-row items-center gap-2 p-4 w-full max-w-3xl mx-auto ">
       <Textarea
         ref={textAreaRef}
         placeholder={placeholder ?? "Type your message..."}
