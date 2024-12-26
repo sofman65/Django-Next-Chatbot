@@ -23,8 +23,6 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 // Define the Conversation type with required properties
 type Conversation = {
   id: string;
-  role: MessageRole;
-  message: string;
   title: string;
   createdAt: string;
 };
@@ -35,16 +33,7 @@ function ChatLayout() {
   const chatConversationsContainerRef = useRef<HTMLDivElement>(null)
   const [isQuerying, setIsQuerying] = useState<boolean>(false)
   const [currentConversationId, setCurrentConversationId] = useState<string>("")
-  const [storedConversations, setStoredConversations] = useState<Conversation[]>([
-    {
-      id: "1",
-      role: MessageRole.ASSISTANT,
-      message: "Welcome to the chat!",
-      title: "Initial Conversation",
-      createdAt: new Date().toISOString(),
-    },
-    // Add more conversations as needed
-  ])
+  const [storedConversations, setStoredConversations] = useState<Conversation[]>([])
   const [chatConversations, setChatConversations] = useState<Conversations>([
     {
       id: "1",
@@ -90,9 +79,11 @@ function ChatLayout() {
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/conversations`)
+      const response = await fetch(`${BACKEND_URL}/api/conversations`)
       const data = await response.json()
-      setStoredConversations(data.conversations)
+      if (data.conversations) {
+        setStoredConversations(data.conversations)
+      }
     } catch (error) {
       console.error("Error fetching conversations:", error)
     }
@@ -210,6 +201,23 @@ function ChatLayout() {
 //     fetchSuggestions(value);
 //   };
 
+  const loadConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/conversations/${conversationId}`)
+      const data = await response.json()
+      if (data.conversation?.messages) {
+        setChatConversations(data.conversation.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role as MessageRole,
+          message: msg.content
+        })))
+        setCurrentConversationId(conversationId)
+      }
+    } catch (error) {
+      console.error("Error loading conversation:", error)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <ChatHeader onNewChat={createNewChat} />
@@ -218,6 +226,7 @@ function ChatLayout() {
           conversations={storedConversations}
           currentId={currentConversationId}
           onNewChat={createNewChat}
+          onSelectConversation={loadConversation}
           className={cn(
             "transition-transform duration-300 ease-in-out",
             isMobile ? (

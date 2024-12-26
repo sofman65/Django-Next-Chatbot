@@ -17,6 +17,7 @@ interface ConversationsSidebarProps {
   conversations: Conversation[]
   currentId?: string
   onNewChat: () => void
+  onSelectConversation: (id: string) => void
   className?: string
 }
 
@@ -24,6 +25,7 @@ export function ConversationsSidebar({
   conversations,
   currentId,
   onNewChat,
+  onSelectConversation,
   className
 }: ConversationsSidebarProps) {
   const router = useRouter()
@@ -61,7 +63,7 @@ export function ConversationsSidebar({
               "w-full justify-start gap-2 text-white/80 hover:bg-white/10 hover:text-white",
               currentId === conversation.id && "bg-white/20 text-white"
             )}
-            onClick={() => router.push(`/chat/${conversation.id}`)}
+            onClick={() => onSelectConversation(conversation.id)}
           >
             <MessageSquare className="h-5 w-5" />
             <span className="truncate">{conversation.title}</span>

@@ -83,7 +83,7 @@ def answer_query(query):
         yield {"answer": "No relevant information found in the provided documents."}
         return
 
-    context = "\n".join([doc.page_content[:300] for doc in relevant_docs])
+    context = "\n".join([f"- {doc.page_content[:300]}" for doc in relevant_docs])
 
     prompt_template = """
         You are given the following context, which contains information relevant to the user's query.
@@ -115,3 +115,15 @@ def answer_query(query):
         logger.error(f"Error during LLM response: {e}")
         yield {"answer": "An error occurred while processing the query."}
         return
+
+def generate_title(query):
+    """Generate a title for a new conversation based on the first query."""
+    messages = [{"role": "user", "content": f"Generate a short title (max 6 words) for a conversation that starts with this query: {query}"}]
+    response = client.chat_completion(
+        messages=messages,
+        model="mistralai/Mistral-7B-Instruct-v0.3",
+        max_tokens=20,
+        stream=False
+    )
+    title = response.choices[0].message.content.strip()
+    return title[:255]  # Ensure it fits in the database field
