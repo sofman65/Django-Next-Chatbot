@@ -10,7 +10,7 @@ from huggingface_hub import InferenceClient
 from openai import OpenAI
 import os
 import logging
-
+from .prompt_template import mistral_prompt_template, openai_prompt_template
 load_dotenv()
 # Load environment variables
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -71,8 +71,8 @@ def build_database():
     print(f"Loaded {len(documents)} documents.")
 
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=500,  # Smaller chunks to capture details
-        chunk_overlap=50  # Overlap to maintain context
+        chunk_size=1000,  # Smaller chunks to capture details
+        chunk_overlap=100  # Overlap to maintain context
     )
     splits = splitter.split_documents(documents)
 
@@ -81,6 +81,7 @@ def build_database():
         embeddings,
         collection_name="company_docs",
         persist_directory=CHROMA_DB_DIRECTORY
+
     )
     db.persist()
     logger.info("Database built and persisted successfully.")
@@ -88,70 +89,48 @@ def build_database():
 def answer_query(query, model="mistralai/Mistral-7B-Instruct-v0.3", provider="huggingface"):
     logger.info(f"Answer query called with model: {model}, provider: {provider}")
     db = get_db()
-    retriever = db.as_retriever(search_kwargs={"k": 5})
+    retriever = db.as_retriever(search_kwargs={"k": 14})  # Removed filter for now to ensure broader search
     relevant_docs = retriever.invoke(query)
 
-    # Manually filter by score if it exists
-    score_threshold = 0.2
-    filtered_docs = [
-        doc for doc in relevant_docs if hasattr(doc, 'score') and doc.score >= score_threshold
-    ]
+    # Check if relevant_docs is not None or empty
+    if not relevant_docs:
+        logger.warning(f"No documents found for query '{query}'")
+        yield {"answer": "No relevant information found in the provided documents."}
+        return
 
-
-
-    # Prepare context for the LLM
+    # Sort and build context, safely handle missing scores
     context = "\n".join(
-        [f"- Source: {doc.metadata.get('source', 'Unknown')} | {doc.page_content[:300]}" 
-         for doc in sorted(filtered_docs, key=lambda x: x.score, reverse=True)]
+        [
+            f"- Source: {doc.metadata.get('source', 'Unknown')} | {doc.page_content[:300]}"
+            for doc in sorted(relevant_docs, key=lambda x: getattr(x, 'score', 0), reverse=True)
+        ]
     )
 
-    # Prompt template
-    prompt_template = """
-        You are an expert assistant of Nexi Group. Answer the following question using only the provided context. Do not use outside knowledge or guess.
-
-        Context: {context}
-
-        If the user asks questions about your functionality or identity, respond as follows:
-        "I am Nexi Group's AI assistant, here to assist with questions about our services, products, and more."
-
-        If the user asks questions about the company, respond as follows:
-        "Nexi Group is a leading provider of financial services, offering a wide range of products and solutions to meet your financial needs."
-
-
-
-        Question: {question}
-
-        If the context is insufficient, say: "No relevant information found in the provided documents."
-
-        ALWAYS ANSWER WITH THE LANGUAGE OF THE QUESTION.
-
-        ALWAYS CITE YOUR SOURCES.
-
-        ALWAYS RESPOND WHEN THE USER GIVES YOU A QUESTION.
-
-        Answer:
-        """
-    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-    formatted_prompt = prompt.format(context=context, question=query)
-
-    # Ensure the correct response function is called
+    # Choose the prompt template
     if provider == "huggingface":
-        logger.info("Routing to Hugging Face API")
-        yield from mistral_response(formatted_prompt, model)
+        prompt_template = mistral_prompt_template
     elif provider == "openai":
-        logger.info("Routing to OpenAI API")
-        yield from openai_response(formatted_prompt, model)
+        prompt_template = openai_prompt_template
     else:
         logger.error(f"Invalid provider specified: {provider}")
-        yield {"answer": "An error occurred while processing the query. Invalid provider specified."}
+        yield {"answer": "Error: Invalid provider specified."}
+        return
+
+    # Format the prompt
+    formatted_prompt = prompt_template.format(context=context, question=query)
+
+    # Route to the appropriate response function
+    if provider == "huggingface":
+        yield from mistral_response(formatted_prompt, model)
+    elif provider == "openai":
+        yield from openai_response(formatted_prompt, model)
 
 
-
-def mistral_response(prompt, model):
+def mistral_response(prompt, model, temperature=0.7):
     """Generate a response using a Hugging Face model."""
     try:
         messages = [{"role": "user", "content": prompt}]
-        response = hf_client.chat_completion(messages=messages, model=model, max_tokens=150, stream=True)
+        response = hf_client.chat_completion(messages=messages, model=model, max_tokens=150, stream=True, temperature=temperature)
 
         accumulated_text = ""
         previous_token = None
@@ -166,7 +145,7 @@ def mistral_response(prompt, model):
     except Exception as e:
         logger.error(f"Error during Mistral response: {e}")
         yield {"answer": "An error occurred while processing the query."}
-        return
+
 
 
 def openai_response(prompt, model):
@@ -174,7 +153,7 @@ def openai_response(prompt, model):
         logger.info(f"Calling OpenAI API with model: {model}")
         response = openai_client.chat.completions.create(
             model=model,
-            messages=[{"role": "user", "content": prompt }],
+            messages=[{"role": "user", "content": prompt}],
             stream=True
         )
         accumulated_text = ""
@@ -193,6 +172,8 @@ def openai_response(prompt, model):
     except Exception as e:
         logger.error(f"Error during OpenAI response: {e}")
         yield {"answer": "An error occurred while processing the query."}
+
+
 
 
 
