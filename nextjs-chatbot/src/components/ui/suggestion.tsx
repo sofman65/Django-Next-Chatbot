@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
-import { useWindowSize } from 'usehooks-ts';
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { useWindowSize } from "usehooks-ts";
 
-import type { UISuggestion } from '@/lib/suggestions';
+import type { UISuggestion } from "@/lib/suggestions";
 
-import { CrossIcon, MessageIcon } from '@/components/ui/icons';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { CrossIcon, MessageIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Suggestion = ({
   suggestion,
@@ -20,12 +20,14 @@ export const Suggestion = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const { width: windowWidth } = useWindowSize();
 
-  console.log('Rendering Suggestion:', suggestion);
+  console.log("Rendering Suggestion:", suggestion);
 
   return (
     <AnimatePresence>
       <motion.div
-        className={cn('cursor-pointer text-muted-foreground p-1 relative flex items-center')}
+        className={cn(
+          "cursor-pointer text-muted-foreground p-1 relative flex items-center",
+        )}
         onClick={() => {
           setIsExpanded(!isExpanded);
         }}
@@ -40,7 +42,7 @@ export const Suggestion = ({
         <motion.div
           key={suggestion.id}
           className="relative bg-background p-3 flex flex-col gap-3 rounded-2xl border text-sm w-56 shadow-xl z-50"
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: -20 }}
           exit={{ opacity: 0, y: -10 }}

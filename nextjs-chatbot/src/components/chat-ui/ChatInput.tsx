@@ -1,40 +1,40 @@
-"use client"
+"use client";
 
-import { SendHorizontal } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { useCallback, useRef } from "react"
+import { SendHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useCallback, useRef } from "react";
 
 interface ChatInputProps {
-  disabled?: boolean
-  onSubmit: (value: string) => void
-  placeholder?: string
+  disabled?: boolean;
+  onSubmit: (value: string) => void;
+  placeholder?: string;
 }
 
 export function ChatInput({ disabled, onSubmit, placeholder }: ChatInputProps) {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = useCallback(
     (e: React.SyntheticEvent) => {
-      e.preventDefault()
-      const textArea = textAreaRef?.current
+      e.preventDefault();
+      const textArea = textAreaRef?.current;
       if (textArea && textArea.value.trim().length > 0) {
-        onSubmit(textArea.value)
-        textArea.value = ""
+        onSubmit(textArea.value);
+        textArea.value = "";
       }
     },
-    [onSubmit]
-  )
+    [onSubmit],
+  );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault()
-        handleSubmit(e)
+        e.preventDefault();
+        handleSubmit(e);
       }
     },
-    [handleSubmit]
-  )
+    [handleSubmit],
+  );
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-2 p-4 w-full max-w-3xl mx-auto ">
@@ -57,5 +57,5 @@ export function ChatInput({ disabled, onSubmit, placeholder }: ChatInputProps) {
         <span className="sr-only">Send message</span>
       </Button>
     </div>
-  )
+  );
 }

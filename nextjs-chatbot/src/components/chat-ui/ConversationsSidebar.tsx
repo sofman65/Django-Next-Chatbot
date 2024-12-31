@@ -9,6 +9,13 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useState } from 'react'
+
+import { MessageRole } from '@/types/MessageRoles'
+import { useEffect } from 'react'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+
 
 interface Conversation {
   id: string
@@ -24,6 +31,7 @@ interface ConversationsSidebarProps {
   className?: string
   isSidebarOpen?: boolean // Controls visibility on mobile
   closeSidebar?: () => void // Callback to close sidebar
+  fetchConversations: () => Promise<void>
 }
 
 export function ConversationsSidebar({
@@ -35,6 +43,28 @@ export function ConversationsSidebar({
   isSidebarOpen = false, // Default to closed
   closeSidebar, // Callback to close
 }: ConversationsSidebarProps) {
+
+    const [storedConversations, setStoredConversations] = useState<Conversation[]>([]);
+
+    useEffect(() => {
+        fetchConversations();
+    }, []);
+
+    const fetchConversations = async () => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/conversations`);
+            const data = await response.json();
+            if (data.conversations) {
+                setStoredConversations(data.conversations);
+            }
+        } catch (error) {
+            console.error("Error fetching conversations:", error);
+        }
+    };
+
+    
+
+
   return (
     <>
       {/* Sidebar */}
@@ -59,9 +89,9 @@ export function ConversationsSidebar({
         </div>
 
         {/* Conversation List */}
-        <div className="flex-1 overflow-auto p-2">
+        <div className=" p-2">
           <SidebarMenu>
-            {conversations.map((conversation) => (
+            {storedConversations.map((conversation) => (
               <SidebarMenuItem key={conversation.id}>
                 <SidebarMenuButton
                   asChild
@@ -88,7 +118,7 @@ export function ConversationsSidebar({
         </div>
 
         {/* Footer with User Settings */}
-        <div className="border-t border-white/10 p-2">
+        <div className="border-t absolute bottom-[70px]  border-white/10 p-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

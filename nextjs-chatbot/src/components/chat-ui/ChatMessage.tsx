@@ -1,14 +1,14 @@
-import { MessageRole } from "../../types/MessageRoles"
-import { cn } from "../../lib/utils"
-import { Bot, User } from 'lucide-react'
-import { CustomSkeleton } from "@/components/ui/CustomSkeleton"
-import { Markdown } from "@/components/ui/Markdown"
-import { CopyButton } from "../ui/copy-button"
+import { MessageRole } from "../../types/MessageRoles";
+import { cn } from "../../lib/utils";
+import { Bot, User } from "lucide-react";
+import { CustomSkeleton } from "@/components/ui/CustomSkeleton";
+import { Markdown } from "@/components/ui/Markdown";
+import { CopyButton } from "../ui/copy-button";
 
 interface ChatMessageProps {
-  role: MessageRole
-  message: string
-  isStreaming?: boolean
+  role: MessageRole;
+  message: string;
+  isStreaming?: boolean;
 }
 
 export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
@@ -17,13 +17,15 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
       className={cn(
         "flex w-full items-start gap-2 p-2 sm:gap-4 sm:p-4 rounded-lg backdrop-blur-sm",
         "bg-white/80",
-        "ml-4 sm:ml-6"
+        "ml-4 sm:ml-6",
       )}
     >
-      <div className={cn(
-        "flex size-6 sm:size-8 shrink-0 select-none items-center justify-center rounded-md border shadow",
-        "bg-[#3333CC] text-white"
-      )}>
+      <div
+        className={cn(
+          "flex size-6 sm:size-8 shrink-0 select-none items-center justify-center rounded-md border shadow",
+          "bg-[#3333CC] text-white",
+        )}
+      >
         {role === MessageRole.ASSISTANT ? (
           <Bot className="size-3 sm:size-4 text-white" />
         ) : (
@@ -43,7 +45,7 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
             <>
               <Markdown>{message}</Markdown>
               {role === MessageRole.ASSISTANT && message && !isStreaming && (
-                <CopyButton 
+                <CopyButton
                   value={message}
                   className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
                 />
@@ -53,8 +55,5 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
-

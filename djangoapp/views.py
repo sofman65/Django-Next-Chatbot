@@ -11,6 +11,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.views.decorators.csrf import csrf_exempt
+from .models import Conversation, Message, Role
 # Configure logger
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ class LoginView(APIView):
             return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=200)
         return Response({'error': 'Invalid credentials'}, status=400)
     
-    
+
 @csrf_exempt
 def index(request):
     """Handle user queries and stream chatbot answers progressively."""
@@ -119,6 +121,9 @@ def chat(request):
             body = json.loads(request.body)
             query = body.get("query", "")
             conversation_id = body.get("conversation_id")
+            model = body.get("model", "mistralai/Mistral-7B-Instruct-v0.3")  # Default to Mistral
+            provider = "huggingface" if model.startswith("mistralai") else "openai"  # Determine provider
+            logger.info(f"Chat endpoint called with model: {model}, provider: {provider}")
 
             if not query:
                 return JsonResponse({"error": "No query provided"}, status=400)
@@ -128,8 +133,7 @@ def chat(request):
                 conversation = Conversation.objects.create(
                     title=generate_title(query)
                 )
-                # Send the conversation ID in the first chunk
-                yield f"data: {json.dumps({'conversation_id': str(conversation.id)})}\n\n"
+                conversation_id = conversation.id
             else:
                 try:
                     conversation = Conversation.objects.get(id=conversation_id)
@@ -147,7 +151,7 @@ def chat(request):
                 """Stream tokens from the chatbot."""
                 response_content = []
                 try:
-                    for token in answer_query(query):
+                    for token in answer_query(query, model=model, provider=provider):
                         response_content.append(token.get('answer', ''))
                         yield f"data: {json.dumps(token)}\n\n"
                 except Exception as e:
@@ -175,6 +179,7 @@ def chat(request):
 
 
 
+
 @csrf_exempt
 def conversations(request):
     """Get all conversations."""
@@ -189,6 +194,31 @@ def conversations(request):
             for conv in conversations
         ]
     })
+
+@csrf_exempt
+def create_conversation(request):
+    """Create a new conversation."""
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            query = body.get("query", "")  # Optional query for title generation
+
+            # Generate title dynamically if a query is provided
+            title = generate_title(query) if query else "New Conversation"
+
+            # Create the conversation with the generated title
+            conversation = Conversation.objects.create(title=title)
+
+            return JsonResponse({
+                "id": conversation.id,
+                "title": conversation.title,
+                "createdAt": conversation.created_at.isoformat(),
+            }, status=201)
+        except Exception as e:
+            logger.error(f"Error creating conversation: {e}")
+            return JsonResponse({"error": "An error occurred while creating the conversation."}, status=500)
+
+    return JsonResponse({"error": "Invalid HTTP method."}, status=405)
 
 @csrf_exempt
 def conversation_detail(request, conversation_id):
@@ -214,3 +244,5 @@ def conversation_detail(request, conversation_id):
         })
     except Conversation.DoesNotExist:
         return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    

@@ -9,3 +9,12 @@ urlpatterns = [
     path('api/db/status', views.db_status, name='db_status'),
     path('api/db/build', views.build_db, name='build_db'),
 ]
+
+
+
+
+
+
+
+
+

@@ -7,12 +7,7 @@ export const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   const components = {
     code: ({ node, inline, className, children, ...props }: any) => {
       return (
-        <CodeBlock
-          node={node}
-          inline={inline}
-          className={className}
-          {...props}
-        >
+        <CodeBlock node={node} inline={inline} className={className} {...props}>
           {children}
         </CodeBlock>
       );
@@ -47,7 +42,10 @@ export const NonMemoizedMarkdown = ({ children }: { children: string }) => {
     },
     blockquote: ({ node, children, ...props }: any) => {
       return (
-        <blockquote className="border-l-4 border-gray-300 pl-4 italic" {...props}>
+        <blockquote
+          className="border-l-4 border-gray-300 pl-4 italic"
+          {...props}
+        >
           {children}
         </blockquote>
       );
@@ -81,7 +79,6 @@ export const NonMemoizedMarkdown = ({ children }: { children: string }) => {
         </a>
       );
     },
-    
 
     // img: ({ node, children, ...props }: any) => {
     //   return (
@@ -89,7 +86,6 @@ export const NonMemoizedMarkdown = ({ children }: { children: string }) => {
     //       {children}
     //     </Image>
     //   );
-    
   };
 
   return (

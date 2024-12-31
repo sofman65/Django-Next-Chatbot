@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { MessageSquare, Plus, User } from 'lucide-react'
+import { MessageSquare, Plus, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,24 +9,24 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useAuth } from "@/contexts/auth-context"
-import { SidebarActions } from "./sidebar-actions"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/auth-context";
+import { SidebarActions } from "./sidebar-actions";
 
 interface Conversation {
-  id: string
-  title: string
-  createdAt: string
+  id: string;
+  title: string;
+  createdAt: string;
 }
 
 interface AppSidebarProps {
-  conversations: Conversation[]
-  currentId?: string
-  onNewChat: () => void
-  onSelectConversation: (id: string) => void
-  className?: string
+  conversations: Conversation[];
+  currentId?: string;
+  onNewChat: () => void;
+  onSelectConversation: (id: string) => void;
+  className?: string;
 }
 
 export function AppSidebar({
@@ -34,12 +34,14 @@ export function AppSidebar({
   currentId,
   onNewChat,
   onSelectConversation,
-  className
+  className,
 }: AppSidebarProps) {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
-    <Sidebar className={cn("border-r border-[#3333CC]/20 bg-[#3333CC]", className)}>
+    <Sidebar
+      className={cn("border-r border-[#3333CC]/20 bg-[#3333CC]", className)}
+    >
       <SidebarHeader className="border-b border-white/10 p-2">
         <Button
           onClick={onNewChat}
@@ -59,9 +61,9 @@ export function AppSidebar({
                 isActive={currentId === conversation.id}
                 className={cn(
                   "w-full justify-start gap-2 text-white",
-                  currentId === conversation.id 
-                    ? "bg-white/20" 
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                  currentId === conversation.id
+                    ? "bg-white/20"
+                    : "text-white/80 hover:bg-white/10 hover:text-white",
                 )}
                 onClick={() => onSelectConversation(conversation.id)}
               >
@@ -78,6 +80,5 @@ export function AppSidebar({
         <SidebarActions />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
-

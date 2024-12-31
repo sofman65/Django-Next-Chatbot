@@ -1,11 +1,11 @@
-import { useEffect } from "react"
-import { ChatMessage } from "./ChatMessage"
-import type { Conversations } from "../../types"
+import { useEffect } from "react";
+import { ChatMessage } from "./ChatMessage";
+import type { Conversations } from "../../types";
 
 interface ChatConversationsProps {
-  conversations: Conversations
-  isQuerying: boolean
-  chatConversationsContainerRef: React.RefObject<HTMLDivElement>
+  conversations: Conversations;
+  isQuerying: boolean;
+  chatConversationsContainerRef: React.RefObject<HTMLDivElement>;
 }
 
 export function ChatConversations({
@@ -16,9 +16,9 @@ export function ChatConversations({
   useEffect(() => {
     if (chatConversationsContainerRef.current) {
       chatConversationsContainerRef.current.scrollTop =
-        chatConversationsContainerRef.current.scrollHeight
+        chatConversationsContainerRef.current.scrollHeight;
     }
-  }, [conversations, chatConversationsContainerRef])
+  }, [conversations, chatConversationsContainerRef]);
 
   return (
     <div className="flex w-full max-w-3xl flex-col space-y-4 ">
@@ -31,8 +31,5 @@ export function ChatConversations({
         />
       ))}
     </div>
-  )
+  );
 }
-
-
-

@@ -1,48 +1,64 @@
-'use client'
+"use client";
 
-import { User } from 'lucide-react'
+import { User, Settings, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function SidebarActions() {
-  return (  
-    <SidebarProvider>
-      <SidebarMenu className=" ">
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton className="h-10 bg-white/10 flex items-center gap-2">
-                <User className="h-5 w-5" />
-                <span className="truncate">User Settings</span>
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              side="top"
-              className="w-[--radix-popper-anchor-width]"
-            >
-              <DropdownMenuItem className="cursor-pointer hover:bg-white/10">
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarProvider>
-  )
-}
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton className="h-10 w-full justify-between bg-white/10 text-white hover:bg-white/20">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                <span className="truncate">
+                  {user?.username || "User Settings"}
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="top"
+            align="start"
+            className="w-[--radix-popper-anchor-width]"
+          >
+            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
