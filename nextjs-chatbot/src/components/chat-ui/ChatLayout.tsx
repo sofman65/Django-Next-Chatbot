@@ -32,7 +32,8 @@ const MODELS = [
 function ChatLayout() {
   const isMobile = useIsMobile();
   const { openMobile, setOpenMobile } = useSidebar();
-  const { accessToken, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const accessToken = localStorage.getItem('accessToken');
   const chatConversationsContainerRef = useRef<HTMLDivElement>(null);
   const [isQuerying, setIsQuerying] = useState<boolean>(false);
   const [currentConversationId, setCurrentConversationId] = useState<string>("");
@@ -49,20 +50,26 @@ function ChatLayout() {
 
   const [containerRef, endRef] = useScrollToBottom<HTMLDivElement>();
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
-
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/conversations`, {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch conversations");
+      }
+
       const data = await response.json();
       if (data.conversations) {
-        setStoredConversations(data.conversations);
+        const sortedConversations = data.conversations.sort(
+          (a: Conversation, b: Conversation) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setStoredConversations(sortedConversations);
       }
     } catch (error) {
       console.error("Error fetching conversations:", error);
@@ -70,7 +77,11 @@ function ChatLayout() {
         logout();
       }
     }
-  };
+  }, [accessToken, logout]);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [isAuthenticated, fetchConversations]);
 
   const createNewChat = useCallback(() => {
     setChatConversations([
@@ -92,6 +103,11 @@ function ChatLayout() {
           ...conversations,
           {
             id: (conversations.length + 1).toString(),
+            role: MessageRole.USER,
+            message: data,
+          },
+          {
+            id: (conversations.length + 2).toString(),
             role: MessageRole.ASSISTANT,
             message: "",
           },
@@ -184,23 +200,19 @@ function ChatLayout() {
         `${BACKEND_URL}/api/conversations/${conversationId}`,
         {
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
-        },
+        }
       );
-      if (response.status === 401) {
-        logout();
-        return;
+
+      if (!response.ok) {
+        throw new Error("Failed to load conversation");
       }
+
       const data = await response.json();
-      if (data.conversation?.messages) {
-        setChatConversations(
-          data.conversation.messages.map((msg: any) => ({
-            id: msg.id,
-            role: msg.role as MessageRole,
-            message: msg.content,
-          })),
-        );
+      if (data.messages) {
+        setChatConversations(data.messages);
         setCurrentConversationId(conversationId);
       }
     } catch (error) {
@@ -209,66 +221,69 @@ function ChatLayout() {
   };
 
   return (
-    <div className="flex-col md:flex-row lg: w-screen grid lg:grid-cols-[280px_1fr]">
-      <ConversationsSidebar
-        conversations={storedConversations}
-        currentId={currentConversationId}
-        onNewChat={createNewChat}
-        onSelectConversation={loadConversation}
-        className={cn(
-          "fixed inset-y-0 z-30 hidden md:block lg:block",
-          isMobile && (openMobile ? "block" : "hidden"),
-        )}
-        fetchConversations={fetchConversations}
-      />
-      <div className="flex flex-col w-full z-10">
-        <div className="flex items-center justify-between p-2">
-          <ChatHeader onNewChat={createNewChat} />
-          {isMobile && <SidebarToggle />}
-          <select
-            className="border rounded-md p-2 bg-white"
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-          >
-            {MODELS.map((model) => (
-              <option key={model.value} value={model.value}>
-                {model.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <main className="relative flex-1 nexi-gradient" ref={containerRef}>
-          <div
-            className="h-full flex-col overflow-y-auto py-4"
-            ref={chatConversationsContainerRef}
-          >
-            <div className="mx-auto w-full px-4">
-              <ChatConversations
-                conversations={chatConversations}
-                isQuerying={isQuerying}
-                chatConversationsContainerRef={chatConversationsContainerRef}
-              />
-            </div>
-            <div ref={endRef} />
-          </div>
-          <div className="absolute inset-x-0 bottom-0 bg-white/80 backdrop-blur-sm">
-            <div className="mx-auto w-full p-4">
-              <ChatInput
-                disabled={isQuerying}
-                onSubmit={handleSubmit}
-                placeholder="Ask me anything about Nexi Group..."
-              />
-            </div>
-          </div>
-        </main>
-      </div>
-      {isMobile && openMobile && (
-        <div
-          className="fixed inset-0 z-20 bg-black/50 transition-opacity md:hidden lg:hidden"
-          onClick={() => setOpenMobile(false)}
+   
+      <div className="flex-col md:flex-row lg: w-screen grid lg:grid-cols-[280px_1fr]">
+        <ConversationsSidebar
+          conversations={storedConversations}
+          currentId={currentConversationId}
+          onNewChat={createNewChat}
+          onSelectConversation={loadConversation}
+          className={cn(
+            "fixed inset-y-0 z-30 hidden md:block lg:block",
+            isMobile && (openMobile ? "block" : "hidden"),
+          )}
+          fetchConversations={fetchConversations}
         />
-      )}
-    </div>
+        <div className="flex flex-col w-full z-10">
+          <div className="flex items-center justify-between p-2">
+            <ChatHeader onNewChat={createNewChat} />
+            {isMobile && <SidebarToggle />}
+            <select
+              className="border rounded-md p-2 bg-white"
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+            >
+              {MODELS.map((model) => (
+                <option key={model.value} value={model.value}>
+                  {model.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <main className="relative flex-1 nexi-gradient" ref={containerRef}>
+            <div
+              className="h-full flex-col overflow-y-auto py-4"
+              ref={chatConversationsContainerRef}
+            >
+              <div className="mx-auto w-full px-4">
+                <ChatConversations
+                  conversations={chatConversations}
+                  isQuerying={isQuerying}
+                  chatConversationsContainerRef={chatConversationsContainerRef}
+                />
+              </div>
+              <div ref={endRef} />
+            </div>
+            {/* <div className="absolute inset-x-0 bottom-0 bg-white/80 backdrop-blur-sm"> */}
+              {/* Sticky Input */}
+              <div className="fixed bottom-0 left-0 right-0 z-10 bg-white p-4 shadow">
+                <ChatInput
+                  disabled={isQuerying}
+                  onSubmit={(value) => sendMessage(value)}
+                  placeholder="Type your message here..."
+                />
+              {/* </div> */}
+            </div>
+          </main>
+        </div>
+        {isMobile && openMobile && (
+          <div
+            className="fixed inset-0 z-20 bg-black/50 transition-opacity md:hidden lg:hidden"
+            onClick={() => setOpenMobile(false)}
+          />
+        )}
+      </div>
+
   );
 }
 

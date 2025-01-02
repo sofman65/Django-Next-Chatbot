@@ -1,150 +1,220 @@
-"use client";
+'use client';
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { User, AuthState, LoginCredentials, SignupCredentials } from '@/types/auth';
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import type {
-  AuthState,
-  LoginCredentials,
-  SignupCredentials,
-  User,
-} from "@/types/auth";
-
-interface AuthContextType extends AuthState {
+interface AuthContextType {
+  authState: AuthState;
   login: (credentials: LoginCredentials) => Promise<void>;
   signup: (credentials: SignupCredentials) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  isAuthenticated: boolean;
   isLoading: boolean;
 }
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [state, setState] = React.useState<AuthState>({
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [authState, setAuthState] = useState<AuthState>({
     user: null,
     accessToken: null,
     refreshToken: null,
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // Check for existing auth state on mount
-  React.useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    const user = localStorage.getItem("user");
-
-    if (accessToken && refreshToken && user) {
-      setState({
-        accessToken,
-        refreshToken,
-        user: JSON.parse(user),
-      });
+  const checkTokenExpiration = (token: string | null): boolean => {
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 > Date.now();
+    } catch (error) {
+      console.error('Token parsing error:', error);
+      return false;
     }
-  }, []);
+  };
 
-  const login = React.useCallback(
-    async (credentials: LoginCredentials) => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+  const refreshToken = useCallback(async () => {
+    try {
+      const newAccessToken = await fetch(`${BACKEND_URL}/api/auth/token/refresh/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: authState.refreshToken }),
+      }).then(res => {
+        if (!res.ok) throw new Error('Token refresh failed');
+        return res.json();
+      }).then(data => data.access);
+
+      setAuthState(prev => ({
+        ...prev,
+        accessToken: newAccessToken,
+      }));
+      localStorage.setItem('accessToken', newAccessToken);
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      throw error;
+    }
+  }, [authState.refreshToken]);
+
+  const logout = useCallback(async () => {
+    try {
+      if (authState.accessToken && checkTokenExpiration(authState.accessToken)) {
+        await fetch(`${BACKEND_URL}/api/auth/logout/`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authState.accessToken}`
           },
-          body: JSON.stringify(credentials),
+          body: JSON.stringify({ refresh: authState.refreshToken }),
         });
-
-        if (!response.ok) {
-          throw new Error("Login failed");
-        }
-
-        const data = await response.json();
-
-        // Store tokens and user data
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        setState({
-          accessToken: data.access,
-          refreshToken: data.refresh,
-          user: data.user,
-        });
-
-        router.push("/chat");
-      } catch (error) {
-        console.error("Login error:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
       }
-    },
-    [router],
-  );
-
-  const signup = React.useCallback(
-    async (credentials: SignupCredentials) => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/signup`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(credentials),
-        });
-
-        if (!response.ok) {
-          throw new Error("Signup failed");
-        }
-
-        // After successful signup, log the user in
-        await login({
-          username: credentials.username,
-          password: credentials.password,
-        });
-      } catch (error) {
-        console.error("Signup error:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [login],
-  );
-
-  const logout = React.useCallback(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    setState({
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    
+    setAuthState({
       user: null,
       accessToken: null,
       refreshToken: null,
     });
-    router.push("/login");
-  }, [router]);
+    
+    router.push('/login');
+  }, [authState, router]);
 
-  const value = React.useMemo(
-    () => ({
-      ...state,
-      login,
-      signup,
-      logout,
-      isLoading,
-    }),
-    [state, login, signup, logout, isLoading],
+  useEffect(() => {
+    if (!isLoading) return;
+    
+    const initAuth = async () => {
+      try {
+        setIsLoading(true);
+        const user = localStorage.getItem('user');
+        const accessToken = localStorage.getItem('accessToken');
+        const storedrefreshToken = localStorage.getItem('refreshToken');
+        
+        console.log('Initial auth check:', { user, accessToken, storedrefreshToken });
+        
+        if (user && accessToken && storedrefreshToken) {
+          if (checkTokenExpiration(accessToken)) {
+            const parsedUser = JSON.parse(user);
+            setAuthState({
+              user: parsedUser,
+              accessToken,
+              refreshToken: storedrefreshToken,
+            });
+          } else if (checkTokenExpiration(storedrefreshToken)) {
+            await refreshToken();
+          } else {
+            console.log('Tokens expired, logging out');
+            await logout();
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        await logout();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initAuth();
+  }, [logout, refreshToken, isLoading, setIsLoading]);
+
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${BACKEND_URL}/api/auth/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+    
+      const data = await response.json();
+      
+      if (!data.access || !data.refresh) {
+        throw new Error('Invalid token response');
+      }
+      
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('accessToken', data.access);
+      localStorage.setItem('refreshToken', data.refresh);
+      
+      setAuthState({
+        user: data.user,
+        accessToken: data.access,
+        refreshToken: data.refresh,
+      });
+    
+      console.log('Login successful, redirecting...');
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signup = async (credentials: SignupCredentials) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/signup/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Signup failed');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('accessToken', data.access);
+      localStorage.setItem('refreshToken', data.refresh);
+      
+      setAuthState({
+        user: data.user,
+        accessToken: data.access,
+        refreshToken: data.refresh,
+      });
+
+      router.push('/');
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
+  };
+
+  const isAuthenticated = !!authState.accessToken;
+
+  return (
+    <AuthContext.Provider value={{ 
+      authState, 
+      login, 
+      signup, 
+      logout, 
+      isAuthenticated,
+      isLoading
+    }}>
+      {children}
+    </AuthContext.Provider>
   );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const context = React.useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

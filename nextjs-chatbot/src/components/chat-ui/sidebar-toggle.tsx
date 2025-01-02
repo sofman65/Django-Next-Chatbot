@@ -15,7 +15,7 @@ export function SidebarToggle() {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
+        {/* <Button
           onClick={toggleSidebar}
           variant="ghost"
           size="icon"
@@ -23,7 +23,7 @@ export function SidebarToggle() {
         >
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Sidebar</span>
-        </Button>
+        </Button> */}
       </TooltipTrigger>
       <TooltipContent>Toggle Sidebar</TooltipContent>
     </Tooltip>
