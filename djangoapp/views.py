@@ -7,18 +7,31 @@ import threading
 import json
 import logging
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.views.decorators.csrf import csrf_exempt
 from .models import Conversation, Message, Role
+from rest_framework import status
+from rest_framework_simplejwt.exceptions import TokenError
 # Configure logger
 logger = logging.getLogger(__name__)
 
 #----- Authentication----
 
 User = get_user_model()
+
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'role': user.role.name if user.role else None,
+        })
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
@@ -48,6 +61,46 @@ class LoginView(APIView):
             return Response({'refresh': str(refresh), 'access': str(refresh.access_token)}, status=200)
         return Response({'error': 'Invalid credentials'}, status=400)
     
+class LogoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh')
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Successfully logged out"}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+
+
+
+class TokenRefreshView(APIView):
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+        
+        if not refresh_token:
+            return Response(
+                {'error': 'Refresh token is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            refresh = RefreshToken(refresh_token)
+            new_access_token = str(refresh.access_token)
+            
+            return Response({
+                'access': new_access_token
+            }, status=status.HTTP_200_OK)
+            
+        except TokenError as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
 
 @csrf_exempt
 def index(request):
@@ -245,4 +298,14 @@ def conversation_detail(request, conversation_id):
     except Conversation.DoesNotExist:
         return JsonResponse({'error': 'Conversation not found'}, status=404)
     
+    
+
+
+    
+
+
+    
+    
+
+
     
