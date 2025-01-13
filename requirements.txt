@@ -118,6 +118,7 @@ pdfplumber==0.11.4
 pi_heif==0.18.0
 pikepdf==9.2.1
 pillow==10.4.0
+pip-tools==7.4.1
 portalocker==2.10.1
 posthog==3.6.6
 proto-plus==1.24.0
@@ -189,6 +190,7 @@ uvloop==0.20.0
 watchfiles==0.24.0
 websocket-client==1.8.0
 websockets==13.1
+wheel==0.45.1
 wrapt==1.16.0
 yarl==1.13.0
 zipp==3.20.2
