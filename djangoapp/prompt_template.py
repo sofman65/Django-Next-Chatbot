@@ -1,6 +1,6 @@
 from langchain.prompts import PromptTemplate
 
-# Mistral Prompt Template
+# ---- Existing Prompt Templates (unchanged) ----
 mistral_prompt_template_str = """
 You are Nexi Group’s AI assistant. Use the following context if relevant, 
 but feel free to respond politely if the user is greeting you or asking about your identity.
@@ -20,7 +20,6 @@ Always answer in the language of the question and, if possible, cite your source
 Answer:
 """
 
-# OpenAI Prompt Template
 openai_prompt_template_str = """
 You are Nexi Group’s AI assistant. You must only use the provided context 
 for factual questions about Nexi’s products or services. 
@@ -44,7 +43,21 @@ Always answer in the question’s language and cite any relevant sources.
 Answer:
 """
 
-# Wrap Templates in PromptTemplate
+# ---- NEW: Refine Prompt Template ----
+refine_prompt_template_str = """
+You have the following draft answer:
+{draft_answer}
+
+Refine it using the following context (if relevant):
+{context}
+
+Return a new, improved, or more concise answer in the same language as the draft. 
+Keep the relevant citations if any, and ensure factual correctness.
+If context is insufficient, respond with: 
+"No relevant information found in the provided documents."
+"""
+
+# Wrap existing templates
 mistral_prompt_template = PromptTemplate(
     template=mistral_prompt_template_str,
     input_variables=["context", "question"]
@@ -53,4 +66,10 @@ mistral_prompt_template = PromptTemplate(
 openai_prompt_template = PromptTemplate(
     template=openai_prompt_template_str,
     input_variables=["context", "question"]
+)
+
+# Wrap refine template
+refine_prompt_template = PromptTemplate(
+    template=refine_prompt_template_str,
+    input_variables=["draft_answer", "context"]
 )
