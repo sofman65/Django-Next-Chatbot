@@ -32,8 +32,8 @@ const MODELS = [
 function ChatLayout() {
   const isMobile = useIsMobile();
   const { openMobile, setOpenMobile } = useSidebar();
-  const { isAuthenticated, logout } = useAuth();
-  const accessToken = localStorage.getItem('accessToken');
+  const { isAuthenticated, logout, authState } = useAuth();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const chatConversationsContainerRef = useRef<HTMLDivElement>(null);
   const [isQuerying, setIsQuerying] = useState<boolean>(false);
   const [currentConversationId, setCurrentConversationId] = useState<string>("");
@@ -55,7 +55,7 @@ function ChatLayout() {
       const response = await fetch(`${BACKEND_URL}/api/conversations`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${authState.accessToken}`,
         },
       });
 
@@ -77,11 +77,16 @@ function ChatLayout() {
         logout();
       }
     }
-  }, [accessToken, logout]);
+  }, [authState.accessToken, logout]);
 
   useEffect(() => {
-    fetchConversations();
-  }, [isAuthenticated, fetchConversations]);
+    if (accessToken) {
+      const token = localStorage.getItem('accessToken');
+      setAccessToken(token);
+      fetchConversations();
+    }
+  }, [accessToken, fetchConversations]);
+
 
   const createNewChat = useCallback(() => {
     setChatConversations([

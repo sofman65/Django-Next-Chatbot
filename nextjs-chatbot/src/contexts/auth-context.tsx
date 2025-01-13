@@ -1,12 +1,23 @@
 'use client';
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, AuthState, LoginCredentials, SignupCredentials } from '@/types/auth';
+
+interface User {
+  id: number;
+  username: string;
+  role: string | null;
+}
+
+interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+}
 
 interface AuthContextType {
   authState: AuthState;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  signup: (credentials: SignupCredentials) => Promise<void>;
+  login: (credentials: { username: string; password: string }) => Promise<void>;
+  signup: (credentials: { username: string; password: string; role_name: string }) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -25,107 +36,69 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const checkTokenExpiration = (token: string | null): boolean => {
-    if (!token) return false;
+  const initAuth = useCallback(async () => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch (error) {
-      console.error('Token parsing error:', error);
-      return false;
-    }
-  };
+      const user = localStorage.getItem('user');
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
 
-  const refreshToken = useCallback(async () => {
-    try {
-      const newAccessToken = await fetch(`${BACKEND_URL}/api/auth/token/refresh/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh: authState.refreshToken }),
-      }).then(res => {
-        if (!res.ok) throw new Error('Token refresh failed');
-        return res.json();
-      }).then(data => data.access);
+      // Debugging: Log the retrieved values
+      console.log('Auth data from storage:', { user, accessToken, refreshToken });
 
-      setAuthState(prev => ({
-        ...prev,
-        accessToken: newAccessToken,
-      }));
-      localStorage.setItem('accessToken', newAccessToken);
-    } catch (error) {
-      console.error('Token refresh error:', error);
-      throw error;
-    }
-  }, [authState.refreshToken]);
-
-  const logout = useCallback(async () => {
-    try {
-      if (authState.accessToken && checkTokenExpiration(authState.accessToken)) {
-        await fetch(`${BACKEND_URL}/api/auth/logout/`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authState.accessToken}`
-          },
-          body: JSON.stringify({ refresh: authState.refreshToken }),
+      // Check if this is a fresh session (all values null)
+      if (user === null && accessToken === null && refreshToken === null) {
+        console.log('Fresh session detected - no auth data in storage');
+        setAuthState({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
         });
+        return;
       }
+
+      // Check if any required token is missing or invalid
+      if (!user || user === 'undefined' || !accessToken || accessToken === 'undefined' || !refreshToken || refreshToken === 'undefined') {
+        console.warn('Missing or invalid auth data in storage - clearing potentially corrupted data');
+        // Clear any potentially corrupted data
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setAuthState({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+        });
+        return;
+      }
+
+      // If we have valid data, set the auth state
+      setAuthState({
+        user: JSON.parse(user),
+        accessToken,
+        refreshToken,
+      });
+
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Auth initialization error:', error);
+      // Clear invalid data from storage
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setAuthState({
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    localStorage.removeItem('user');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    
-    setAuthState({
-      user: null,
-      accessToken: null,
-      refreshToken: null,
-    });
-    
-    router.push('/login');
-  }, [authState, router]);
+  }, []);
 
   useEffect(() => {
-    if (!isLoading) return;
-    
-    const initAuth = async () => {
-      try {
-        setIsLoading(true);
-        const user = localStorage.getItem('user');
-        const accessToken = localStorage.getItem('accessToken');
-        const storedrefreshToken = localStorage.getItem('refreshToken');
-        
-        console.log('Initial auth check:', { user, accessToken, storedrefreshToken });
-        
-        if (user && accessToken && storedrefreshToken) {
-          if (checkTokenExpiration(accessToken)) {
-            const parsedUser = JSON.parse(user);
-            setAuthState({
-              user: parsedUser,
-              accessToken,
-              refreshToken: storedrefreshToken,
-            });
-          } else if (checkTokenExpiration(storedrefreshToken)) {
-            await refreshToken();
-          } else {
-            console.log('Tokens expired, logging out');
-            await logout();
-          }
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        await logout();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     initAuth();
-  }, [logout, refreshToken, isLoading, setIsLoading]);
+  }, [initAuth]);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials: { username: string; password: string }) => {
     try {
       setIsLoading(true);
       const response = await fetch(`${BACKEND_URL}/api/auth/login/`, {
@@ -133,30 +106,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
-      
+
       if (!response.ok) {
         throw new Error('Login failed');
       }
-    
+
       const data = await response.json();
-      
-      if (!data.access || !data.refresh) {
-        throw new Error('Invalid token response');
-      }
       
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('accessToken', data.access);
       localStorage.setItem('refreshToken', data.refresh);
-      
+
       setAuthState({
         user: data.user,
         accessToken: data.access,
         refreshToken: data.refresh,
       });
-    
-      console.log('Login successful, redirecting...');
+
       router.push('/');
-      router.refresh();
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -165,32 +132,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (credentials: SignupCredentials) => {
+  const signup = async (credentials: { username: string; password: string; role_name: string }) => {
     try {
+      setIsLoading(true);
       const response = await fetch(`${BACKEND_URL}/api/auth/signup/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
-      
+
       if (!response.ok) {
         throw new Error('Signup failed');
       }
 
-      const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('accessToken', data.access);
-      localStorage.setItem('refreshToken', data.refresh);
-      
-      setAuthState({
-        user: data.user,
-        accessToken: data.access,
-        refreshToken: data.refresh,
+      // Automatically login after successful signup
+      await login({
+        username: credentials.username,
+        password: credentials.password,
       });
-
-      router.push('/');
     } catch (error) {
       console.error('Signup error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const refreshToken = authState.refreshToken;
+      if (refreshToken) {
+        await fetch(`${BACKEND_URL}/api/auth/logout/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+      }
+
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
+      setAuthState({
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+      });
+
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = authState.refreshToken;
+      if (!refreshToken) throw new Error('No refresh token available');
+
+      const response = await fetch(`${BACKEND_URL}/api/auth/token/refresh/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+
+      if (!response.ok) throw new Error('Token refresh failed');
+
+      const data = await response.json();
+      
+      localStorage.setItem('accessToken', data.access);
+      setAuthState(prev => ({
+        ...prev,
+        accessToken: data.access,
+      }));
+
+      return data.access;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      await logout();
       throw error;
     }
   };
