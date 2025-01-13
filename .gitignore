@@ -47,3 +47,6 @@ pyenv.cfg
 
 node_modules/
 
+#evaluation
+evaluation.py
+

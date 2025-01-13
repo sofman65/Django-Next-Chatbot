@@ -12,8 +12,8 @@ from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
 
-# Import your existing prompt templates
-from .prompt_template import (
+# Import your existing prompt templates from the prompt_templates directory
+from djangoapp.prompt_templates.prompt_template import (
     mistral_prompt_template,
     openai_prompt_template,
     refine_prompt_template
@@ -120,7 +120,7 @@ def answer_query(query, model="mistralai/Mistral-7B-Instruct-v0.3", provider="hu
 
     # --- 2) Retrieve context from Chroma ---
     db = get_db()
-    retriever = db.as_retriever(search_kwargs={"k": 14, "score_threshold": 0.4})
+    retriever = db.as_retriever(search_kwargs={"k": 14})
     relevant_docs = retriever.invoke(query)
 
     if not relevant_docs:
@@ -210,7 +210,11 @@ def run_llm_stream(prompt, model, provider):
 
 
 def mistral_stream_inference(prompt, model, temperature=0.7):
-    """Streaming pass with Hugging Face for refined answer."""
+    """
+    Stream the final answer from a Hugging Face Mistral model,
+    accumulating tokens and yielding once at the end.
+    This avoids cutting off after each period.
+    """
     try:
         messages = [{"role": "user", "content": prompt}]
         response = hf_client.chat_completion(
@@ -222,23 +226,19 @@ def mistral_stream_inference(prompt, model, temperature=0.7):
         )
 
         accumulated_text = ""
-        previous_token = None
         for chunk in response:
-            token = chunk.choices[0].delta.content
-            if token and token != previous_token:
+            token = chunk.choices[0].delta.content if chunk.choices[0].delta.content else ""
+            if token:
                 accumulated_text += token
-                if token.endswith("."):
-                    yield {"answer": accumulated_text.strip()}
-                    accumulated_text = ""
-                previous_token = token
 
-        if accumulated_text:
-            yield {"answer": accumulated_text.strip()}
+        # After all chunks are processed, yield whatever is accumulated
+        final_text = accumulated_text.strip()
+        if final_text:
+            yield {"answer": final_text}
 
     except Exception as e:
         logger.error(f"Error during Mistral streaming: {e}")
-        yield {"answer": "An error occurred while processing the refined query."}
-
+        yield {"answer": "An error occurred while processing the query."}
 
 def openai_stream_inference(prompt, model, temperature=0.7):
     """Streaming pass with OpenAI for refined answer."""
