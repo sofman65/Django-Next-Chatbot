@@ -240,11 +240,10 @@ function ChatLayout() {
       />
 
       {/* Main Content */}
-      <div
-        className="
-flex flex-1 flex-col h-full min-w-0
-"
-      >
+      <div className="
+  flex flex-1 flex-col h-full min-w-0
+">
+        {/* Header + Model Select */}
         <div className="flex items-center justify-between border-b p-4 bg-white">
           <ChatHeader onNewChat={createNewChat} />
           <select
@@ -260,24 +259,40 @@ flex flex-1 flex-col h-full min-w-0
           </select>
         </div>
 
+        {/* Chat Area */}
         <main
-          className="flex-1 h-full w-full overflow-hidden relative "
           ref={containerRef}
+          className="flex-1 h-full w-full overflow-hidden relative"
         >
-          <div className="absolute inset-0 overflow-y-auto py-4 px-4" ref={chatConversationsContainerRef}>
-            <ChatConversations
-              conversations={chatConversations}
-              isQuerying={isQuerying}
-              chatConversationsContainerRef={chatConversationsContainerRef}
-            />
-            <div ref={endRef} className="h-32" /> {/* Padding for input */}
-          </div>
+          <div className="absolute inset-0 flex flex-col justify-between">
+            {/* Messages (scrollable, centered) */}
+            <div
+              ref={chatConversationsContainerRef}
+              className="overflow-y-auto py-4 px-4 w-full max-w-3xl mx-auto flex-1"
+            >
+              <ChatConversations
+                conversations={chatConversations}
+                isQuerying={isQuerying}
+                chatConversationsContainerRef={chatConversationsContainerRef}
+              />
+              <div ref={endRef} className="h-32" />
+            </div>
 
-          <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t">
-            <ChatInput disabled={isQuerying} onSubmit={sendMessage} placeholder="Type your message here..." />
+            {/* Input (centered under messages) */}
+            <div className="w-full bg-white/80 backdrop-blur-sm border-t">
+              <div className="max-w-3xl mx-auto">
+                <ChatInput
+                  disabled={isQuerying}
+                  onSubmit={sendMessage}
+                  placeholder="Type your message here..."
+                />
+              </div>
+            </div>
           </div>
         </main>
       </div>
+
+
 
       {/* Mobile Overlay */}
       {isMobile && openMobile && (
