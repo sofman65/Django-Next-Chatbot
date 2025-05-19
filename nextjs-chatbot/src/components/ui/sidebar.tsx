@@ -150,6 +150,19 @@ const SidebarProvider = React.forwardRef<
             }
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              "group/sidebar-wrapper flex min-h-svh w-full",
+
+              /* Light mode gradient: */
+              "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100",
+
+              /* Dark mode gradient: */
+              "dark:from-gray-900 dark:via-gray-800 dark:to-gray-700",
+
+              /* (optional) fall back to full-viewport height everywhere */
+              "min-h-screen",
+
+              /* you can drop the old inset-bg if you like */
+              // "has-[[data-variant=inset]]:bg-sidebar",
               className,
             )}
             ref={ref}
@@ -622,7 +635,7 @@ const SidebarMenuAction = React.forwardRef<
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
+        "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className,
       )}
       {...props}

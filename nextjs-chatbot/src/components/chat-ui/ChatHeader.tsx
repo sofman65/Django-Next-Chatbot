@@ -34,7 +34,7 @@ export function ChatHeader({ onNewChat }: ChatHeaderProps) {
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
       ) : (
-        <div className={cn("flex-1 flex items-center", "justify-start")}>
+        <div className="flex-1 flex items-center justify-start">
           <Image
             src="/NexiLogo.png"
             alt="Nexi Group Logo"

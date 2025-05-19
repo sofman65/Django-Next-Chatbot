@@ -66,7 +66,7 @@ function ChatLayout() {
       const data = await response.json();
       if (data.conversations) {
         const sortedConversations = data.conversations.sort(
-          (a: Conversation, b: Conversation) => 
+          (a: Conversation, b: Conversation) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setStoredConversations(sortedConversations);
@@ -226,70 +226,66 @@ function ChatLayout() {
   };
 
   return (
-   
-      <div className="flex-col md:flex-row lg: w-screen grid lg:grid-cols-[280px_1fr]">
-        <ConversationsSidebar
-          conversations={storedConversations}
-          currentId={currentConversationId}
-          onNewChat={createNewChat}
-          onSelectConversation={loadConversation}
-          className={cn(
-            "fixed inset-y-0 z-30 hidden md:block lg:block",
-            isMobile && (openMobile ? "block" : "hidden"),
-          )}
-          fetchConversations={fetchConversations}
-        />
-        <div className="flex flex-col w-full z-10">
-          <div className="flex items-center justify-between p-2">
-            <ChatHeader onNewChat={createNewChat} />
-            {isMobile && <SidebarToggle />}
-            <select
-              className="border rounded-md p-2 bg-white"
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-            >
-              {MODELS.map((model) => (
-                <option key={model.value} value={model.value}>
-                  {model.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <main className="relative flex-1 nexi-gradient" ref={containerRef}>
-            <div
-              className="h-full flex-col overflow-y-auto py-4"
-              ref={chatConversationsContainerRef}
-            >
-              <div className="mx-auto w-full px-4">
-                <ChatConversations
-                  conversations={chatConversations}
-                  isQuerying={isQuerying}
-                  chatConversationsContainerRef={chatConversationsContainerRef}
-                />
-              </div>
-              <div ref={endRef} />
-            </div>
-            {/* <div className="absolute inset-x-0 bottom-0 bg-white/80 backdrop-blur-sm"> */}
-              {/* Sticky Input */}
-              <div className="fixed bottom-0 left-0 right-0 z-10 bg-white p-4 shadow">
-                <ChatInput
-                  disabled={isQuerying}
-                  onSubmit={(value) => sendMessage(value)}
-                  placeholder="Type your message here..."
-                />
-              {/* </div> */}
-            </div>
-          </main>
+    <div className="flex h-screen overflow-hidden w-screen">
+      {/* Sidebar */}
+      <ConversationsSidebar
+        conversations={storedConversations}
+        currentId={currentConversationId}
+        onNewChat={createNewChat}
+        onSelectConversation={loadConversation}
+        className={cn("w-[280px] border-r", isMobile ? "fixed inset-y-0 z-50" : "")}
+        isSidebarOpen={openMobile}
+        closeSidebar={() => setOpenMobile(false)}
+        fetchConversations={fetchConversations}
+      />
+
+      {/* Main Content */}
+      <div
+        className="
+flex flex-1 flex-col h-full min-w-0
+"
+      >
+        <div className="flex items-center justify-between border-b p-4 bg-white">
+          <ChatHeader onNewChat={createNewChat} />
+          <select
+            className="border rounded-md p-2 bg-white"
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+          >
+            {MODELS.map((model) => (
+              <option key={model.value} value={model.value}>
+                {model.label}
+              </option>
+            ))}
+          </select>
         </div>
-        {isMobile && openMobile && (
-          <div
-            className="fixed inset-0 z-20 bg-black/50 transition-opacity md:hidden lg:hidden"
-            onClick={() => setOpenMobile(false)}
-          />
-        )}
+
+        <main
+          className="flex-1 h-full w-full overflow-hidden relative "
+          ref={containerRef}
+        >
+          <div className="absolute inset-0 overflow-y-auto py-4 px-4" ref={chatConversationsContainerRef}>
+            <ChatConversations
+              conversations={chatConversations}
+              isQuerying={isQuerying}
+              chatConversationsContainerRef={chatConversationsContainerRef}
+            />
+            <div ref={endRef} className="h-32" /> {/* Padding for input */}
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t">
+            <ChatInput disabled={isQuerying} onSubmit={sendMessage} placeholder="Type your message here..." />
+          </div>
+        </main>
       </div>
 
-  );
+      {/* Mobile Overlay */}
+      {isMobile && openMobile && (
+        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setOpenMobile(false)} />
+      )}
+    </div>
+  )
 }
 
-export default ChatLayout;
+export default ChatLayout
+
