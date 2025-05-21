@@ -1,8 +1,5 @@
-"use client";
-
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
-import { useSidebar } from "@/components/ui/sidebar";
 import { UserMenu } from "./UserMenu";
 
 interface ChatHeaderProps {
@@ -11,27 +8,24 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ onToggleSidebar, isSidebarOpen }: ChatHeaderProps) {
-  // Show hamburger or close only on mobile
   return (
-    <header className="w-full border-b bg-white">
+    <header className="w-full border-b bg-white shadow-sm dark:bg-[#3333CC] dark:border-[#3333CC]/20">
       <div className="flex items-center h-16 px-4">
-        {/* Left: Hamburger/Close icon for mobile */}
-        <div className="w-10 flex justify-start">
-          <button
-            className="lg:hidden flex items-center justify-center rounded hover:bg-[#3333CC]/10"
-            onClick={onToggleSidebar}
-            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-          >
-            {isSidebarOpen ? (
-              <X className="h-6 w-6 text-[#3333CC]" />
-            ) : (
-              <Menu className="h-6 w-6 text-[#3333CC]" />
-            )}
-          </button>
-        </div>
+        {/* Hamburger/Close icon - always visible */}
+        <button
+          className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#3333CC]/10"
+          onClick={onToggleSidebar}
+          aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+        >
+          {isSidebarOpen ? (
+            <X className="h-6 w-6 text-[#3333CC]" />
+          ) : (
+            <Menu className="h-6 w-6 text-[#3333CC]" />
+          )}
+        </button>
 
         {/* Center: Logo */}
-        <div className="flex-1 flex justify-center pointer-events-none">
+        <div className="flex-1 flex justify-center">
           <Image
             src="/NexiLogo.png"
             alt="Nexi Group Logo"
@@ -42,7 +36,7 @@ export function ChatHeader({ onToggleSidebar, isSidebarOpen }: ChatHeaderProps) 
           />
         </div>
 
-        {/* Right: User */}
+        {/* Right: User menu */}
         <div className="w-32 flex justify-end">
           <UserMenu />
         </div>

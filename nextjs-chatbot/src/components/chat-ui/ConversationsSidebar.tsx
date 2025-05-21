@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Plus } from "lucide-react";
+import { MessageSquare, Plus, X } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile"; // <-- Import your hook here
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -38,6 +39,7 @@ export function ConversationsSidebar({
   closeSidebar,
 }: ConversationsSidebarProps) {
   const [storedConversations, setStoredConversations] = useState<Conversation[]>(conversations);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setStoredConversations(conversations);
@@ -49,25 +51,36 @@ export function ConversationsSidebar({
         className={cn(
           "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-[#3333CC]/20 bg-[#3333CC] text-white transition-transform duration-300 ease-in-out",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:relative lg:translate-x-0",
           className
         )}
       >
-        {/* New Chat at the top */}
-        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2">
+        {/* Top Bar: Plus and X */}
+        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2 justify-between">
+          {/* New Chat (Plus) */}
           <Button
             onClick={() => {
               onNewChat();
-              if (closeSidebar) closeSidebar(); // also close sidebar on mobile after click
+              if (isMobile && closeSidebar) closeSidebar();
             }}
             variant="ghost"
-            className="w-full justify-start gap-2 text-white hover:bg-white/10"
+            className="gap-2 text-white hover:bg-white/10"
           >
             <Plus className="h-5 w-5" />
-            New Chat
           </Button>
+          {/* X Button (close, mobile only) */}
+          {closeSidebar && (
+            <Button
+              onClick={closeSidebar}
+              variant="ghost"
+              className="text-white hover:bg-white/10 ml-auto"
+              aria-label="Close sidebar"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
         </div>
 
+        {/* Conversations List */}
         <div className="flex-1 overflow-y-auto">
           <SidebarMenu>
             {storedConversations.map((conversation) => (
@@ -83,7 +96,7 @@ export function ConversationsSidebar({
                   )}
                   onClick={() => {
                     onSelectConversation(conversation.id);
-                    if (closeSidebar) closeSidebar();
+                    if (isMobile && closeSidebar) closeSidebar();
                   }}
                 >
                   <div className="flex items-center gap-2">
@@ -96,13 +109,17 @@ export function ConversationsSidebar({
           </SidebarMenu>
         </div>
       </div>
-      {/* Overlay for mobile */}
-      {isSidebarOpen && (
+
+      {/* Mobile overlay */}
+      {isSidebarOpen && isMobile && (
         <div
           className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           onClick={closeSidebar}
+          aria-label="Close sidebar"
         />
       )}
     </>
   );
 }
+
+export default ConversationsSidebar;

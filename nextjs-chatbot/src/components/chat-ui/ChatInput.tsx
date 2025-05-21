@@ -56,7 +56,7 @@ export function ChatInput({
   return (
     <form
       className={cn(
-        "w-full flex justify-center sticky bottom-0 z-10 px-2 pb-10 "
+        "w-full flex justify-center sticky bottom-0 z-10 px-2 pb-10"
       )}
       style={{ backdropFilter: "blur(8px)" }}
       onSubmit={handleSubmit}
