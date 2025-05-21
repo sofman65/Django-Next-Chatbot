@@ -12,7 +12,6 @@ import { useAuth } from "@/contexts/auth-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToBottom } from "@/hooks/useScrollToBottom";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import "@/styles/gradients.css";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -23,11 +22,10 @@ type Conversation = {
   createdAt: string;
 };
 
-const MODELS = [
-  { label: "Mistral-7B", value: "mistralai/Mistral-7B-Instruct-v0.3" },
-  { label: "GPT-3.5 Turbo", value: "gpt-3.5-turbo" },
-  { label: "GPT-4", value: "gpt-4" },
-];
+
+
+
+
 
 export default function ChatLayout() {
   const isMobile = useIsMobile();
@@ -45,11 +43,16 @@ export default function ChatLayout() {
   ]);
   const [currentConversationId, setCurrentConversationId] = useState<string>("");
   const [isQuerying, setIsQuerying] = useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState(MODELS[2].value);
+
 
   const chatConversationsContainerRef = useRef<HTMLDivElement>(null);
   const [containerRef, endRef] = useScrollToBottom<HTMLDivElement>();
-
+  const MODELS = [
+    { label: "Mistral-7B", value: "mistralai/Mistral-7B-Instruct-v0.3" },
+    { label: "GPT-3.5 Turbo", value: "gpt-3.5-turbo" },
+    { label: "GPT-4", value: "gpt-4" },
+  ];
+  const [selectedModel, setSelectedModel] = useState(MODELS[0].value);
 
 
   // fetchWithAuth helper
@@ -193,23 +196,7 @@ export default function ChatLayout() {
     [currentConversationId, fetchWithAuth, logout, selectedModel]
   );
 
-  // const handleSubmit = useCallback(
-  //   (value: string) => {
-  //     setIsQuerying(true);
-  //     setChatConversations((conversations) => [
-  //       ...conversations,
-  //       {
-  //         id: (conversations.length + 1).toString(),
-  //         role: MessageRole.USER,
-  //         message: value,
-  //       },
-  //     ]);
-  //     sendMessage(value).finally(() => {
-  //       setIsQuerying(false);
-  //     });
-  //   },
-  //   [sendMessage]
-  // );
+
 
   const loadConversation = useCallback(
     async (id: string) => {
@@ -293,69 +280,62 @@ export default function ChatLayout() {
         currentId={currentConversationId}
         onNewChat={createNewChat}
         onSelectConversation={loadConversation}
-        className="w-[280px] border-r lg:relative fixed inset-y-0 z-50 lg:inset-auto lg:z-auto"
+        className="w-[280px] border-r"
         isSidebarOpen={openMobile}
         closeSidebar={() => setOpenMobile(false)}
       />
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col h-full min-w-0">
-        {/* Header + Model Select */}
-        <div className="flex items-center justify-between border-b p-4 bg-white">
-          <ChatHeader onNewChat={createNewChat} />
-          <select
-            className="border rounded-md p-2 bg-white"
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-          >
-            {MODELS.map((model) => (
-              <option key={model.value} value={model.value}>
-                {model.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Header */}
+        <ChatHeader
+          onToggleSidebar={() => setOpenMobile(!openMobile)}
+          isSidebarOpen={openMobile}
+        />
 
         {/* Chat Area */}
         <main
           ref={containerRef}
-          className="flex-1 h-full w-full overflow-hidden relative"
+          className="flex-1 h-full w-full flex flex-col overflow-hidden" // <-- key changes here
         >
-          <div className="absolute inset-0 flex flex-col justify-between">
-            {/* Messages (scrollable, centered) */}
-            <div
-              ref={chatConversationsContainerRef}
-              className="overflow-y-auto py-4 px-2 md:px-4 w-full max-w-3xl mx-auto flex-1"
-            >
-              <ChatConversations
-                conversations={chatConversations}
-                isQuerying={isQuerying}
-                chatConversationsContainerRef={chatConversationsContainerRef}
-              />
-              <div ref={endRef} className="h-32" />
-            </div>
+          {/* Messages (scrollable, centered) */}
+          <div
+            ref={chatConversationsContainerRef}
+            className="flex-1 overflow-y-auto py-4 px-2 md:px-4 w-full max-w-3xl mx-auto custom-scrollbar"
+          >
+            <ChatConversations
+              conversations={chatConversations}
+              isQuerying={isQuerying}
+              chatConversationsContainerRef={chatConversationsContainerRef}
+            />
+            <div ref={endRef} className="h-32" />
+          </div>
 
-            {/* Input (centered under messages) */}
-            <div className="w-full bg-white/80 backdrop-blur-sm border-t">
-              <div className="max-w-3xl mx-auto">
-                <ChatInput
-                  disabled={isQuerying}
-                  onSubmit={sendMessage}
-                  placeholder="Type your message here..."
-                />
-              </div>
+          {/* Input (centered under messages) */}
+          <div className="w-full ">
+            <div className="max-w-3xl mx-auto">
+              <ChatInput
+                disabled={isQuerying}
+                onSubmit={sendMessage}
+                placeholder="Type your message here..."
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                models={MODELS}
+
+              />
             </div>
           </div>
         </main>
+
       </div>
 
       {/* Mobile Overlay */}
-      {isMobile && openMobile && (
+      {/* {isMobile && openMobile && (
         <div
           className="fixed inset-0 z-40 bg-black/50"
           onClick={() => setOpenMobile(false)}
         />
-      )}
+      )} */}
     </div>
   );
 }

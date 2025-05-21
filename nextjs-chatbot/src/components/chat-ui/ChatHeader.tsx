@@ -1,50 +1,52 @@
 "use client";
 
-import { Plus, Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
-import { SidebarToggle } from "./sidebar-toggle";
+import { UserMenu } from "./UserMenu";
 
 interface ChatHeaderProps {
-  onNewChat: () => void;
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
-export function ChatHeader({ onNewChat }: ChatHeaderProps) {
-  const { toggleSidebar } = useSidebar();
-  // We’ll show the mobile menu on anything below 'lg' (1024px)
-  const showHamburger = useIsMobile() || typeof window !== 'undefined' && window.innerWidth < 1024;
-
+export function ChatHeader({ onToggleSidebar, isSidebarOpen }: ChatHeaderProps) {
+  // Show hamburger or close only on mobile
   return (
-    <header className="sticky top-0 z-50 flex items-center border-b bg-white px-4 shadow">
-      {showHamburger ? (
-        <Button
-          onClick={toggleSidebar}
-          variant="ghost"
-          size="icon"
-          className="text-[#3333CC] hover:bg-[#3333CC]/10"
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
-      ) : (
-        <div className="flex-1 flex items-center justify-start">
+    <header className="w-full border-b bg-white">
+      <div className="flex items-center h-16 px-4">
+        {/* Left: Hamburger/Close icon for mobile */}
+        <div className="w-10 flex justify-start">
+          <button
+            className="lg:hidden flex items-center justify-center rounded hover:bg-[#3333CC]/10"
+            onClick={onToggleSidebar}
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            {isSidebarOpen ? (
+              <X className="h-6 w-6 text-[#3333CC]" />
+            ) : (
+              <Menu className="h-6 w-6 text-[#3333CC]" />
+            )}
+          </button>
+        </div>
+
+        {/* Center: Logo */}
+        <div className="flex-1 flex justify-center pointer-events-none">
           <Image
             src="/NexiLogo.png"
             alt="Nexi Group Logo"
-            width={80}
-            height={30}
+            width={110}
+            height={32}
             className="h-8 w-auto"
+            priority
           />
         </div>
-      )}
+
+        {/* Right: User */}
+        <div className="w-32 flex justify-end">
+          <UserMenu />
+        </div>
+      </div>
     </header>
   );
 }
