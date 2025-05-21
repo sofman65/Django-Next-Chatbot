@@ -41,7 +41,43 @@ export function ChatInput({ disabled, onSubmit, placeholder }: ChatInputProps) {
       <Textarea
         ref={textAreaRef}
         placeholder={placeholder ?? "Type your message..."}
-        className="min-h-[60px] w-full resize-none rounded-lg border focus-visible:ring-1"
+        className="min-h-[60px] w-full resize-none rounded-lg border focus-visible:ring-1 bg-cover  backdrop-blur-sm border-[#3333CC]/20 focus-visible:border-[#3333CC] focus-visible:ring-[#3333CC] focus-visible:ring-opacity-50 text-black placeholder:text-[#3333CC]/50"
+        onFocus={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onInput={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onChange={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onPaste={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onCut={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onCompositionStart={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onCompositionEnd={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
+        onFocusCapture={(e) => {
+          e.currentTarget.style.height = "auto";
+          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+        }}
         onKeyDown={handleKeyDown}
         disabled={disabled}
         rows={1}

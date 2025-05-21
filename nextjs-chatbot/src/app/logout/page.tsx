@@ -1,31 +1,30 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function LogoutPage() {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const didRunOnce = useRef(false);
 
   useEffect(() => {
-    const performLogout = async () => {
-      await logout();
-      router.push('/login');
-    };
-
-    if (isAuthenticated) {
-      performLogout();
-    } else {
-      router.push('/login');
+    // Only trigger logout once
+    if (!didRunOnce.current && isAuthenticated && !isLoading) {
+      didRunOnce.current = true;
+      logout();
+      // don't redirect here: let auth-context.tsx handle clearing state
     }
-  }, [logout, isAuthenticated, router]);
+    // After state is cleared, redirect to login if not authenticated and not loading
+    if (!isAuthenticated && !isLoading) {
+      router.replace('/login');
+    }
+  }, [logout, isAuthenticated, isLoading, router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Logging out...</h1>
-      </div>
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-2xl font-bold">Logging out...</h1>
+      <p className="mt-4">You will be redirected to the login page shortly.</p>
     </div>
   );
 }

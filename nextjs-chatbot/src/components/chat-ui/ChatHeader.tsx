@@ -19,11 +19,12 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ onNewChat }: ChatHeaderProps) {
   const { toggleSidebar } = useSidebar();
-  const isMobile = useIsMobile();
+  // We’ll show the mobile menu on anything below 'lg' (1024px)
+  const showHamburger = useIsMobile() || typeof window !== 'undefined' && window.innerWidth < 1024;
 
   return (
     <header className="sticky top-0 z-50 flex items-center border-b bg-white px-4 shadow">
-      {isMobile ? (
+      {showHamburger ? (
         <Button
           onClick={toggleSidebar}
           variant="ghost"
