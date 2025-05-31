@@ -67,7 +67,7 @@ export function ConversationsSidebar({
           >
             <Plus className="h-5 w-5" />
           </Button>
-          {/* X Button (close, mobile only) */}
+          {/* X Button  */}
           {closeSidebar && (
             <Button
               onClick={closeSidebar}

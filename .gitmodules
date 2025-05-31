@@ -1,0 +1,3 @@
+[submodule "copilot_preprocessing"]
+	path = copilot_preprocessing
+	url = https://github.com/IlyaRice/RAG-Challenge-2.git
