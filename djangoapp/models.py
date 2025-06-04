@@ -65,3 +65,26 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+
+class Document(models.Model):
+    """Stores uploaded knowledge base documents for RAG."""
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="docs/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    # Optionally: add field to track document type, e.g. PDF, DOCX
+
+    def __str__(self):
+        return self.title
+
+class Chunk(models.Model):
+    """Stores chunked text from documents, used in vector search."""
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='chunks')
+    chunk_id = models.CharField(max_length=100, unique=True)  # for Pinecone/FAISS ID
+    text = models.TextField()
+    metadata = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.document.title} - {self.chunk_id[:8]}"

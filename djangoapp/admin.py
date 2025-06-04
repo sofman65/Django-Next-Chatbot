@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import Role, CustomUser, DocumentAccess, Conversation, Message
+from .models import Role, CustomUser, DocumentAccess, Conversation, Message, Document,Chunk
 
 # Customizing the display of the Role model
 @admin.register(Role)
@@ -43,3 +43,16 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ('conversation', 'role', 'content', 'created_at')  # Columns to display
     search_fields = ('content',)                                     # Enable search for content
     list_filter = ('role', 'created_at')                             # Add filters
+
+
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'uploaded_at', 'file')
+    search_fields = ('title',)
+    list_filter = ('uploaded_at',)
+
+@admin.register(Chunk)
+class ChunkAdmin(admin.ModelAdmin):
+    list_display = ('document', 'chunk_id', 'created_at')
+    search_fields = ('chunk_id', 'text')
+    list_filter = ('document',)

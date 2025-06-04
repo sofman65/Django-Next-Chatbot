@@ -98,6 +98,10 @@ TEMPLATES = [
     },
 ]
 
+# APPEND_SLASH = False
+# Application definition
+# https://docs.djangoproject.com/en/4.2/ref/settings/#installed-apps
+
 # WSGI_APPLICATION = 'djangoproj.wsgi.application'
 
 ASGI_APPLICATION = 'djangoproj.asgi.application'
