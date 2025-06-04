@@ -36,17 +36,21 @@ This project is a chatbot application built using **Django** on the backend and 
    git clone https://github.com/sofman65/Django-Next-Chatbot.git
    cd Django-Next-Chatbot
 
-2. Install dependencies:
+2. Initialize submodules:
+   ```bash
+   git submodule update --init --recursive
+   ```
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Create a `.env` file in the `djangoapp` directory with the following:
+4. Create a `.env` file in the `djangoapp` directory with the following:
    ```bash
    HF_API_KEY=<your_hugging_face_api_key>
    ```
 
-4. Run the Django development server:
+5. Run the Django development server:
    ```bash
    python manage.py runserver
    ```
