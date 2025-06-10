@@ -1,0 +1,28 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-Developmentoperatingmodelhigh-leveldefinition-260924-0946-240",
+    "pages_amount": 1,
+    "text_blocks_amount": 20,
+    "tables_amount": 0,
+    "pictures_amount": 0,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 223,
+        "text": "# Development operating model high-level definition\n\n\n## Processes Index (draft)\n\n\n- 1.  HPS's deliveries on PowerCardHPS\n- 2.  Source code management - branching strategy\n- 3.  Setup a new Project\n- 4.  Features Driven Development (FDD)\n- 5.  Testing\n- 6.  Documentation\n- 7.  Source code conflicts prevention - resolution strategy\n- 8.  Source code versioning\n- 9.  Project moderator merges features to PowerCardSIA/Project\n- 10.  Releases moderator merges PowerCardHPS code to PowerCardSIA\n- 11.  Releases moderator merges PowerCardSIA/Projects source code to build a new release\n- 12.  Developing CI/CD pipelines\n- 13.  Deployment on DEV\n- 14.  Deployment on SIT\n- 15.  Deployment on UAT\n- 16.  Deployment on PreProd\n- 17.  Create Hotfix\n- 18.  Deploy Hotfix",
+        "id": 0,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# Development operating model high-level definition\n\n\n## Processes Index (draft)\n\n\n- 1.  HPS's deliveries on PowerCardHPS\n- 2.  Source code management - branching strategy\n- 3.  Setup a new Project\n- 4.  Features Driven Development (FDD)\n- 5.  Testing\n- 6.  Documentation\n- 7.  Source code conflicts prevention - resolution strategy\n- 8.  Source code versioning\n- 9.  Project moderator merges features to PowerCardSIA/Project\n- 10.  Releases moderator merges PowerCardHPS code to PowerCardSIA\n- 11.  Releases moderator merges PowerCardSIA/Projects source code to build a new release\n- 12.  Developing CI/CD pipelines\n- 13.  Deployment on DEV\n- 14.  Deployment on SIT\n- 15.  Deployment on UAT\n- 16.  Deployment on PreProd\n- 17.  Create Hotfix\n- 18.  Deploy Hotfix"
+      }
+    ]
+  }
+}

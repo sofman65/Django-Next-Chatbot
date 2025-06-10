@@ -1,0 +1,527 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-17094796-260924-1001-248",
+    "pages_amount": 19,
+    "text_blocks_amount": 79,
+    "tables_amount": 0,
+    "pictures_amount": 2,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 239,
+        "text": "# 2. Edit an existing screen - add a details datatable (use case 8)\n\n\n- UI\n- Server\n- Database\n\n\nIntro : The whole example is based  in the use case scenario:  Use Case [8]: Insert Courier ranges\n\n\n## UI\n\nIn order to insert courier ranges we had to add a new pop up window to an already existing screen.\n\nExisting screen : Delivery supplier code\n\nNew pop - up window: Add the range numbers for the courier Range numbers ( )\n\nThe path for code is: pwc-ui\\src\\app\\parameters\\issuing\\product\\delivery-supplier-code. In Visual Studio this was the file structure delivery supplier code before adding new functionalities:\n\n\nThe files represent the following:\n- tests folder = unit tests\n- view folder = the html and typescript files required for the screens\n- vo (value object) folder = the entity component\n- deliverySupplierCode.config.ts file  = configuration file\n- deliverySupplierCode.module.ts file = angular module class\n\n\nSo, for the implementation of courier ranges was needed:  an additional entity in folder and two more files in  'popups' folder. VO",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 210,
+        "text": "Since the screen was already in place, we have to add the path of the URL which is mapped on the <module_name>.routes.ts file. For example, in didn't our case in  issuing.routes.ts  file the:\n\n{ path: 'delivery-supplier-code', loadChildren: './product/delivery-supplier-code/deliverySupplierCode.module#DeliverySupplierCodeModule' } was already included.\n\n\n# Analyzing each file:\n\n\n## deliverySupplierCode.module.ts  :\n\nNgModule class: Angular has its own modularity system called which are containers for a block of code. They can contain components, service NgModules providers and import functionality that is exported from other NgModules.\n\nis a function  that takes a single metadata object, whose properties describes the module, e.g.: : Other modules whose exported @NgModule() imports classes are needed by component templates declared in this NgModule. : The , directives, and pipes that belong to this declarations components NgModule.",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 6,
+        "text": "# deliverySupplierCode.module.ts",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 288,
+        "text": "import {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {DeliverySupplierCodeDetailsComponent}   from './view/details/deliverySupplierCode-details.component'; import {DeliverySupplierCodeCriteriasComponent} from './view/deliverySupplierCode-criterias.component'; import {DeliverySupplierCodeComponent}          from './view/deliverySupplierCode.component'; import {SCREEN} from './deliverySupplierCode.config'; import {DeliverySupplierCodePopupComponent} from \"./view/popups/deliverySupplierCode-popup.component\"; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** DeliverySupplierCode Routes */ export const deliverySupplierCodeRoutes = [ { path: '', component: DeliverySupplierCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path:",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 183,
+        "text": "ActionReducerMap<PwcState> { return reducers; } /** DeliverySupplierCode Routes */ export const deliverySupplierCodeRoutes = [ { path: '', component: DeliverySupplierCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: DeliverySupplierCodeDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** DeliverySupplierCode Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(deliverySupplierCodeRoutes), StoreModule.forFeature(SCREEN, reducerToken), EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ DeliverySupplierCodeComponent, DeliverySupplierCodeCriteriasComponent, DeliverySupplierCodeDetailsComponent, DeliverySupplierCodePopupComponent], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class DeliverySupplierCodeModule { constructeur() { console.log('DeliverySupplierCodeModule'); } }",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 13,
+        "text": "deliverySupplierCode.config.ts: References and lists (adding info?)",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 94,
+        "text": "```\ndeliverySupplierCode.config.ts /** * DeliverySupplierCode Config */ export const SCREEN = 'delivery_supplier_code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Delivery_supplier_code'; export const SEARCH_PARAM_REFS = ['Bank']; export const SEARCH_STATIC_LISTS = ['pin_plastic_statement','Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# VO\n\ndeliverySupplierCode.entity.ts",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 25,
+        "text": "```\ndeliverySupplierCode.entity.ts import { PkgDeliverySupplierRangesEntity } from './pkgDeliverySupplierRanges.entity';\n```",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 297,
+        "text": "import {AbstractEntity} from '@pwc/shared'; export class DeliverySupplierCodeEntity extends AbstractEntity { bank_code: string; delivery_supplier_code  : string; abrv_wording: string; wording: string; pin_flag: string; plastic_flag: string; statement_flag: string; status: string; threshold: string; pkg_delivery_supplier_ranges_col: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col: number; constructor({ bank_code = null, delivery_supplier_code = null, abrv_wording = null, wording = null, pin_flag = null, plastic_flag = null, statement_flag = null, status = null, threshold = null, pkg_delivery_supplier_ranges_col = null, lazy_level_col = 1 }: { bank_code?: string delivery_supplier_code?: string; abrv_wording?: string; wording?: string; pin_flag?: string; plastic_flag?: string; statement_flag?: string; status?: string; threshold?: string; pkg_delivery_supplier_ranges_col?: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col?: number; }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.abrv_wording = abrv_wording; this.wording = wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status = status; this.threshold = threshold; this.pkg_delivery_supplier_ranges_col = pkg_delivery_supplier_ranges_col;",
+        "id": 11,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 59,
+        "text": "= wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status = status; this.threshold = threshold; this.pkg_delivery_supplier_ranges_col = pkg_delivery_supplier_ranges_col; this.lazy_level_col = lazy_level_col; } }",
+        "id": 12,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 13,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 165,
+        "text": "```\npkgDeliverySupplierRanges.entity.ts import { AbstractEntity } from '@pwc/shared'; export class PkgDeliverySupplierRangesEntity extends AbstractEntity { bank_code: string; delivery_supplier_code: string; range_start: number; range_end: number; last_number: number; constructor({ bank_code = null, delivery_supplier_code = null, range_start = null, range_end = null, last_number = null }: { bank_code?: string, delivery_supplier_code?: string, range_start?: number, range_end?: number, last_number?: number, }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.range_start = range_start; this.range_end = range_end; this.last_number = last_number; } }\n```\n\n\n# Component:\n\ndeliverySupplierCode.component.html",
+        "id": 14,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 284,
+        "text": "# deliverySupplierCode.component.html\n\n\n```\n<pwc-screen [titleValue]=\"'delivery_supplier_code.title.delivery_supplier_code_labelLab' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\"  > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-delivery-supplier-code-criterias [context]=\"context\" ></pwc-comp-delivery-supplier-codecriterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\" clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"deliverySupplierCodeDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\" showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate)=\" duplicateEntity($event)\" (onRemove)=\"removeEntity($event)\" [ref]=\"context?.ref\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```\n\n\n## deliverySupplierCode.component.ts",
+        "id": 15,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 16,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 294,
+        "text": "deliverySupplierCode.component.ts import {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../deliverySupplierCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {DeliverySupplierCodeEntity} from '../vo/deliverySupplierCode.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-delivery-supplier-code', templateUrl: './deliverySupplierCode.component.html' }) export class DeliverySupplierCodeComponent extends AbstractSearchScreenComponent { deliverySupplierCodeEntity: DeliverySupplierCodeEntity = new DeliverySupplierCodeEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.addStringColumn({field:'delivery_supplier_code', header:'Common.input.delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true});",
+        "id": 17,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 198,
+        "text": "this.addStringColumn({field:'delivery_supplier_code', header:'Common.input.delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true}); this.addStringColumn({field:'wording', header:'Common.input.wording', sortable: true}); this.addStringColumn({field:'threshold', header:'Common.input.pkg_threshold', sortable: true}); this.addStaticListColumn({ field: 'status', header: 'Common.input.status_flag', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.deliverySupplierCodeEntity = new DeliverySupplierCodeEntity(this.getAllValues()); this.searchEntity(this.deliverySupplierCodeEntity); } getBundleName(): string { return SCREEN; } duplicateEntity(entity) { const duplicateEntity = {...entity}; duplicateEntity.pkg_delivery_supplier_ranges_col = []; super.duplicateEntity(duplicateEntity) } }",
+        "id": 18,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 19,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 48,
+        "text": "# Criterias component:\n\n\n## deliverySupplierCode-criterias.component.html\n\n\n## deliverySupplierCode-criterias.component.html\n\n\n```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\">\n```",
+        "id": 20,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 21,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 298,
+        "text": "<pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"delivery_supplier_code\" type=\"input\" [array]=\"array\" maxlength=\"3\" [minLength]=\"context.state === 'DETAIL'?3:0\" [labelKey]=\"'Common.input.delivery_supplier_code_label'\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\"> </pwc-input> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"wording\" type=\"input\" [array]=\"array\" maxlength=\"32\" [labelKey]=\"'Common.input.wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"abrv_wording\" [array]=\"array\" type=\"input\" maxlength=\"16\" [labelKey]=\"'Common.input.abrv_wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div",
+        "id": 22,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 298,
+        "text": "[array]=\"array\" type=\"input\" maxlength=\"16\" [labelKey]=\"'Common.input.abrv_wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12 ui-md-12\"> <div class=\"ui-g-6 ui-md-6\"> <pwc-input id=\"threshold\" type=\"number\" [array]=\"array\" maxlength=\"2\" [labelKey]=\"'Common.input.pkg_threshold'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-6 ui-md-6\"> <pwc-radiobutton id=\"status\" maxlength=\"1\" labelKey=\"Common.input.status_flag\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'delivery_supplier_code.input.status_enable'| pwcTrans | async, 'D':'delivery_supplier_code.input.status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"plastic_flag\" eurekaLabel=\"value_label\"  eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'plastic_flag.input.plastic_flag'\" [array]=\"array\" [data]=\"context.ref.get",
+        "id": 23,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 290,
+        "text": "id=\"plastic_flag\" eurekaLabel=\"value_label\"  eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'plastic_flag.input.plastic_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"pin_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'pin_flag.input.pin_flag'\" [array]=\"array\" [data]=\"context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"statement_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'statement_flag.input.statement_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\">",
+        "id": 24,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 25,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 137,
+        "text": "```\n</pwc-eureka> </div> </div>\n```\n\n\n# deliverySupplierCode-criterias.component.ts\n\n\n```\ndeliverySupplierCode-criterias.component.ts import {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-delivery-supplier-code-criterias', templateUrl: './deliverySupplierCode-criterias.component.html' }) export class DeliverySupplierCodeCriteriasComponent extends AbstractSubFormComponent { constructor(injector: Injector) { super(injector); } }\n```\n\n\n## Details component\n\ndeliverySupplierCode-details.component.html",
+        "id": 26,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 7,
+        "text": "# deliverySupplierCode-details.component.html",
+        "id": 27,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 28,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 297,
+        "text": "<pwc-screen [titleValue]=\"'delivery_supplier_code.title.delivery_supplier_code_labelLab' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\"context. grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\"  (back)=\"back()\" (save)=\"save()\"></pwc-comp-actionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'delivery_supplier_code' | async | uppercase}} < /p-header> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-delivery-supplier-code-criterias [context]=\"context\" ></pwc-comp-deliverysupplier-code-criterias> </div> </p-fieldset> <p-tabView> <p-tabPanel [header]=\"'delivery_supplier_code.text.ranges' | pwcTrans | async | uppercase\"> <p-fieldset> <p-header>{{'Common.header.information' | pwcTrans | async | uppercase}}</p-header> <div class=\"ui-g-12 ui-md-12\"> &nbsp; </div> <pwc-datatable #dtba id=\"pkgDeliverySupplierRangesDt\"",
+        "id": 29,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 252,
+        "text": "| pwcTrans | async | uppercase}}</p-header> <div class=\"ui-g-12 ui-md-12\"> &nbsp; </div> <pwc-datatable #dtba id=\"pkgDeliverySupplierRangesDt\" [(datasource)]=\"pkgDeliverySupplierRangesList\" [showColmunsList]=\"false\" [actionBarBtns]=\"actionBarBtnsArrays\" [grants]=\"context.grants\" [columns]=\"columns\" [ref]=\"context?.ref\" [showAddFooter]=\"true\" (onTriggerCustoActionEvent)=\"custoAction($event)\" (onFooterAddEvent)=\"addElement()\" (onSelect)=\"selectEntity($event)\"> </pwc-datatable> </p-fieldset> </p-tabPanel> </p-tabView> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> <pwc-comp-deliverySupplierCode-popup [context]=\"context\" [pkgDeliverySupplierRangesEntity]=\"pkgDeliverySupplierRangesList\" [selectedEntity]=\"selectedEntity\" [displayPopup]=\"displayPopup\" (onClose)=\"closePopup()\" (onValidate)=\"pushAddField($event)\"> </pwc-comp-deliverySupplierCode-popup> </pwc-screen>",
+        "id": 30,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 31,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 14,
+        "text": "## deliverySupplierCode-details.component.ts\n\ndeliverySupplierCode-details.component.ts",
+        "id": 32,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 27,
+        "text": "```\nimport {SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS} from '../../deliverySupplierCode.\n```",
+        "id": 33,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 34,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 298,
+        "text": "config'; import {DeliverySupplierCodeEntity} from '../../vo/deliverySupplierCode.entity'; import {AbstractDetailScreenComponent, PwcState, ColumnType, AbstractEntity, ActionBarBtn, ColumnEntity, ActionBarButton, PwcTransPipe} from '@pwc/shared'; import {Component, Injector, ChangeDetectorRef, AfterViewInit} from '@angular/core'; import {Store} from '@ngrx/store'; import { PkgDeliverySupplierRangesEntity } from '../../vo/pkgDeliverySupplierRanges.entity'; @Component({ selector: 'pwc-comp-delivery-supplier-code-details', templateUrl: './deliverySupplierCode-details.component.html' }) export class DeliverySupplierCodeDetailsComponent extends AbstractDetailScreenComponent { cd: ChangeDetectorRef; bankCode:string; deliverySupplierCode:string; pkgDeliverySupplierRangesList: Array<AbstractEntity> = []; actionBarBtnsArrays: Array<ActionBarBtn> = new Array<ActionBarBtn>(); columns: Array<ColumnEntity> = new Array<ColumnEntity>(); displayPopup: boolean = false; selectedEntity: any; indexOfSelectedEntity: any = null; constructor(injector: Injector, private _pwcTransPipe: PwcTransPipe) { super(injector); this.cd = injector.get(ChangeDetectorRef); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() {",
+        "id": 35,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 243,
+        "text": "this.cd = injector.get(ChangeDetectorRef); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new DeliverySupplierCodeEntity(this.getAllValues()); this.context.entity.pkg_delivery_supplier_ranges_col = this.pkgDeliverySupplierRangesList; this.context.entity.pkg_delivery_supplier_ranges_col.forEach((v, index) => { v.bank_code = this.getControl('bank_code').value; v.delivery_supplier_code = this.getControl('delivery_supplier_code').value; }) } getBundleName(): string { return SCREEN; } ngAfterViewInit() { super.ngAfterViewInit(); this.buildColumns(); this.buildActionBarBtns(); this.pkgDeliverySupplierRangesList = this.context.entity ? this.context.entity. pkg_delivery_supplier_ranges_col : []; //this.cd.detectChanges(); } buildColumns() { this.pushColumn(this.columns, { field: 'range_start', header: 'Common.input.range_start', type: ColumnType.STRING, sortable: true }); this.pushColumn(this.columns, { field: 'range_end', header: 'Common.input.range_end',",
+        "id": 36,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 37,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 38,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 298,
+        "text": "type: ColumnType.STRING, sortable: true }); this.pushColumn(this.columns, { field: 'last_number', header: 'delivery_supplier_code.text.last_number', type: ColumnType.STRING, sortable: true }); } buildActionBarBtns() { this.addActionBarButton({ isDisplayed: true, icon: 'fa-trash', code: 'REMOVE_EVENT', tooltipPosition: 'top', pTooltip: 'Common. tooltip.remove', 'grantFct': (row) => row.last_number == null }); } addActionBarButton(actionBarButton: Partial<ActionBarButton>) { this.pushActionBarButton(this.actionBarBtnsArrays, actionBarButton); } custoAction(event) { if (event.code === 'REMOVE_EVENT') { this.removeElement(this.pkgDeliverySupplierRangesList, event.index); return; } } removeElement(values: any[], i) { this.commonService.displayConfirmationPopup(this._pwcTransPipe.transform('Common.title.confirm').value, this._pwcTransPipe.transform('Common.message.confirmation').value, () => { // Accept values.splice(i, 1); this.pkgDeliverySupplierRangesList = [...values]; } ); } pushAddField(values){ const adFieldsObj:PkgDeliverySupplierRangesEntity = new PkgDeliverySupplierRangesEntity({ bank_code:this.bankCode ?  this.getControl('bank_code').value : null, delivery_supplier_code:this.deliverySupplierCode ?  this.getControl('delivery_supplier_code').value : null,",
+        "id": 39,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 204,
+        "text": "= new PkgDeliverySupplierRangesEntity({ bank_code:this.bankCode ?  this.getControl('bank_code').value : null, delivery_supplier_code:this.deliverySupplierCode ?  this.getControl('delivery_supplier_code').value : null, range_start:values.range_start, range_end:values.range_end, last_number:values.last_number, }); this.indexOfSelectedEntity = this.findAddField(values); if(this.indexOfSelectedEntity === -1){ const tempAdFields = this.pkgDeliverySupplierRangesList.slice(0); tempAdFields.push(adFieldsObj); this.pkgDeliverySupplierRangesList = tempAdFields; } else{ this.pkgDeliverySupplierRangesList[this.indexOfSelectedEntity] = adFieldsObj; } } findAddField(obj) { const index = this.pkgDeliverySupplierRangesList.findIndex((adField: any) => adField.range_start === obj. range_start); return index; } selectEntity(entity: any) { this.updateElement(entity); } updateElement(entity) {",
+        "id": 40,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 41,
+        "type": "content"
+      },
+      {
+        "page": 14,
+        "length_tokens": 95,
+        "text": "```\nthis.selectedEntity = Object.assign({}, entity); this.displayPopup = true; } afterSaveState() { super.afterSaveState(); if(!this.editionState){ this.pkgDeliverySupplierRangesList = []; } } closePopup() { this.displayPopup = false; } addElement() { this.displayPopup = true; } duplicate() { this.pkgDeliverySupplierRangesList = []; super.duplicate(); } }\n```\n\n\n# Popup\n\ndeliverySupplierCode-popup.component.html",
+        "id": 42,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 7,
+        "text": "# deliverySupplierCode-popup.component.html",
+        "id": 43,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 44,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 299,
+        "text": "<pwc-popup [header]=\"'delivery_supplier_code.text.ranges' | pwcTrans | async\" [(displayPopup)]=\"displayPopup\" width=\"1000\" okLabel=\"Validate\" (onCancel)=\"close()\" (onValidate)=\"validate(true)\" [okLabel] = \"'Common.tooltip.save'\" [forceOverflow]=\"true\" [validateDesabled]=\"array.invalid\"> <!-- Header --> <div class=\"pageHeader\"></div> <!-- Content --> <div class=\"content\"> <div class=\"criterias\"> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-12\"> <pwc-input id=\"range_start\" type=\"number\" [array]=\"array\" [labelKey]=\"'Common.input.range_start'\" [maxlength]=\"18\" [min]=\"minRangeStart()\" [readOnly]=\"modeUpdate\" [required]=\"true\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-12\"> <pwc-input id=\"range_end\" type=\"number\" [array]=\"array\" [labelKey]=\"'Common.input.range_end'\" [maxlength]=\"18\" [min]=\"getControl('range_start')?.value\" [readOnly]=\"modeUpdate\" [required]=\"true\"> </pwc-input> </div> </div> </div> </div> <!-- Footer --> <div class=\"additional-actionfooter\" style=\"display: inline-block\"> <pwc-button [disabled]=\"array.invalid\"",
+        "id": 45,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 113,
+        "text": "[required]=\"true\"> </pwc-input> </div> </div> </div> </div> <!-- Footer --> <div class=\"additional-actionfooter\" style=\"display: inline-block\"> <pwc-button [disabled]=\"array.invalid\" *ngIf=\"!modeUpdate\" id=\"addNewAdFieldBtn\" type=\"button\" labelKey=\"Common.tooltip.save.and.add\" (click)=\"validate(false)\" [icon]=\"'fa-check'\" [iconPos]=\"'right'\"> </pwc-button> </div> </pwc-popup>",
+        "id": 46,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 47,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 106,
+        "text": "## deliverySupplierCode-popup.component.ts\n\n\n```\ndeliverySupplierCode-popup.component.ts import { Component, Injector, Output, EventEmitter, Input, ChangeDetectorRef } from '@angular/core';\n```\n\n\n```\nimport { AbstractPopupComponent, CommonService } from '@pwc/shared'; import { SCREEN } from '../../deliverySupplierCode.config'; import { PkgDeliverySupplierRangesEntity } from '../../vo/pkgDeliverySupplierRanges.entity'; import { BehaviorSubject } from 'rxjs'; import { FormArray } from '@angular/forms';\n```",
+        "id": 48,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 49,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 292,
+        "text": "@Component({ selector: 'pwc-comp-deliverySupplierCode-popup', templateUrl: './deliverySupplierCode-popup.component.html' }) export class DeliverySupplierCodePopupComponent extends AbstractPopupComponent { @Output() onClose: EventEmitter<Boolean> = new EventEmitter(); @Output() onValidate: EventEmitter<any> = new EventEmitter(); @Input() pkgDeliverySupplierRangesEntity: Array<PkgDeliverySupplierRangesEntity>; @Input() selectedEntityBehSub: BehaviorSubject<PkgDeliverySupplierRangesEntity> = new BehaviorSubject<PkgDeliverySupplierRangesEntity>(null); @Input() set selectedEntity(_selectedEntity: any) { if (_selectedEntity) { this.selectedEntityBehSub.next(_selectedEntity); } } selectedEnt: any; modeUpdate: boolean = false; cdr: ChangeDetectorRef; constructor(injector: Injector) { super(injector); this.cdr = injector.get(ChangeDetectorRef); } ngOnInit() { super.ngOnInit(); this._buildForm(); } _buildForm() { // Build child group this.array = new FormArray([]); this.addControlsToArray(); } ngAfterViewInit() { super.ngAfterViewInit(); this.selectedEntityBehSub.subscribe((entity: any) => { if (entity != null) { this.selectedEnt = entity; if (this.getControl('range_start')) { this.getControl('range_start').setValue(entity.range_start); } if",
+        "id": 50,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 191,
+        "text": "any) => { if (entity != null) { this.selectedEnt = entity; if (this.getControl('range_start')) { this.getControl('range_start').setValue(entity.range_start); } if (this.getControl('range_end')) { this.getControl('range_end').setValue(entity.range_end); } this.modeUpdate = true; } }); this.cdr.detectChanges(); } validate(closePopup: boolean) { // Action on save //this.commonService.displayInfoMessage('Validate', 'Validate Popup Action'); const values = this.getAllValues(); if (this.array.valid && values.range_start != null && !this.modeUpdate) { this.onValidate.emit(values); } // } else if (this.array.valid && values.range_start != null && this.modeUpdate) { //   this.onValidate.emit(Object.assign({}, { ...this.selectedEnt, ...values })); // } closePopup ? this.close() : this.clear(); }",
+        "id": 51,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 52,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 164,
+        "text": "```\nminRangeStart() { if (!this.modeUpdate) { return Math.max.apply(Math, this.pkgDeliverySupplierRangesEntity.map(r => r.range_end)) + 1; } } cancel() { //TODO:  ADD TO HTML // Action on cancel //this.commonService.displayInfoMessage('Cancel', 'Cancel Popup Action'); } close() { this.onClose.emit(false); this.modeUpdate = false; this.clear(); } clear() { this.array.reset(); } getBundleName(): string { return SCREEN; }\n```\n\n}\n\n\n# Server\n\nIn the pwc-server project the .btdesign file needs to be modified. The affected backend element is located in:  pwcserver\\paramsCardholder\\src\\main\\resources\\paramsCardholder.btdesign.\n\n1) New entity",
+        "id": 53,
+        "type": "content"
+      },
+      {
+        "page": 18,
+        "length_tokens": 300,
+        "text": "```\nPkg_delivery_supplier_ranges Entity Pkg_delivery_supplier_ranges { databaseTable=\"Pkg_delivery_supplier_ranges\" auditable !optimisticLocking scaffold -@ Delivery_supplier_code fk_pkg_deliv_suppl_ranges key hint=\"BaseColumn1=delivery_supplier_code, BaseColumn2=bank_code\" opposite pkg_delivery_supplier_rangesList; String range_start key databaseType=\"NUMBER(18,0)\"; String range_end databaseColumn=\"range_end\" databaseType=\"NUMBER(18,0)\" nullable; String last_number databaseColumn=\"last_number\" databaseType=\"NUMBER(18,0)\" nullable; Repository Pkg_delivery_supplier_rangesRepository { findByKeys;findByKey;findByCondition;findByCriteria; } } DataTransferObject Pkg_delivery_supplier_rangesVO { String  bank_code; String  delivery_supplier_code; String  range_start; String  range_end; String  last_number; } Service Pkg_delivery_supplier_rangesService{ > @Pkg_delivery_supplier_rangesRepository String createPkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); String updatePkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); String deletePkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); List<@Pkg_delivery_supplier_rangesVO> getAllPkg_delivery_supplier_rangesService(); List<@Pkg_delivery_supplier_rangesVO> searchPkg_delivery_supplier_rangesService (@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); }",
+        "id": 54,
+        "type": "content"
+      },
+      {
+        "page": 18,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 55,
+        "type": "content"
+      },
+      {
+        "page": 18,
+        "length_tokens": 22,
+        "text": "Delivery supplier ranges added as and as . entity DataTransferObject\n\n2) Modified delivery supplier code (+ranges)",
+        "id": 56,
+        "type": "content"
+      },
+      {
+        "page": 19,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 57,
+        "type": "content"
+      },
+      {
+        "page": 19,
+        "length_tokens": 297,
+        "text": "delivery-supplier-code /**************************** Delivery_supplier_code ****************************/ Entity Delivery_supplier_code { databaseTable=\"Delivery_supplier_code\" !auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String delivery_supplier_code key databaseType=\"CHAR(3)\"; String abrv_wording databaseColumn=\"abrv_wording\" length=\"16\" nullable; String wording databaseColumn=\"wording\" length=\"32\" nullable; String plastic_flag databaseColumn=\"plastic_flag\" databaseType=\"CHAR(1)\" nullable; String pin_flag databaseColumn=\"pin_flag\" databaseType=\"CHAR(1)\" nullable; String statement_flag databaseColumn=\"statement_flag\" databaseType=\"CHAR(1)\" nullable; String status databaseColumn=\"status\" databaseType=\"CHAR(1)\" nullable; String threshold databaseColumn=\"threshold\" databaseType=\"NUMBER(2,0)\" nullable; - Set<@Pkg_delivery_supplier_ranges> pkg_delivery_supplier_rangesList cascade = \"all-delete-orphan\" opposite fk_pkg_deliv_suppl_ranges; Repository Delivery_supplier_codeRepository { findByKeys;findByKey;findByCondition;findByCriteria; } } DataTransferObject Delivery_supplier_codeVO { String  bank_code; String  delivery_supplier_code; String  abrv_wording; String  wording; String  plastic_flag; String  pin_flag; String  statement_flag; String status; String threshold; Collection",
+        "id": 58,
+        "type": "content"
+      },
+      {
+        "page": 19,
+        "length_tokens": 180,
+        "text": "Delivery_supplier_codeVO { String  bank_code; String  delivery_supplier_code; String  abrv_wording; String  wording; String  plastic_flag; String  pin_flag; String  statement_flag; String status; String threshold; Collection <Pkg_delivery_supplier_rangesVO> pkg_delivery_supplier_ranges_col hint = \"Set=pkg_delivery_supplier_rangesList\" ; } Service Delivery_supplier_codeService{ > @Delivery_supplier_codeRepository > @Pkg_delivery_supplier_rangesService String createDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); String updateDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); String deleteDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); List<@Delivery_supplier_codeVO> getAllDelivery_supplier_codeService(); List<@Delivery_supplier_codeVO> searchDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); }",
+        "id": 59,
+        "type": "content"
+      },
+      {
+        "page": 19,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 60,
+        "type": "content"
+      },
+      {
+        "page": 19,
+        "length_tokens": 55,
+        "text": "How to build: Using Sculptor generator => Case 2: Add a new entity\n\n\n# Database\n\nFor the database two new need to be added: and delivery_supplier_ranges_df. The second one has been created for tables delivery_supplier_ranges keeping history of data changes.",
+        "id": 61,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# 2. Edit an existing screen - add a details datatable (use case 8)\n\n\n- UI\n- Server\n- Database\n\n\nIntro : The whole example is based  in the use case scenario:  Use Case [8]: Insert Courier ranges\n\n\n## UI\n\nIn order to insert courier ranges we had to add a new pop up window to an already existing screen.\n\nExisting screen : Delivery supplier code\n\nNew pop - up window: Add the range numbers for the courier Range numbers ( )\n\nThe path for code is: pwc-ui\\src\\app\\parameters\\issuing\\product\\delivery-supplier-code. In Visual Studio this was the file structure delivery supplier code before adding new functionalities:\n\n\nThe files represent the following:\n- tests folder = unit tests\n- view folder = the html and typescript files required for the screens\n- vo (value object) folder = the entity component\n- deliverySupplierCode.config.ts file  = configuration file\n- deliverySupplierCode.module.ts file = angular module class\n\n\nSo, for the implementation of courier ranges was needed:  an additional entity in folder and two more files in  'popups' folder. VO"
+      },
+      {
+        "page": 2,
+        "text": "Since the screen was already in place, we have to add the path of the URL which is mapped on the <module_name>.routes.ts file. For example, in didn't our case in  issuing.routes.ts  file the:\n\n{ path: 'delivery-supplier-code', loadChildren: './product/delivery-supplier-code/deliverySupplierCode.module#DeliverySupplierCodeModule' } was already included.\n\n\n# Analyzing each file:\n\n\n## deliverySupplierCode.module.ts  :\n\nNgModule class: Angular has its own modularity system called which are containers for a block of code. They can contain components, service NgModules providers and import functionality that is exported from other NgModules.\n\nis a function  that takes a single metadata object, whose properties describes the module, e.g.: : Other modules whose exported @NgModule() imports classes are needed by component templates declared in this NgModule. : The , directives, and pipes that belong to this declarations components NgModule."
+      },
+      {
+        "page": 3,
+        "text": "# deliverySupplierCode.module.ts\n\n\n```\nimport {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {DeliverySupplierCodeDetailsComponent}   from './view/details/deliverySupplierCode-details.component'; import {DeliverySupplierCodeCriteriasComponent} from './view/deliverySupplierCode-criterias.component'; import {DeliverySupplierCodeComponent}          from './view/deliverySupplierCode.component'; import {SCREEN} from './deliverySupplierCode.config'; import {DeliverySupplierCodePopupComponent} from \"./view/popups/deliverySupplierCode-popup.component\"; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** DeliverySupplierCode Routes */ export const deliverySupplierCodeRoutes = [ { path: '', component: DeliverySupplierCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: DeliverySupplierCodeDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** DeliverySupplierCode Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(deliverySupplierCodeRoutes), StoreModule.forFeature(SCREEN, reducerToken), EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ DeliverySupplierCodeComponent, DeliverySupplierCodeCriteriasComponent, DeliverySupplierCodeDetailsComponent, DeliverySupplierCodePopupComponent], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class DeliverySupplierCodeModule { constructeur() { console.log('DeliverySupplierCodeModule'); } }\n```\n\ndeliverySupplierCode.config.ts: References and lists (adding info?)"
+      },
+      {
+        "page": 4,
+        "text": "```\ndeliverySupplierCode.config.ts /** * DeliverySupplierCode Config */ export const SCREEN = 'delivery_supplier_code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Delivery_supplier_code'; export const SEARCH_PARAM_REFS = ['Bank']; export const SEARCH_STATIC_LISTS = ['pin_plastic_statement','Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# VO\n\ndeliverySupplierCode.entity.ts"
+      },
+      {
+        "page": 5,
+        "text": "```\ndeliverySupplierCode.entity.ts import { PkgDeliverySupplierRangesEntity } from './pkgDeliverySupplierRanges.entity';\n```\n\n\n```\nimport {AbstractEntity} from '@pwc/shared'; export class DeliverySupplierCodeEntity extends AbstractEntity { bank_code: string; delivery_supplier_code  : string; abrv_wording: string; wording: string; pin_flag: string; plastic_flag: string; statement_flag: string; status: string; threshold: string; pkg_delivery_supplier_ranges_col: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col: number; constructor({ bank_code = null, delivery_supplier_code = null, abrv_wording = null, wording = null, pin_flag = null, plastic_flag = null, statement_flag = null, status = null, threshold = null, pkg_delivery_supplier_ranges_col = null, lazy_level_col = 1 }: { bank_code?: string delivery_supplier_code?: string; abrv_wording?: string; wording?: string; pin_flag?: string; plastic_flag?: string; statement_flag?: string; status?: string; threshold?: string; pkg_delivery_supplier_ranges_col?: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col?: number; }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.abrv_wording = abrv_wording; this.wording = wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status = status; this.threshold = threshold; this.pkg_delivery_supplier_ranges_col = pkg_delivery_supplier_ranges_col; this.lazy_level_col = lazy_level_col; } }\n```"
+      },
+      {
+        "page": 6,
+        "text": "```\npkgDeliverySupplierRanges.entity.ts import { AbstractEntity } from '@pwc/shared'; export class PkgDeliverySupplierRangesEntity extends AbstractEntity { bank_code: string; delivery_supplier_code: string; range_start: number; range_end: number; last_number: number; constructor({ bank_code = null, delivery_supplier_code = null, range_start = null, range_end = null, last_number = null }: { bank_code?: string, delivery_supplier_code?: string, range_start?: number, range_end?: number, last_number?: number, }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.range_start = range_start; this.range_end = range_end; this.last_number = last_number; } }\n```\n\n\n# Component:\n\ndeliverySupplierCode.component.html"
+      },
+      {
+        "page": 7,
+        "text": "# deliverySupplierCode.component.html\n\n\n```\n<pwc-screen [titleValue]=\"'delivery_supplier_code.title.delivery_supplier_code_labelLab' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\"  > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-delivery-supplier-code-criterias [context]=\"context\" ></pwc-comp-delivery-supplier-codecriterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\" clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"deliverySupplierCodeDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\" showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate)=\" duplicateEntity($event)\" (onRemove)=\"removeEntity($event)\" [ref]=\"context?.ref\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```\n\n\n## deliverySupplierCode.component.ts"
+      },
+      {
+        "page": 8,
+        "text": "```\ndeliverySupplierCode.component.ts import {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../deliverySupplierCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {DeliverySupplierCodeEntity} from '../vo/deliverySupplierCode.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-delivery-supplier-code', templateUrl: './deliverySupplierCode.component.html' }) export class DeliverySupplierCodeComponent extends AbstractSearchScreenComponent { deliverySupplierCodeEntity: DeliverySupplierCodeEntity = new DeliverySupplierCodeEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.addStringColumn({field:'delivery_supplier_code', header:'Common.input.delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true}); this.addStringColumn({field:'wording', header:'Common.input.wording', sortable: true}); this.addStringColumn({field:'threshold', header:'Common.input.pkg_threshold', sortable: true}); this.addStaticListColumn({ field: 'status', header: 'Common.input.status_flag', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.deliverySupplierCodeEntity = new DeliverySupplierCodeEntity(this.getAllValues()); this.searchEntity(this.deliverySupplierCodeEntity); } getBundleName(): string { return SCREEN; } duplicateEntity(entity) { const duplicateEntity = {...entity}; duplicateEntity.pkg_delivery_supplier_ranges_col = []; super.duplicateEntity(duplicateEntity) } }\n```\n\n\n# Criterias component:\n\n\n## deliverySupplierCode-criterias.component.html\n\n\n## deliverySupplierCode-criterias.component.html\n\n\n```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\">\n```"
+      },
+      {
+        "page": 9,
+        "text": "```\n<pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"delivery_supplier_code\" type=\"input\" [array]=\"array\" maxlength=\"3\" [minLength]=\"context.state === 'DETAIL'?3:0\" [labelKey]=\"'Common.input.delivery_supplier_code_label'\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\"> </pwc-input> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"wording\" type=\"input\" [array]=\"array\" maxlength=\"32\" [labelKey]=\"'Common.input.wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"abrv_wording\" [array]=\"array\" type=\"input\" maxlength=\"16\" [labelKey]=\"'Common.input.abrv_wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12 ui-md-12\"> <div class=\"ui-g-6 ui-md-6\"> <pwc-input id=\"threshold\" type=\"number\" [array]=\"array\" maxlength=\"2\" [labelKey]=\"'Common.input.pkg_threshold'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-6 ui-md-6\"> <pwc-radiobutton id=\"status\" maxlength=\"1\" labelKey=\"Common.input.status_flag\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'delivery_supplier_code.input.status_enable'| pwcTrans | async, 'D':'delivery_supplier_code.input.status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"plastic_flag\" eurekaLabel=\"value_label\"  eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'plastic_flag.input.plastic_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"pin_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'pin_flag.input.pin_flag'\" [array]=\"array\" [data]=\"context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"statement_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'statement_flag.input.statement_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\">\n```"
+      },
+      {
+        "page": 10,
+        "text": "```\n</pwc-eureka> </div> </div>\n```\n\n\n# deliverySupplierCode-criterias.component.ts\n\n\n```\ndeliverySupplierCode-criterias.component.ts import {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-delivery-supplier-code-criterias', templateUrl: './deliverySupplierCode-criterias.component.html' }) export class DeliverySupplierCodeCriteriasComponent extends AbstractSubFormComponent { constructor(injector: Injector) { super(injector); } }\n```\n\n\n## Details component\n\ndeliverySupplierCode-details.component.html"
+      },
+      {
+        "page": 11,
+        "text": "# deliverySupplierCode-details.component.html\n\n\n```\n<pwc-screen [titleValue]=\"'delivery_supplier_code.title.delivery_supplier_code_labelLab' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\"context. grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\"  (back)=\"back()\" (save)=\"save()\"></pwc-comp-actionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'delivery_supplier_code' | async | uppercase}} < /p-header> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-delivery-supplier-code-criterias [context]=\"context\" ></pwc-comp-deliverysupplier-code-criterias> </div> </p-fieldset> <p-tabView> <p-tabPanel [header]=\"'delivery_supplier_code.text.ranges' | pwcTrans | async | uppercase\"> <p-fieldset> <p-header>{{'Common.header.information' | pwcTrans | async | uppercase}}</p-header> <div class=\"ui-g-12 ui-md-12\"> &nbsp; </div> <pwc-datatable #dtba id=\"pkgDeliverySupplierRangesDt\" [(datasource)]=\"pkgDeliverySupplierRangesList\" [showColmunsList]=\"false\" [actionBarBtns]=\"actionBarBtnsArrays\" [grants]=\"context.grants\" [columns]=\"columns\" [ref]=\"context?.ref\" [showAddFooter]=\"true\" (onTriggerCustoActionEvent)=\"custoAction($event)\" (onFooterAddEvent)=\"addElement()\" (onSelect)=\"selectEntity($event)\"> </pwc-datatable> </p-fieldset> </p-tabPanel> </p-tabView> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> <pwc-comp-deliverySupplierCode-popup [context]=\"context\" [pkgDeliverySupplierRangesEntity]=\"pkgDeliverySupplierRangesList\" [selectedEntity]=\"selectedEntity\" [displayPopup]=\"displayPopup\" (onClose)=\"closePopup()\" (onValidate)=\"pushAddField($event)\"> </pwc-comp-deliverySupplierCode-popup> </pwc-screen>\n```\n\n\n## deliverySupplierCode-details.component.ts\n\ndeliverySupplierCode-details.component.ts"
+      },
+      {
+        "page": 12,
+        "text": "```\nimport {SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS} from '../../deliverySupplierCode.\n```\n\n\n```\nconfig'; import {DeliverySupplierCodeEntity} from '../../vo/deliverySupplierCode.entity'; import {AbstractDetailScreenComponent, PwcState, ColumnType, AbstractEntity, ActionBarBtn, ColumnEntity, ActionBarButton, PwcTransPipe} from '@pwc/shared'; import {Component, Injector, ChangeDetectorRef, AfterViewInit} from '@angular/core'; import {Store} from '@ngrx/store'; import { PkgDeliverySupplierRangesEntity } from '../../vo/pkgDeliverySupplierRanges.entity'; @Component({ selector: 'pwc-comp-delivery-supplier-code-details', templateUrl: './deliverySupplierCode-details.component.html' }) export class DeliverySupplierCodeDetailsComponent extends AbstractDetailScreenComponent { cd: ChangeDetectorRef; bankCode:string; deliverySupplierCode:string; pkgDeliverySupplierRangesList: Array<AbstractEntity> = []; actionBarBtnsArrays: Array<ActionBarBtn> = new Array<ActionBarBtn>(); columns: Array<ColumnEntity> = new Array<ColumnEntity>(); displayPopup: boolean = false; selectedEntity: any; indexOfSelectedEntity: any = null; constructor(injector: Injector, private _pwcTransPipe: PwcTransPipe) { super(injector); this.cd = injector.get(ChangeDetectorRef); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new DeliverySupplierCodeEntity(this.getAllValues()); this.context.entity.pkg_delivery_supplier_ranges_col = this.pkgDeliverySupplierRangesList; this.context.entity.pkg_delivery_supplier_ranges_col.forEach((v, index) => { v.bank_code = this.getControl('bank_code').value; v.delivery_supplier_code = this.getControl('delivery_supplier_code').value; }) } getBundleName(): string { return SCREEN; } ngAfterViewInit() { super.ngAfterViewInit(); this.buildColumns(); this.buildActionBarBtns(); this.pkgDeliverySupplierRangesList = this.context.entity ? this.context.entity. pkg_delivery_supplier_ranges_col : []; //this.cd.detectChanges(); } buildColumns() { this.pushColumn(this.columns, { field: 'range_start', header: 'Common.input.range_start', type: ColumnType.STRING, sortable: true }); this.pushColumn(this.columns, { field: 'range_end', header: 'Common.input.range_end',\n```"
+      },
+      {
+        "page": 13,
+        "text": "```\ntype: ColumnType.STRING, sortable: true }); this.pushColumn(this.columns, { field: 'last_number', header: 'delivery_supplier_code.text.last_number', type: ColumnType.STRING, sortable: true }); } buildActionBarBtns() { this.addActionBarButton({ isDisplayed: true, icon: 'fa-trash', code: 'REMOVE_EVENT', tooltipPosition: 'top', pTooltip: 'Common. tooltip.remove', 'grantFct': (row) => row.last_number == null }); } addActionBarButton(actionBarButton: Partial<ActionBarButton>) { this.pushActionBarButton(this.actionBarBtnsArrays, actionBarButton); } custoAction(event) { if (event.code === 'REMOVE_EVENT') { this.removeElement(this.pkgDeliverySupplierRangesList, event.index); return; } } removeElement(values: any[], i) { this.commonService.displayConfirmationPopup(this._pwcTransPipe.transform('Common.title.confirm').value, this._pwcTransPipe.transform('Common.message.confirmation').value, () => { // Accept values.splice(i, 1); this.pkgDeliverySupplierRangesList = [...values]; } ); } pushAddField(values){ const adFieldsObj:PkgDeliverySupplierRangesEntity = new PkgDeliverySupplierRangesEntity({ bank_code:this.bankCode ?  this.getControl('bank_code').value : null, delivery_supplier_code:this.deliverySupplierCode ?  this.getControl('delivery_supplier_code').value : null, range_start:values.range_start, range_end:values.range_end, last_number:values.last_number, }); this.indexOfSelectedEntity = this.findAddField(values); if(this.indexOfSelectedEntity === -1){ const tempAdFields = this.pkgDeliverySupplierRangesList.slice(0); tempAdFields.push(adFieldsObj); this.pkgDeliverySupplierRangesList = tempAdFields; } else{ this.pkgDeliverySupplierRangesList[this.indexOfSelectedEntity] = adFieldsObj; } } findAddField(obj) { const index = this.pkgDeliverySupplierRangesList.findIndex((adField: any) => adField.range_start === obj. range_start); return index; } selectEntity(entity: any) { this.updateElement(entity); } updateElement(entity) {\n```"
+      },
+      {
+        "page": 14,
+        "text": "```\nthis.selectedEntity = Object.assign({}, entity); this.displayPopup = true; } afterSaveState() { super.afterSaveState(); if(!this.editionState){ this.pkgDeliverySupplierRangesList = []; } } closePopup() { this.displayPopup = false; } addElement() { this.displayPopup = true; } duplicate() { this.pkgDeliverySupplierRangesList = []; super.duplicate(); } }\n```\n\n\n# Popup\n\ndeliverySupplierCode-popup.component.html"
+      },
+      {
+        "page": 15,
+        "text": "# deliverySupplierCode-popup.component.html\n\n\n```\n<pwc-popup [header]=\"'delivery_supplier_code.text.ranges' | pwcTrans | async\" [(displayPopup)]=\"displayPopup\" width=\"1000\" okLabel=\"Validate\" (onCancel)=\"close()\" (onValidate)=\"validate(true)\" [okLabel] = \"'Common.tooltip.save'\" [forceOverflow]=\"true\" [validateDesabled]=\"array.invalid\"> <!-- Header --> <div class=\"pageHeader\"></div> <!-- Content --> <div class=\"content\"> <div class=\"criterias\"> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-12\"> <pwc-input id=\"range_start\" type=\"number\" [array]=\"array\" [labelKey]=\"'Common.input.range_start'\" [maxlength]=\"18\" [min]=\"minRangeStart()\" [readOnly]=\"modeUpdate\" [required]=\"true\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-12\"> <pwc-input id=\"range_end\" type=\"number\" [array]=\"array\" [labelKey]=\"'Common.input.range_end'\" [maxlength]=\"18\" [min]=\"getControl('range_start')?.value\" [readOnly]=\"modeUpdate\" [required]=\"true\"> </pwc-input> </div> </div> </div> </div> <!-- Footer --> <div class=\"additional-actionfooter\" style=\"display: inline-block\"> <pwc-button [disabled]=\"array.invalid\" *ngIf=\"!modeUpdate\" id=\"addNewAdFieldBtn\" type=\"button\" labelKey=\"Common.tooltip.save.and.add\" (click)=\"validate(false)\" [icon]=\"'fa-check'\" [iconPos]=\"'right'\"> </pwc-button> </div> </pwc-popup>\n```\n\n\n## deliverySupplierCode-popup.component.ts\n\n\n```\ndeliverySupplierCode-popup.component.ts import { Component, Injector, Output, EventEmitter, Input, ChangeDetectorRef } from '@angular/core';\n```\n\n\n```\nimport { AbstractPopupComponent, CommonService } from '@pwc/shared'; import { SCREEN } from '../../deliverySupplierCode.config'; import { PkgDeliverySupplierRangesEntity } from '../../vo/pkgDeliverySupplierRanges.entity'; import { BehaviorSubject } from 'rxjs'; import { FormArray } from '@angular/forms';\n```"
+      },
+      {
+        "page": 16,
+        "text": "```\n@Component({ selector: 'pwc-comp-deliverySupplierCode-popup', templateUrl: './deliverySupplierCode-popup.component.html' }) export class DeliverySupplierCodePopupComponent extends AbstractPopupComponent { @Output() onClose: EventEmitter<Boolean> = new EventEmitter(); @Output() onValidate: EventEmitter<any> = new EventEmitter(); @Input() pkgDeliverySupplierRangesEntity: Array<PkgDeliverySupplierRangesEntity>; @Input() selectedEntityBehSub: BehaviorSubject<PkgDeliverySupplierRangesEntity> = new BehaviorSubject<PkgDeliverySupplierRangesEntity>(null); @Input() set selectedEntity(_selectedEntity: any) { if (_selectedEntity) { this.selectedEntityBehSub.next(_selectedEntity); } } selectedEnt: any; modeUpdate: boolean = false; cdr: ChangeDetectorRef; constructor(injector: Injector) { super(injector); this.cdr = injector.get(ChangeDetectorRef); } ngOnInit() { super.ngOnInit(); this._buildForm(); } _buildForm() { // Build child group this.array = new FormArray([]); this.addControlsToArray(); } ngAfterViewInit() { super.ngAfterViewInit(); this.selectedEntityBehSub.subscribe((entity: any) => { if (entity != null) { this.selectedEnt = entity; if (this.getControl('range_start')) { this.getControl('range_start').setValue(entity.range_start); } if (this.getControl('range_end')) { this.getControl('range_end').setValue(entity.range_end); } this.modeUpdate = true; } }); this.cdr.detectChanges(); } validate(closePopup: boolean) { // Action on save //this.commonService.displayInfoMessage('Validate', 'Validate Popup Action'); const values = this.getAllValues(); if (this.array.valid && values.range_start != null && !this.modeUpdate) { this.onValidate.emit(values); } // } else if (this.array.valid && values.range_start != null && this.modeUpdate) { //   this.onValidate.emit(Object.assign({}, { ...this.selectedEnt, ...values })); // } closePopup ? this.close() : this.clear(); }\n```"
+      },
+      {
+        "page": 17,
+        "text": "```\nminRangeStart() { if (!this.modeUpdate) { return Math.max.apply(Math, this.pkgDeliverySupplierRangesEntity.map(r => r.range_end)) + 1; } } cancel() { //TODO:  ADD TO HTML // Action on cancel //this.commonService.displayInfoMessage('Cancel', 'Cancel Popup Action'); } close() { this.onClose.emit(false); this.modeUpdate = false; this.clear(); } clear() { this.array.reset(); } getBundleName(): string { return SCREEN; }\n```\n\n}\n\n\n# Server\n\nIn the pwc-server project the .btdesign file needs to be modified. The affected backend element is located in:  pwcserver\\paramsCardholder\\src\\main\\resources\\paramsCardholder.btdesign.\n\n1) New entity"
+      },
+      {
+        "page": 18,
+        "text": "```\nPkg_delivery_supplier_ranges Entity Pkg_delivery_supplier_ranges { databaseTable=\"Pkg_delivery_supplier_ranges\" auditable !optimisticLocking scaffold -@ Delivery_supplier_code fk_pkg_deliv_suppl_ranges key hint=\"BaseColumn1=delivery_supplier_code, BaseColumn2=bank_code\" opposite pkg_delivery_supplier_rangesList; String range_start key databaseType=\"NUMBER(18,0)\"; String range_end databaseColumn=\"range_end\" databaseType=\"NUMBER(18,0)\" nullable; String last_number databaseColumn=\"last_number\" databaseType=\"NUMBER(18,0)\" nullable; Repository Pkg_delivery_supplier_rangesRepository { findByKeys;findByKey;findByCondition;findByCriteria; } } DataTransferObject Pkg_delivery_supplier_rangesVO { String  bank_code; String  delivery_supplier_code; String  range_start; String  range_end; String  last_number; } Service Pkg_delivery_supplier_rangesService{ > @Pkg_delivery_supplier_rangesRepository String createPkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); String updatePkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); String deletePkg_delivery_supplier_rangesService(@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); List<@Pkg_delivery_supplier_rangesVO> getAllPkg_delivery_supplier_rangesService(); List<@Pkg_delivery_supplier_rangesVO> searchPkg_delivery_supplier_rangesService (@Pkg_delivery_supplier_rangesVO pkg_delivery_supplier_rangesVO); }\n```\n\nDelivery supplier ranges added as and as . entity DataTransferObject\n\n2) Modified delivery supplier code (+ranges)"
+      },
+      {
+        "page": 19,
+        "text": "```\ndelivery-supplier-code /**************************** Delivery_supplier_code ****************************/ Entity Delivery_supplier_code { databaseTable=\"Delivery_supplier_code\" !auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String delivery_supplier_code key databaseType=\"CHAR(3)\"; String abrv_wording databaseColumn=\"abrv_wording\" length=\"16\" nullable; String wording databaseColumn=\"wording\" length=\"32\" nullable; String plastic_flag databaseColumn=\"plastic_flag\" databaseType=\"CHAR(1)\" nullable; String pin_flag databaseColumn=\"pin_flag\" databaseType=\"CHAR(1)\" nullable; String statement_flag databaseColumn=\"statement_flag\" databaseType=\"CHAR(1)\" nullable; String status databaseColumn=\"status\" databaseType=\"CHAR(1)\" nullable; String threshold databaseColumn=\"threshold\" databaseType=\"NUMBER(2,0)\" nullable; - Set<@Pkg_delivery_supplier_ranges> pkg_delivery_supplier_rangesList cascade = \"all-delete-orphan\" opposite fk_pkg_deliv_suppl_ranges; Repository Delivery_supplier_codeRepository { findByKeys;findByKey;findByCondition;findByCriteria; } } DataTransferObject Delivery_supplier_codeVO { String  bank_code; String  delivery_supplier_code; String  abrv_wording; String  wording; String  plastic_flag; String  pin_flag; String  statement_flag; String status; String threshold; Collection <Pkg_delivery_supplier_rangesVO> pkg_delivery_supplier_ranges_col hint = \"Set=pkg_delivery_supplier_rangesList\" ; } Service Delivery_supplier_codeService{ > @Delivery_supplier_codeRepository > @Pkg_delivery_supplier_rangesService String createDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); String updateDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); String deleteDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); List<@Delivery_supplier_codeVO> getAllDelivery_supplier_codeService(); List<@Delivery_supplier_codeVO> searchDelivery_supplier_codeService(@Delivery_supplier_codeVO delivery_supplier_codeVO); }\n```\n\nHow to build: Using Sculptor generator => Case 2: Add a new entity\n\n\n# Database\n\nFor the database two new need to be added: and delivery_supplier_ranges_df. The second one has been created for tables delivery_supplier_ranges keeping history of data changes."
+      }
+    ]
+  }
+}

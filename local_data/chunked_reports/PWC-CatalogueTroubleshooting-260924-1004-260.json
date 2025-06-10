@@ -1,0 +1,42 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-CatalogueTroubleshooting-260924-1004-260",
+    "pages_amount": 1,
+    "text_blocks_amount": 25,
+    "tables_amount": 0,
+    "pictures_amount": 0,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 244,
+        "text": "# Catalogue Troubleshooting\n\n\n## Introduction\n\n\nWhen an error occurs during the validation of a marketable catalog product, the following elements must be analyzed:\n- Check if the error is logged on the catalogue_traces table\n\n\nSelect * from catalogue_traces order by date_create desc\n\n\n- Open the server logs (Jboss, etc.)\n\n\nCheck that we point toward the logs associated to the catalog validation operation.\n\nGo to the top of the log containing the issue and start reading the log files trying to identify the table name field or specific service name that causes the issue.\n\n\n## Recurring error examples\n\n\n## Constraint violation\n\nThe constraint name is traced in the log file. In this scenario, you must open this constraint in sqlnav to identify the field and table names that cause the issue and then look into the catalogue_mapping and catalogue_defaulting tables to find the data source for this identified field on the catalogue\n\nExample:\n\nselect * from catalogue_mapping where entity_name = 'Cr_profile' and field_name = 'com_year'\n\ncatalogue_mapping: Contains the mapping setting between XML tags and the fields of the various tables.\n\ncatalogue_defaulting: Contains the default values of the fields that are non-visible on the catalogue screen.",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 260,
+        "text": "catalogue_mapping: Contains the mapping setting between XML tags and the fields of the various tables.\n\ncatalogue_defaulting: Contains the default values of the fields that are non-visible on the catalogue screen.\n\n\nTwo use cases are possible in this scenario:\n- Not null constraint violation\n- 1.  There is an entry for the identified field in the catalogue_mapping table, but the field is not mandatory in the XML file and thus not filled in by the project team.\n- 2.  There is no entry for the identified field in either the catalogue_mapping nor the catalogue_defaulting table while this field is mandatory in the database scheme.\n- Check constraint violationIn this scenario, the possible values for the field in the database differ from the default value in the catalogue_defaulting or in the possible values declared in the XML file (static_list).\n\n\n\n## Error in the specific service treatment\n\n80% of the catalogue tables are processed in the same way through a generic process that ignore the tables name and structure. This generic process is stable and rarely edited by the developers.\n\n20 % of the remaining table are handled by specific services.\n\nYou can find the list of specific services on the following Repo server repository:  catalogue/src/main/java/ma/hps/powercard/catalogue/injectorspec/",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 120,
+        "text": "20 % of the remaining table are handled by specific services.\n\nYou can find the list of specific services on the following Repo server repository:  catalogue/src/main/java/ma/hps/powercard/catalogue/injectorspec/\n\nIf by reading the server log files you spot an error in a specific service that belongs to the Online team (Example: Product_domainInjector, Autho_fees_paramInjector) then route the defect to the Online team. If you spot an error in a specific service that belongs to the Issuing team then analyze the service source code to identify the source of the issue.",
+        "id": 2,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# Catalogue Troubleshooting\n\n\n## Introduction\n\n\nWhen an error occurs during the validation of a marketable catalog product, the following elements must be analyzed:\n- Check if the error is logged on the catalogue_traces table\n\n\nSelect * from catalogue_traces order by date_create desc\n\n\n- Open the server logs (Jboss, etc.)\n\n\nCheck that we point toward the logs associated to the catalog validation operation.\n\nGo to the top of the log containing the issue and start reading the log files trying to identify the table name field or specific service name that causes the issue.\n\n\n## Recurring error examples\n\n\n## Constraint violation\n\nThe constraint name is traced in the log file. In this scenario, you must open this constraint in sqlnav to identify the field and table names that cause the issue and then look into the catalogue_mapping and catalogue_defaulting tables to find the data source for this identified field on the catalogue\n\nExample:\n\nselect * from catalogue_mapping where entity_name = 'Cr_profile' and field_name = 'com_year'\n\ncatalogue_mapping: Contains the mapping setting between XML tags and the fields of the various tables.\n\ncatalogue_defaulting: Contains the default values of the fields that are non-visible on the catalogue screen.\n\n\nTwo use cases are possible in this scenario:\n- Not null constraint violation\n- 1.  There is an entry for the identified field in the catalogue_mapping table, but the field is not mandatory in the XML file and thus not filled in by the project team.\n- 2.  There is no entry for the identified field in either the catalogue_mapping nor the catalogue_defaulting table while this field is mandatory in the database scheme.\n- Check constraint violationIn this scenario, the possible values for the field in the database differ from the default value in the catalogue_defaulting or in the possible values declared in the XML file (static_list).\n\n\n\n## Error in the specific service treatment\n\n80% of the catalogue tables are processed in the same way through a generic process that ignore the tables name and structure. This generic process is stable and rarely edited by the developers.\n\n20 % of the remaining table are handled by specific services.\n\nYou can find the list of specific services on the following Repo server repository:  catalogue/src/main/java/ma/hps/powercard/catalogue/injectorspec/\n\nIf by reading the server log files you spot an error in a specific service that belongs to the Online team (Example: Product_domainInjector, Autho_fees_paramInjector) then route the defect to the Online team. If you spot an error in a specific service that belongs to the Issuing team then analyze the service source code to identify the source of the issue."
+      }
+    ]
+  }
+}

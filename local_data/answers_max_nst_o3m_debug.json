@@ -1,0 +1,152 @@
+{
+  "questions": [
+    {
+      "question_text": "Describe the step-by-step process to add a new attribute (field) across the PowerCard solution, including which files or modules must be changed in the UI, server, and database layers.",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/0"
+      }
+    },
+    {
+      "question_text": "What is the recommended Git branching strategy for developing new features in PowerCard, including branch naming conventions and pull request process?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/1"
+      }
+    },
+    {
+      "question_text": "How can a developer set up a local development environment for PowerCard, including the necessary tools, VDI usage, and any key configuration steps?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/2"
+      }
+    },
+    {
+      "question_text": "If you need to add a details datatable (such as for courier ranges) to an existing screen, what UI components and backend value objects (VOs) are involved, and what is the typical workflow?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/3"
+      }
+    },
+    {
+      "question_text": "What changes are required in the 'Delivery supplier code' screen and associated backend entities to add support for courier range numbers?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/4"
+      }
+    },
+    {
+      "question_text": "Which specific process should be followed after making changes in a .btdesign file to compile, package, and deploy the server-side changes to a PowerCard environment?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/5"
+      }
+    },
+    {
+      "question_text": "Explain the architectural purpose of the paramsCardholder.btdesign file in PowerCard and its role in the server-side implementation.",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/6"
+      }
+    },
+    {
+      "question_text": "How are static lists, such as 'Pkg_status_flag', referenced and utilized within the PowerCard UI configuration for search or details screens?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/7"
+      }
+    },
+    {
+      "question_text": "Describe how a developer can identify which UI and server modules to modify when editing or extending a specific PowerCard screen.",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/8"
+      }
+    },
+    {
+      "question_text": "What is the recommended process for handling database schema changes (such as adding fields or tables) in the PowerCard project, including script organization and execution?",
+      "kind": "name",
+      "value": null,
+      "references": [],
+      "error": "ValueError: No relevant context found (global retrieval)",
+      "answer_details": {
+        "$ref": "#/answer_details/9"
+      }
+    }
+  ],
+  "answer_details": [
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/0"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/1"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/2"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/3"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/4"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/5"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/6"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/7"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/8"
+    },
+    {
+      "error_traceback": "Traceback (most recent call last):\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 344, in _process_single_question\n    answer_dict = self.process_question(question_text, schema)\n  File \"/Users/lsofianos/Documents/NexiChatbot/django-mistral/advanced_rag/src/questions_processing.py\", line 217, in process_question\n    raise ValueError(\"No relevant context found (global retrieval)\")\nValueError: No relevant context found (global retrieval)\n",
+      "self": "#/answer_details/9"
+    }
+  ],
+  "statistics": {
+    "total_questions": 10,
+    "error_count": 10,
+    "na_count": 0,
+    "success_count": 0
+  }
+}

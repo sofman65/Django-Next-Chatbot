@@ -1,0 +1,238 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-17094804-260924-1001-246",
+    "pages_amount": 8,
+    "text_blocks_amount": 264,
+    "tables_amount": 0,
+    "pictures_amount": 3,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 280,
+        "text": "# 1. Edit an existing screen - add a new field (use case 5-6-7)\n\n\n## Introduction.\n\nThis is a specific feature described in  Assign Courier\n\nThe task involved in adding two parameters for a courier\n\n\n- 1.  Threshold: It refers to alerting and is expressed as a percentage. A courier is assigned a given Range of Numbers for delivering parcels. Each new delivery consumes a Range Number. Threshold signifies what is the minimum number of Range Numbers left before raising an alert for renewing the Range Numbers.\n- e.g. If the courier named LDH is given a span of 1000 Range Numbers, with a Threshold of 20%,\n- having a Start Range Number:1000 and an End Range Number: 2000, then when the consumed Range Number has reached the value of 1800, an alert will be raised for renewing the range numbers.\n- 2.  Status: If the courier is Enabled or Disable in the sense whether it can be used or not.\n\n\nThe first task was first to identify whether his kind of functionality is offered from PowerCard or identify where we could intervene as to provide this functionality.\n\nThe screen of in Issuing / Parameters / Embossing seemed to fit the requirements. \"Delivery supplier code\"\n\n\n## How to locate the component that need to change in U.I. and Server.",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 201,
+        "text": "The screen of in Issuing / Parameters / Embossing seemed to fit the requirements. \"Delivery supplier code\"\n\n\n## How to locate the component that need to change in U.I. and Server.\n\nOne of the crucial matters is how to locate the screen, in terms of the U.I. and the Server, where the additional code must be inserted.\n\nThe Browser assist us in locating the code. In case of Chrome we use More Tools  Developer Tools.\n\nThe open a debug window showing the posting of the page.\n\nFor the  U.I. we look under the submenu of the Sources Developer Tools:\n\nIn order to locate the element on the U.I., simply select and element (=input box), right click on the element and from the pop up menu select \" \" Inspect\n\nFor the Server we look under the submenu of the Network Developer Tools:\n\nIn order to get a request from the server pressing a button e.g. \"Search\" button will do the job in reveling the server side component.",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 284,
+        "text": "For the Server the path where changes need to place is: paramsCardholder/Delivery_supplier_codeService\n\n\n# Building the additional two fields (= thershold - status )\n\n\n## 1. pwc-db (Oracle Server)\n\n\nFirst we clone the pwc-db:\n- Next we make or we check our branch / feature.\n- On this directory structure we make our changes.\n- On the Database what we must tackle are:\n- a.  Two additional fields on the table delivery_supplier_code       : (pwc-\n\n\n\n## db\\Installation_pkg\\Patch\\BO\\Dev_DB_Repository\\002_Tables)\n\n\n- i.  File name: DELIVERY_SUPPLIER_CODE.SQL\n- Note the delimiter after line, it is best to use (  ) or but not both / ( ; )\n- b.  Two additional fields on the table delivery_supplier_code_df :  (pwc-db\\Installation_pkg\\Patch\\BO\\Dev_DB_Repository\\002_Tables)\n- i.  File name: DELIVERY_SUPPLIER_CODE_DF.SQL\n- c.  Constraints on the fields\n- d.  Altering the triggers on the table delievery_supplier_code for Before_Delete , After Delete\n- ... The Database \"module\" will be revisited when we will add the labeling on the U.I.\n\n\n\n## 2. pwc-server (application server)",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 153,
+        "text": "## 2. pwc-server (application server)\n\n\n- Again we clone the branch. Checkout or build are own feature branch and add our changes.\n\n\nOn the server-side after locating the path next we go /src/main/resources paramsCardholder/Delivery_supplier_codeService,\n\n\n- /paramsCardholder.btdesign\n- (IntelliJIDEA is used to open the tree structure of the server code)\n\n\nThe full path is therefore and the file is : paramsCardholder/src/main/resources/ paramsCardholder.btdesign\n\nIn the file we search for which is the name of the Entity that we will implement our paramsCardholder.btdesign Delivery_Supplier_Code , changes.\n\n\nThe sections that need to be altered are:\n- a. Delivery_supplier_code Entity",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 264,
+        "text": "```\nEntity Delievery_supplier_code Entity Delivery_supplier_code { databaseTable=\"Delivery_supplier_code\" !auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String delivery_supplier_code key databaseType=\"CHAR(3)\"; String abrv_wording databaseColumn=\"abrv_wording\" length=\"16\" nullable; String wording databaseColumn=\"wording\" length=\"32\" nullable; String plastic_flag databaseColumn=\"plastic_flag\" databaseType=\"CHAR(1)\" nullable; String pin_flag databaseColumn=\"pin_flag\" databaseType=\"CHAR(1)\" nullable; String statement_flag databaseColumn=\"statement_flag\" databaseType=\"CHAR (1)\" nullable; String status databaseColumn=\"status\" databaseType=\"CHAR(1)\" nullable; String threshold databaseColumn=\"threshold\" databaseType=\"NUMBER(2,0)\" nullable; }\n```\n\n\n# b. Delivery_supplier_codeVO\n\n\n```\nDelivery_supplier_codeVO String  delivery_supplier_code;\n```\n\n\n```\nDataTransferObject Delivery_supplier_codeVO { String  bank_code; String  abrv_wording; String  wording; String  plastic_flag; String  pin_flag; String  statement_flag; String status; String threshold; }\n```\n\n\n## c. Compilation",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 88,
+        "text": "## c. Compilation\n\n\n- i.  After the changes save on the btddesign file, right click on the directory that contains our file changes do TortoiseGit  Clean Up\n- v.  Next we go to the directory pwc-server\\paramsCardholder,  do a cmd on the directory, and at command prompt, we invoke maven complication\n\n\nmvn clean install -Dmaven.test.skip=true v.",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 288,
+        "text": "Then we replace the *.jar produce we replace into the v3_31-web.war. Redeploy into jboss.\n\nOr by directing to the v3_31-parent directory and we execute\n\n\n# mvn install\n\nThis will produce the v3_31-web.war in the target subdirectory i.e. pwc-server\\v3-31-web\\target and we deploy the war to jboss\n\n(v3-31-parent\\pom.xml ?)\n\n\n- d.  Final step is to upload our code to bitbucket.\n\n\nSince we know the file and the path of the file we add git add paramsCardholder/src/main/resources/ paramsCardholder.btdesigngit push\n\n\n## 3.\n\ngit commit -m \"pkg-5: courier setupCreate Courier and link to an institution Define threshold per Courier Deactivate Courier\" pwc-ui (u.i.)\n\nThe pwc-ui is cloned, we make or checkout our feature branch.\n\nWe open the source code using Visual Studio (V.S.)\n\nWe comment the file mention in 0. Introduction, in order to speed up UI complilation\n\nNext we go the branch that we detected, in the U.I. in V.S. /src/app/parameters/issuing/product/delivery-supplier-code\n\n\nThe files that we change are located in the subdirectories:\n- /src/assets-test/parameters/issuing file: delivery-supplier-code.mock.json",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 148,
+        "text": "The files that we change are located in the subdirectories:\n- /src/assets-test/parameters/issuing file: delivery-supplier-code.mock.json\n\n\n\n## delivery-supplier-code.mock.json\n\n\n```\n\"pkg_delivery_supplier_ranges_col\" : null\n```\n\n\n```\n[{ \"bank_code\": null, \"delivery_supplier_code\": null, \"abrv_wording\": null, \"wording\" : null, \"pin_flag\" : null, \"plastic_flag\" : null, \"statement_flag\" : null, \"status\" : null, \"threshold\" : null, }]\n```\n\n\n- src/app/parameters/issuing/product/delivery-supplier-code/ view\n\n\n\n## delievrySupplierCode-criterias.component.html",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 227,
+        "text": "- src/app/parameters/issuing/product/delivery-supplier-code/ view\n\n\n\n## delievrySupplierCode-criterias.component.html\n\n\n```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"delivery_supplier_code\" type=\"input\" [array]=\"array\" maxlength=\"3\" [minLength]=\"context.state === 'DETAIL'?3:0\" [labelKey]=\"'Common.input.delivery_supplier_code_label'\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\"> </pwc-input> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\">\n```",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 297,
+        "text": "<pwc-input id=\"wording\" type=\"input\" [array]=\"array\" maxlength=\"32\" [labelKey]=\"'Common.input.wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"abrv_wording\" [array]=\"array\" type=\"input\" maxlength=\"16\" [labelKey]=\"'Common.input.abrv_wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12 ui-md-12\"> <div class=\"ui-g-6 ui-md-6\"> <pwc-input id=\"threshold\" type=\"number\" [array]=\"array\" maxlength=\"2\" [labelKey]=\"'Common.input.pkg_threshold'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-6 ui-md-6\"> <pwc-radiobutton id=\"status\" maxlength=\"1\" labelKey=\"Common.input.status_flag\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'delivery_supplier_code.input.status_enable'| pwcTrans | async, 'D':'delivery_supplier_code.input.status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div> <div",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 295,
+        "text": "pwcTrans | async, 'D':'delivery_supplier_code.input.status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"plastic_flag\" eurekaLabel=\"value_label\"  eurekaCode=\" value_id\" [isECode]='false' [labelKey]=\"'plastic_flag.input.plastic_flag'\" [array]=\"array\" [data]=\" context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\" context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"pin_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'pin_flag.input.pin_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"statement_flag\" eurekaLabel=\"value_label\" eurekaCode=\" value_id\"",
+        "id": 11,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 119,
+        "text": "null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"statement_flag\" eurekaLabel=\"value_label\" eurekaCode=\" value_id\" [isECode]='false' [labelKey]=\"'statement_flag.input.statement_flag'\" [array]=\"array\" [data]=\"context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> </div>",
+        "id": 12,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 13,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 26,
+        "text": "This is search and the data entry screen\n\n\n- deliverySupplierCode.component.ts These are details of the search (list), column headers",
+        "id": 14,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 6,
+        "text": "# deliverySupplierCode.component.ts",
+        "id": 15,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 16,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 290,
+        "text": "import {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '.. /deliverySupplierCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; import {DeliverySupplierCodeEntity} from '../vo/deliverySupplierCode.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-delivery-supplier-code', templateUrl: './deliverySupplierCode.component.html' }) export class DeliverySupplierCodeComponent extends AbstractSearchScreenComponent { deliverySupplierCodeEntity: DeliverySupplierCodeEntity = new DeliverySupplierCodeEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.addStringColumn({field:'delivery_supplier_code', header:'Common.input. delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true});",
+        "id": 17,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 188,
+        "text": "header:'Common.input. delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true}); this.addStringColumn({field:'wording', header:'Common.input.wording', sortable: true}); this.addStringColumn({field:'threshold', header:'Common.input.pkg_threshold', sortable: true}); this.addStaticListColumn({ field: 'status', header: 'Common.input.status_flag', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.deliverySupplierCodeEntity = new DeliverySupplierCodeEntity(this.getAllValues()); this.searchEntity(this.deliverySupplierCodeEntity); } getBundleName(): string { return SCREEN; } duplicateEntity(entity) { const duplicateEntity = {...entity}; duplicateEntity.pkg_delivery_supplier_ranges_col = []; super.duplicateEntity(duplicateEntity) } }",
+        "id": 18,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 19,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 24,
+        "text": "- src/app/parameters/issuing/product/delivery-supplier-code/ vo\n\n\nDefining the entities of the screen",
+        "id": 20,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 21,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 299,
+        "text": "deliverySupplierCode.entity.ts import {AbstractEntity} from '@pwc/shared'; import { PkgDeliverySupplierRangesEntity } from './pkgDeliverySupplierRanges.entity'; export class DeliverySupplierCodeEntity extends AbstractEntity { bank_code: string; delivery_supplier_code  : string; abrv_wording: string; wording: string; pin_flag: string; plastic_flag: string; statement_flag: string; status: string; threshold: string; pkg_delivery_supplier_ranges_col: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col: number; constructor({ bank_code = null, delivery_supplier_code = null, abrv_wording = null, wording = null, pin_flag = null, plastic_flag = null, statement_flag = null, status = null, threshold = null, pkg_delivery_supplier_ranges_col = null, lazy_level_col = 1 }: { bank_code?: string delivery_supplier_code?: string; abrv_wording?: string; wording?: string; pin_flag?: string; plastic_flag?: string; statement_flag?: string; status?: string; threshold?: string; pkg_delivery_supplier_ranges_col?: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col?: number; }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.abrv_wording = abrv_wording; this.wording = wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status =",
+        "id": 22,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 79,
+        "text": "= delivery_supplier_code; this.abrv_wording = abrv_wording; this.wording = wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status = status; this.threshold = threshold; this.pkg_delivery_supplier_ranges_col = pkg_delivery_supplier_ranges_col; this.lazy_level_col = lazy_level_col; } }",
+        "id": 23,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 24,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 32,
+        "text": "- src/app/parameters/issuing/product/delivery-supplier-code / deliverSupplierCode.config.ts\n\n\nDefinition of lookup / labeling values read from the database.",
+        "id": 25,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 193,
+        "text": "```\ndeliverSupplierCode.config.ts export const SCREEN = 'delivery_supplier_code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Delivery_supplier_code'; export const SEARCH_PARAM_REFS = ['Bank']; export const SEARCH_STATIC_LISTS = ['pin_plastic_statement','Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# Compilation\n\nThe compilation command in given from the Terminal window in V.S. :\n\n\n## node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\n(We have already run at command in the directory and correctly configured file in the User profile directory) npm install pwc-ui .npmrc\n\nOnce the code has been compiled \"successfully\" (Compiled with warning), we can view our code on Powercard UI. at the URL:\n\nhttp://localhost:4200/#/param/issuing/delivery-supplier-code",
+        "id": 26,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# 1. Edit an existing screen - add a new field (use case 5-6-7)\n\n\n## Introduction.\n\nThis is a specific feature described in  Assign Courier\n\nThe task involved in adding two parameters for a courier\n\n\n- 1.  Threshold: It refers to alerting and is expressed as a percentage. A courier is assigned a given Range of Numbers for delivering parcels. Each new delivery consumes a Range Number. Threshold signifies what is the minimum number of Range Numbers left before raising an alert for renewing the Range Numbers.\n- e.g. If the courier named LDH is given a span of 1000 Range Numbers, with a Threshold of 20%,\n- having a Start Range Number:1000 and an End Range Number: 2000, then when the consumed Range Number has reached the value of 1800, an alert will be raised for renewing the range numbers.\n- 2.  Status: If the courier is Enabled or Disable in the sense whether it can be used or not.\n\n\nThe first task was first to identify whether his kind of functionality is offered from PowerCard or identify where we could intervene as to provide this functionality.\n\nThe screen of in Issuing / Parameters / Embossing seemed to fit the requirements. \"Delivery supplier code\"\n\n\n## How to locate the component that need to change in U.I. and Server.\n\nOne of the crucial matters is how to locate the screen, in terms of the U.I. and the Server, where the additional code must be inserted.\n\nThe Browser assist us in locating the code. In case of Chrome we use More Tools  Developer Tools.\n\nThe open a debug window showing the posting of the page.\n\nFor the  U.I. we look under the submenu of the Sources Developer Tools:\n\nIn order to locate the element on the U.I., simply select and element (=input box), right click on the element and from the pop up menu select \" \" Inspect\n\nFor the Server we look under the submenu of the Network Developer Tools:\n\nIn order to get a request from the server pressing a button e.g. \"Search\" button will do the job in reveling the server side component."
+      },
+      {
+        "page": 2,
+        "text": "For the Server the path where changes need to place is: paramsCardholder/Delivery_supplier_codeService\n\n\n# Building the additional two fields (= thershold - status )\n\n\n## 1. pwc-db (Oracle Server)\n\n\nFirst we clone the pwc-db:\n- Next we make or we check our branch / feature.\n- On this directory structure we make our changes.\n- On the Database what we must tackle are:\n- a.  Two additional fields on the table delivery_supplier_code       : (pwc-\n\n\n\n## db\\Installation_pkg\\Patch\\BO\\Dev_DB_Repository\\002_Tables)\n\n\n- i.  File name: DELIVERY_SUPPLIER_CODE.SQL\n- Note the delimiter after line, it is best to use (  ) or but not both / ( ; )\n- b.  Two additional fields on the table delivery_supplier_code_df :  (pwc-db\\Installation_pkg\\Patch\\BO\\Dev_DB_Repository\\002_Tables)\n- i.  File name: DELIVERY_SUPPLIER_CODE_DF.SQL\n- c.  Constraints on the fields\n- d.  Altering the triggers on the table delievery_supplier_code for Before_Delete , After Delete\n- ... The Database \"module\" will be revisited when we will add the labeling on the U.I.\n\n\n\n## 2. pwc-server (application server)\n\n\n- Again we clone the branch. Checkout or build are own feature branch and add our changes.\n\n\nOn the server-side after locating the path next we go /src/main/resources paramsCardholder/Delivery_supplier_codeService,\n\n\n- /paramsCardholder.btdesign\n- (IntelliJIDEA is used to open the tree structure of the server code)\n\n\nThe full path is therefore and the file is : paramsCardholder/src/main/resources/ paramsCardholder.btdesign\n\nIn the file we search for which is the name of the Entity that we will implement our paramsCardholder.btdesign Delivery_Supplier_Code , changes.\n\n\nThe sections that need to be altered are:\n- a. Delivery_supplier_code Entity"
+      },
+      {
+        "page": 3,
+        "text": "```\nEntity Delievery_supplier_code Entity Delivery_supplier_code { databaseTable=\"Delivery_supplier_code\" !auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String delivery_supplier_code key databaseType=\"CHAR(3)\"; String abrv_wording databaseColumn=\"abrv_wording\" length=\"16\" nullable; String wording databaseColumn=\"wording\" length=\"32\" nullable; String plastic_flag databaseColumn=\"plastic_flag\" databaseType=\"CHAR(1)\" nullable; String pin_flag databaseColumn=\"pin_flag\" databaseType=\"CHAR(1)\" nullable; String statement_flag databaseColumn=\"statement_flag\" databaseType=\"CHAR (1)\" nullable; String status databaseColumn=\"status\" databaseType=\"CHAR(1)\" nullable; String threshold databaseColumn=\"threshold\" databaseType=\"NUMBER(2,0)\" nullable; }\n```\n\n\n# b. Delivery_supplier_codeVO\n\n\n```\nDelivery_supplier_codeVO String  delivery_supplier_code;\n```\n\n\n```\nDataTransferObject Delivery_supplier_codeVO { String  bank_code; String  abrv_wording; String  wording; String  plastic_flag; String  pin_flag; String  statement_flag; String status; String threshold; }\n```\n\n\n## c. Compilation\n\n\n- i.  After the changes save on the btddesign file, right click on the directory that contains our file changes do TortoiseGit  Clean Up\n- v.  Next we go to the directory pwc-server\\paramsCardholder,  do a cmd on the directory, and at command prompt, we invoke maven complication\n\n\nmvn clean install -Dmaven.test.skip=true v."
+      },
+      {
+        "page": 4,
+        "text": "Then we replace the *.jar produce we replace into the v3_31-web.war. Redeploy into jboss.\n\nOr by directing to the v3_31-parent directory and we execute\n\n\n# mvn install\n\nThis will produce the v3_31-web.war in the target subdirectory i.e. pwc-server\\v3-31-web\\target and we deploy the war to jboss\n\n(v3-31-parent\\pom.xml ?)\n\n\n- d.  Final step is to upload our code to bitbucket.\n\n\nSince we know the file and the path of the file we add git add paramsCardholder/src/main/resources/ paramsCardholder.btdesigngit push\n\n\n## 3.\n\ngit commit -m \"pkg-5: courier setupCreate Courier and link to an institution Define threshold per Courier Deactivate Courier\" pwc-ui (u.i.)\n\nThe pwc-ui is cloned, we make or checkout our feature branch.\n\nWe open the source code using Visual Studio (V.S.)\n\nWe comment the file mention in 0. Introduction, in order to speed up UI complilation\n\nNext we go the branch that we detected, in the U.I. in V.S. /src/app/parameters/issuing/product/delivery-supplier-code\n\n\nThe files that we change are located in the subdirectories:\n- /src/assets-test/parameters/issuing file: delivery-supplier-code.mock.json\n\n\n\n## delivery-supplier-code.mock.json\n\n\n```\n\"pkg_delivery_supplier_ranges_col\" : null\n```\n\n\n```\n[{ \"bank_code\": null, \"delivery_supplier_code\": null, \"abrv_wording\": null, \"wording\" : null, \"pin_flag\" : null, \"plastic_flag\" : null, \"statement_flag\" : null, \"status\" : null, \"threshold\" : null, }]\n```\n\n\n- src/app/parameters/issuing/product/delivery-supplier-code/ view\n\n\n\n## delievrySupplierCode-criterias.component.html\n\n\n```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"delivery_supplier_code\" type=\"input\" [array]=\"array\" maxlength=\"3\" [minLength]=\"context.state === 'DETAIL'?3:0\" [labelKey]=\"'Common.input.delivery_supplier_code_label'\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\"> </pwc-input> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\">\n```"
+      },
+      {
+        "page": 5,
+        "text": "```\n<pwc-input id=\"wording\" type=\"input\" [array]=\"array\" maxlength=\"32\" [labelKey]=\"'Common.input.wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"abrv_wording\" [array]=\"array\" type=\"input\" maxlength=\"16\" [labelKey]=\"'Common.input.abrv_wording'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12 ui-md-12\"> <div class=\"ui-g-6 ui-md-6\"> <pwc-input id=\"threshold\" type=\"number\" [array]=\"array\" maxlength=\"2\" [labelKey]=\"'Common.input.pkg_threshold'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-6 ui-md-6\"> <pwc-radiobutton id=\"status\" maxlength=\"1\" labelKey=\"Common.input.status_flag\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'delivery_supplier_code.input.status_enable'| pwcTrans | async, 'D':'delivery_supplier_code.input.status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"plastic_flag\" eurekaLabel=\"value_label\"  eurekaCode=\" value_id\" [isECode]='false' [labelKey]=\"'plastic_flag.input.plastic_flag'\" [array]=\"array\" [data]=\" context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\" context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"pin_flag\" eurekaLabel=\"value_label\" eurekaCode=\"value_id\" [isECode]='false' [labelKey]=\"'pin_flag.input.pin_flag'\" [array]=\"array\" [data]=\"context.ref.get ('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-eureka id=\"statement_flag\" eurekaLabel=\"value_label\" eurekaCode=\" value_id\" [isECode]='false' [labelKey]=\"'statement_flag.input.statement_flag'\" [array]=\"array\" [data]=\"context.ref.get('pin_plastic_statement')\" [required]=\"context.state === 'DETAIL'\" [defaultValue]=\"context.state === 'DETAIL'? 'N': null\"> </pwc-eureka> </div> </div>\n```\n\nThis is search and the data entry screen\n\n\n- deliverySupplierCode.component.ts These are details of the search (list), column headers"
+      },
+      {
+        "page": 6,
+        "text": "# deliverySupplierCode.component.ts\n\n\n```\nimport {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '.. /deliverySupplierCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; import {DeliverySupplierCodeEntity} from '../vo/deliverySupplierCode.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-delivery-supplier-code', templateUrl: './deliverySupplierCode.component.html' }) export class DeliverySupplierCodeComponent extends AbstractSearchScreenComponent { deliverySupplierCodeEntity: DeliverySupplierCodeEntity = new DeliverySupplierCodeEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.addStringColumn({field:'delivery_supplier_code', header:'Common.input. delivery_supplier_code_label', sortable: true}); this.addStringColumn({field:'abrv_wording', header:'Common.input.abrv_wording', sortable: true}); this.addStringColumn({field:'wording', header:'Common.input.wording', sortable: true}); this.addStringColumn({field:'threshold', header:'Common.input.pkg_threshold', sortable: true}); this.addStaticListColumn({ field: 'status', header: 'Common.input.status_flag', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.deliverySupplierCodeEntity = new DeliverySupplierCodeEntity(this.getAllValues()); this.searchEntity(this.deliverySupplierCodeEntity); } getBundleName(): string { return SCREEN; } duplicateEntity(entity) { const duplicateEntity = {...entity}; duplicateEntity.pkg_delivery_supplier_ranges_col = []; super.duplicateEntity(duplicateEntity) } }\n```\n\n\n- src/app/parameters/issuing/product/delivery-supplier-code/ vo\n\n\nDefining the entities of the screen"
+      },
+      {
+        "page": 7,
+        "text": "```\ndeliverySupplierCode.entity.ts import {AbstractEntity} from '@pwc/shared'; import { PkgDeliverySupplierRangesEntity } from './pkgDeliverySupplierRanges.entity'; export class DeliverySupplierCodeEntity extends AbstractEntity { bank_code: string; delivery_supplier_code  : string; abrv_wording: string; wording: string; pin_flag: string; plastic_flag: string; statement_flag: string; status: string; threshold: string; pkg_delivery_supplier_ranges_col: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col: number; constructor({ bank_code = null, delivery_supplier_code = null, abrv_wording = null, wording = null, pin_flag = null, plastic_flag = null, statement_flag = null, status = null, threshold = null, pkg_delivery_supplier_ranges_col = null, lazy_level_col = 1 }: { bank_code?: string delivery_supplier_code?: string; abrv_wording?: string; wording?: string; pin_flag?: string; plastic_flag?: string; statement_flag?: string; status?: string; threshold?: string; pkg_delivery_supplier_ranges_col?: Array<PkgDeliverySupplierRangesEntity>; lazy_level_col?: number; }) { super(); this.bank_code = bank_code; this.delivery_supplier_code = delivery_supplier_code; this.abrv_wording = abrv_wording; this.wording = wording; this.pin_flag = pin_flag; this.plastic_flag = plastic_flag; this.statement_flag = statement_flag; this.status = status; this.threshold = threshold; this.pkg_delivery_supplier_ranges_col = pkg_delivery_supplier_ranges_col; this.lazy_level_col = lazy_level_col; } }\n```\n\n\n- src/app/parameters/issuing/product/delivery-supplier-code / deliverSupplierCode.config.ts\n\n\nDefinition of lookup / labeling values read from the database."
+      },
+      {
+        "page": 8,
+        "text": "```\ndeliverSupplierCode.config.ts export const SCREEN = 'delivery_supplier_code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Delivery_supplier_code'; export const SEARCH_PARAM_REFS = ['Bank']; export const SEARCH_STATIC_LISTS = ['pin_plastic_statement','Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# Compilation\n\nThe compilation command in given from the Terminal window in V.S. :\n\n\n## node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\n(We have already run at command in the directory and correctly configured file in the User profile directory) npm install pwc-ui .npmrc\n\nOnce the code has been compiled \"successfully\" (Compiled with warning), we can view our code on Powercard UI. at the URL:\n\nhttp://localhost:4200/#/param/issuing/delivery-supplier-code"
+      }
+    ]
+  }
+}

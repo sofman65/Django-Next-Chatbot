@@ -1,0 +1,132 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-Additionofextraattributeonscreen-260924-1002-254",
+    "pages_amount": 6,
+    "text_blocks_amount": 443,
+    "tables_amount": 0,
+    "pictures_amount": 6,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 262,
+        "text": "# Addition of extra attribute on screen\n\n\n- Prerequisites\n- Identification of Screen in pwc-ui code\n- Modification of Screen in pwc-ui module\n- Modification in pwc-server module\n- Modification in pwc-db module\n\n\nThis section analyses the steps required in a generic screen to be performed in order to efficiently add an attribute across all modules of power card solution.\n\n\n## Prerequisites\n\n\nIn order for the local environment to be setup properly the below guides must be followed:\n- 1.  Setup git:  Setup Git\n- 2.  Setup maven:  Building with maven\n- 3.  Setup npm:  Building with npm\n- 4.  Setup JBOSS: 3.Deploy and Run PowerCard end2end\n\n\nAfter the successful setup, the pwc-server must be up and running on  https://127.0.0.1:8443/v3_31-web/rest/\n\nBefore doing any changes to code, a branch must be created related to this change as described in  Git Scenarios document.\n\nFor development is best to run the application through the command as described in  Building with npm document. ng serve\n\nIf everything was ok, the screen of ui should look like this:\n\n66.8 kB",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 286,
+        "text": "For development is best to run the application through the command as described in  Building with npm document. ng serve\n\nIf everything was ok, the screen of ui should look like this:\n\n66.8 kB\n\nchunk {visaFees visaFees chunk. js 311 kB [rendered] chunk modu Te.chunk js 119 kB chunk {visaPlus modu visaplus modu le chunk js 0 50.2 kB [rendered]\n\n[rendered]\n\nchunk\n\n{visaPlus\n\nmodu le . 0}\n\nvisaplus\n\nmodu le\n\n0.chunk\n\njs\n\n0\n\n50.4\n\nkB\n\n[rendered]\n\nchunk\n\n0\n\n61.1\n\nkB\n\n[rendered]\n\nchunk\n\nmodule} workingDays. module- chunk-js\n\n0 71.1 kB\n\n[rendered]\n\nchunk\n\n{xpos\n\nmodu\n\nXpos . module\n\nchunk-js\n\n0\n\n7.27\n\nkB\n\n[rendered]\n\nkhunk {xpos\n\nmodu le.0}xpos. module\n\n0\n\nchunk. js\n\n0\n\n5.53\n\nkB\n\nchunk\n\n{zipCode\n\nzipCode. modu le\n\nchunk. js\n\n0\n\n59\n\nkB\n\n[rendered]\n\nchunk\n\n{0}\n\n0\n\nchunk\n\njs\n\nMB\n\n[rendered]\n\nchunk\n\n{scripts}\n\nscripts",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 284,
+        "text": "zipCode. modu le\n\nchunk. js\n\n0\n\n59\n\nkB\n\n[rendered]\n\nchunk\n\n{0}\n\n0\n\nchunk\n\njs\n\nMB\n\n[rendered]\n\nchunk\n\n{scripts}\n\nscripts\n\nbundle-js\n\n(scripts)\n\n357\n\nkB\n\n[initial]\n\n[rendered]\n\n[\n\nNARNING in assets/css/componentclasses (Emitted va Tue instead of an instance of Error) autoprefixer: css:1431:5: Replace fill-available to stretch because spec had been changed\n\nNARNING in Inode_modules/raw-loader! . /node_modules/postcss-loader/1ib?7embedded!. /src/assets/css/componentclasses (Emitted value instead of an instance of Error) autoprefixer D: |WorkGitisia-repo pwc css:228:5: Replace fill-available to stretch, because spec had been changed ~ui\n\nWARNING in Inode_modules/raw-loader! . /node_modules/postcss-loader/1ib?7embedded!. /src/assets/css/componentclasses (Emitted value instead of an instance of Error) autoprefixer: css:2847:5: Replace fill-available to stretch, because spec had been changed\n\nNARNING in Inode_ modu les 'mobx-angular/dist/utils/mobx-angular-debug- js 2223:15-27 'export getDebugName was not found in mobx",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 213,
+        "text": "NARNING in Inode_ modu les 'mobx-angular/dist/utils/mobx-angular-debug- js 2223:15-27 'export getDebugName was not found in mobx\n\nNARNING in /node_modules /mobx-angular/dist/utils/mobx-angular-debug-js p9: 28-45 'export getDependencyTree was not found in mobx\n\nwebpack: Compiled with warnings _\n\nThe PowerCard application is up and running in the url http://localhost:4200/#/login\n\n\n## Modification of Screen in pwc-ui code\n\nThe starting point of the change is the screen. The required screen to be modified in pwc-ui comes with a path on the url which is mapped on a <<module_ file. name>>.routes.ts\n\n\n```\ne.g. https://cms3sit.vaservices.eu:8443/PowerCardv35/#/admin/center\n```\n\nFor example the above url points to the center screen which is routes to file which leads to class. center.module CenterModule",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 98,
+        "text": "The screen module associates with the relevant angular components:\n\n\nIn the above example the files represent the following functionalities:\n- tests folder = unit tests\n- view folder = the html and typescript files required for the screens\n- vo (value object) folder = the entity component\n- center.config.ts file (should be updated with more info) = configuration file\n- center.module.ts file = angular module class\n\n\nThe view contains all files for presentation of the current module (search, detail):",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 131,
+        "text": "The usual actions associated with each screen are:\n- Search : search for results based on the user input\n- Add : add new entry\n- Clear : clear the results from the previous search\n- Edit an entry of the results table by double-clicking on it\n\n\nEach of these actions are correlated with a rest api call on the back-end (pwc-server).\n\nIn order to find which rest api call is does which action a simple technique is through developer tools of browser (right-click on the page and select the Inspect Element option).\n\ne.g. Search in Center module corresponds to as shown in the picture below: compliance/CenterService/searchCenterService",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 213,
+        "text": "# Modification of Screen in pwc-ui module\n\nBy adding a new field we also must update the entity object (vo), in our case file by adding the attribute name and type. center.entity.ts\n\nEach rest call to pwc-server transfers the whole value object so in order to correctly execute the job value object must be updated with the correct attributes.\n\nAfter the addition of html elements in combination with pwc-shared modules. The main components that are used by screens are part of pwc-shared module which provide custom functionality on basic angular components\n\n<<TODO: explain more about localisation>>\n\ne.g. pwc-toggle, pwc-input, pwc-eureka\n\n\n```\nCenterVO:{ \"center_code\": null, \"grouping_code\": null, \"center_name\": null, \"network_code\": null, \"multi_country_option\": null, \"country_code\": null, \"country_code_alpha\": null, \"currency_code\": null, \"currency_code_alpha\": null, \"page\": 0, \"pageSize\": 0 }\n```",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 276,
+        "text": "```\n\"centerVO\":{ \"center_code\":\"66\", \"grouping_code\":\"N\", \"center_name\":\"SIA TEST 123\", \"network_code\":\"00\", \"multi_country_option\":\"N\", \"country_code\":\"300\", \"country_code_alpha\":\"GRC\", \"currency_code\":\"978\", \"currency_code_alpha\":\"EUR\" }\n```\n\nAffected Bitbucket repository: PowerCardSIA/pwc-ui\n\n\n# Modification in pwc-server module\n\n\nThe rest api calls are done to the following request URLs:\n- /compliance/CenterService/createCenterService = create new Center\n- /compliance/CenterService/searchCenterService = search Center\n- /compliance/CenterService/deleteCenterService = delete Center\n- /compliance/CenterService/updateCenterService = edit Center\n\n\nThis means that the affected backend element is located in the compliance module of the pwc-server project.\n\nGenerally, to change the backend a change in the .btdesign file of the affiliated module is enough. So, in order to add a new field in the Center for example, the pwc-server/compliance/src/main/resources/compliance needs to be changed, in order to reflect the changes in the database. Find .btdesign the entity of the element you want to change and do the modified changes in the Entity and the DataTransferObject (dto).",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 299,
+        "text": "example of the center section in compliance.btdesign /******************** Center **************************/ Entity Center { databaseTable = \"Center\" auditable ! optimisticLocking scaffold String center_code key length = \"2\"; String grouping_code databaseColumn = \"grouping_code\" length = \"1\" nullable; String center_name databaseColumn = \"center_name\" length = \"30\" nullable; - @Network fk_center_nc hint = \"BaseColumn1=network_code\" nullable fetch = \"lazy\"; String multi_country_option databaseColumn = \"multi_country_option\" length = \"1\" nullable; - @Country fk_center_ccd hint = \"BaseColumn1=country_code\" nullable fetch = \"lazy\"; String country_code_alpha databaseColumn = \"country_code_alpha\" length = \"3\" nullable; - @Currency_table fk_center_ccy hint = \"BaseColumn1=currency_code\" nullable fetch = \"lazy\"; String currency_code_alpha databaseColumn = \"currency_code_alpha\" length = \"3\" nullable; Repository CenterRepository { findByKeys; findByKey; findByCondition; findByCriteria; } } DataTransferObject CenterVO { String center_code ; String grouping_code ; String center_name ; String network_code ; String multi_country_option ; String country_code ; String country_code_alpha ; String currency_code ; String currency_code_alpha ; } Service CenterService { > @CenterRepository String createCenterService(@CenterVO centerVO); String updateCenterService(@CenterVO centerVO);",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 85,
+        "text": "; String country_code ; String country_code_alpha ; String currency_code ; String currency_code_alpha ; } Service CenterService { > @CenterRepository String createCenterService(@CenterVO centerVO); String updateCenterService(@CenterVO centerVO); String deleteCenterService(@CenterVO centerVO); List<@CenterVO> getAllCenterService(); List<@CenterVO> searchCenterService(@CenterVO centerVO); }",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 11,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 260,
+        "text": "After the changes are completed, the parent module (v3_31-parent  of the pwc-server project needs to be built (with the command ) for the ) mvn install code to be generated from the compliance.btdesign and the v3_31-web.war to be built.\n\nRead carefully the document Sculptor generator!!!\n\nAffected Bitbucket repository: PowerCardSIA/pwc-server\n\n\n## Modification in pwc-db module\n\nLocate the table from .btdesign file, in this case the Center table\n\n\n```\ndatabaseTable = \"Center\"\n```\n\n\nand then create the following scripts:\n- sql scripts for changing the schema of the table based on the modifications you want to make (e.g. addition of new columns, constraints etc.)\n- sql script for adding all the labels you want to use in the gui (plus the localization of those) in the table RESSOURCE_BUNDLE (the gui gets all\n- the values used as labels from the database)\n- bash script for applying all the above changes in the database\n- bash script for performing rollback on the above changes\n\n\nAdd the required scripts in the pwc-db project as described in the Feature Deployment and Rollback (WIP) document.\n\nAffected Bitbucket repository: PowerCardSIA/pwc-db",
+        "id": 12,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# Addition of extra attribute on screen\n\n\n- Prerequisites\n- Identification of Screen in pwc-ui code\n- Modification of Screen in pwc-ui module\n- Modification in pwc-server module\n- Modification in pwc-db module\n\n\nThis section analyses the steps required in a generic screen to be performed in order to efficiently add an attribute across all modules of power card solution.\n\n\n## Prerequisites\n\n\nIn order for the local environment to be setup properly the below guides must be followed:\n- 1.  Setup git:  Setup Git\n- 2.  Setup maven:  Building with maven\n- 3.  Setup npm:  Building with npm\n- 4.  Setup JBOSS: 3.Deploy and Run PowerCard end2end\n\n\nAfter the successful setup, the pwc-server must be up and running on  https://127.0.0.1:8443/v3_31-web/rest/\n\nBefore doing any changes to code, a branch must be created related to this change as described in  Git Scenarios document.\n\nFor development is best to run the application through the command as described in  Building with npm document. ng serve\n\nIf everything was ok, the screen of ui should look like this:\n\n66.8 kB\n\nchunk {visaFees visaFees chunk. js 311 kB [rendered] chunk modu Te.chunk js 119 kB chunk {visaPlus modu visaplus modu le chunk js 0 50.2 kB [rendered]\n\n[rendered]\n\nchunk\n\n{visaPlus\n\nmodu le . 0}\n\nvisaplus\n\nmodu le\n\n0.chunk\n\njs\n\n0\n\n50.4\n\nkB\n\n[rendered]\n\nchunk\n\n0\n\n61.1\n\nkB\n\n[rendered]\n\nchunk\n\nmodule} workingDays. module- chunk-js\n\n0 71.1 kB\n\n[rendered]\n\nchunk\n\n{xpos\n\nmodu\n\nXpos . module\n\nchunk-js\n\n0\n\n7.27\n\nkB\n\n[rendered]\n\nkhunk {xpos\n\nmodu le.0}xpos. module\n\n0\n\nchunk. js\n\n0\n\n5.53\n\nkB\n\nchunk\n\n{zipCode\n\nzipCode. modu le\n\nchunk. js\n\n0\n\n59\n\nkB\n\n[rendered]\n\nchunk\n\n{0}\n\n0\n\nchunk\n\njs\n\nMB\n\n[rendered]\n\nchunk\n\n{scripts}\n\nscripts\n\nbundle-js\n\n(scripts)\n\n357\n\nkB\n\n[initial]\n\n[rendered]\n\n[\n\nNARNING in assets/css/componentclasses (Emitted va Tue instead of an instance of Error) autoprefixer: css:1431:5: Replace fill-available to stretch because spec had been changed\n\nNARNING in Inode_modules/raw-loader! . /node_modules/postcss-loader/1ib?7embedded!. /src/assets/css/componentclasses (Emitted value instead of an instance of Error) autoprefixer D: |WorkGitisia-repo pwc css:228:5: Replace fill-available to stretch, because spec had been changed ~ui\n\nWARNING in Inode_modules/raw-loader! . /node_modules/postcss-loader/1ib?7embedded!. /src/assets/css/componentclasses (Emitted value instead of an instance of Error) autoprefixer: css:2847:5: Replace fill-available to stretch, because spec had been changed\n\nNARNING in Inode_ modu les 'mobx-angular/dist/utils/mobx-angular-debug- js 2223:15-27 'export getDebugName was not found in mobx\n\nNARNING in /node_modules /mobx-angular/dist/utils/mobx-angular-debug-js p9: 28-45 'export getDependencyTree was not found in mobx\n\nwebpack: Compiled with warnings _\n\nThe PowerCard application is up and running in the url http://localhost:4200/#/login\n\n\n## Modification of Screen in pwc-ui code\n\nThe starting point of the change is the screen. The required screen to be modified in pwc-ui comes with a path on the url which is mapped on a <<module_ file. name>>.routes.ts\n\n\n```\ne.g. https://cms3sit.vaservices.eu:8443/PowerCardv35/#/admin/center\n```\n\nFor example the above url points to the center screen which is routes to file which leads to class. center.module CenterModule"
+      },
+      {
+        "page": 2,
+        "text": "The screen module associates with the relevant angular components:\n\n\nIn the above example the files represent the following functionalities:\n- tests folder = unit tests\n- view folder = the html and typescript files required for the screens\n- vo (value object) folder = the entity component\n- center.config.ts file (should be updated with more info) = configuration file\n- center.module.ts file = angular module class\n\n\nThe view contains all files for presentation of the current module (search, detail):"
+      },
+      {
+        "page": 3,
+        "text": "The usual actions associated with each screen are:\n- Search : search for results based on the user input\n- Add : add new entry\n- Clear : clear the results from the previous search\n- Edit an entry of the results table by double-clicking on it\n\n\nEach of these actions are correlated with a rest api call on the back-end (pwc-server).\n\nIn order to find which rest api call is does which action a simple technique is through developer tools of browser (right-click on the page and select the Inspect Element option).\n\ne.g. Search in Center module corresponds to as shown in the picture below: compliance/CenterService/searchCenterService"
+      },
+      {
+        "page": 4,
+        "text": "# Modification of Screen in pwc-ui module\n\nBy adding a new field we also must update the entity object (vo), in our case file by adding the attribute name and type. center.entity.ts\n\nEach rest call to pwc-server transfers the whole value object so in order to correctly execute the job value object must be updated with the correct attributes.\n\nAfter the addition of html elements in combination with pwc-shared modules. The main components that are used by screens are part of pwc-shared module which provide custom functionality on basic angular components\n\n<<TODO: explain more about localisation>>\n\ne.g. pwc-toggle, pwc-input, pwc-eureka\n\n\n```\nCenterVO:{ \"center_code\": null, \"grouping_code\": null, \"center_name\": null, \"network_code\": null, \"multi_country_option\": null, \"country_code\": null, \"country_code_alpha\": null, \"currency_code\": null, \"currency_code_alpha\": null, \"page\": 0, \"pageSize\": 0 }\n```"
+      },
+      {
+        "page": 5,
+        "text": "```\n\"centerVO\":{ \"center_code\":\"66\", \"grouping_code\":\"N\", \"center_name\":\"SIA TEST 123\", \"network_code\":\"00\", \"multi_country_option\":\"N\", \"country_code\":\"300\", \"country_code_alpha\":\"GRC\", \"currency_code\":\"978\", \"currency_code_alpha\":\"EUR\" }\n```\n\nAffected Bitbucket repository: PowerCardSIA/pwc-ui\n\n\n# Modification in pwc-server module\n\n\nThe rest api calls are done to the following request URLs:\n- /compliance/CenterService/createCenterService = create new Center\n- /compliance/CenterService/searchCenterService = search Center\n- /compliance/CenterService/deleteCenterService = delete Center\n- /compliance/CenterService/updateCenterService = edit Center\n\n\nThis means that the affected backend element is located in the compliance module of the pwc-server project.\n\nGenerally, to change the backend a change in the .btdesign file of the affiliated module is enough. So, in order to add a new field in the Center for example, the pwc-server/compliance/src/main/resources/compliance needs to be changed, in order to reflect the changes in the database. Find .btdesign the entity of the element you want to change and do the modified changes in the Entity and the DataTransferObject (dto)."
+      },
+      {
+        "page": 6,
+        "text": "```\nexample of the center section in compliance.btdesign /******************** Center **************************/ Entity Center { databaseTable = \"Center\" auditable ! optimisticLocking scaffold String center_code key length = \"2\"; String grouping_code databaseColumn = \"grouping_code\" length = \"1\" nullable; String center_name databaseColumn = \"center_name\" length = \"30\" nullable; - @Network fk_center_nc hint = \"BaseColumn1=network_code\" nullable fetch = \"lazy\"; String multi_country_option databaseColumn = \"multi_country_option\" length = \"1\" nullable; - @Country fk_center_ccd hint = \"BaseColumn1=country_code\" nullable fetch = \"lazy\"; String country_code_alpha databaseColumn = \"country_code_alpha\" length = \"3\" nullable; - @Currency_table fk_center_ccy hint = \"BaseColumn1=currency_code\" nullable fetch = \"lazy\"; String currency_code_alpha databaseColumn = \"currency_code_alpha\" length = \"3\" nullable; Repository CenterRepository { findByKeys; findByKey; findByCondition; findByCriteria; } } DataTransferObject CenterVO { String center_code ; String grouping_code ; String center_name ; String network_code ; String multi_country_option ; String country_code ; String country_code_alpha ; String currency_code ; String currency_code_alpha ; } Service CenterService { > @CenterRepository String createCenterService(@CenterVO centerVO); String updateCenterService(@CenterVO centerVO); String deleteCenterService(@CenterVO centerVO); List<@CenterVO> getAllCenterService(); List<@CenterVO> searchCenterService(@CenterVO centerVO); }\n```\n\nAfter the changes are completed, the parent module (v3_31-parent  of the pwc-server project needs to be built (with the command ) for the ) mvn install code to be generated from the compliance.btdesign and the v3_31-web.war to be built.\n\nRead carefully the document Sculptor generator!!!\n\nAffected Bitbucket repository: PowerCardSIA/pwc-server\n\n\n## Modification in pwc-db module\n\nLocate the table from .btdesign file, in this case the Center table\n\n\n```\ndatabaseTable = \"Center\"\n```\n\n\nand then create the following scripts:\n- sql scripts for changing the schema of the table based on the modifications you want to make (e.g. addition of new columns, constraints etc.)\n- sql script for adding all the labels you want to use in the gui (plus the localization of those) in the table RESSOURCE_BUNDLE (the gui gets all\n- the values used as labels from the database)\n- bash script for applying all the above changes in the database\n- bash script for performing rollback on the above changes\n\n\nAdd the required scripts in the pwc-db project as described in the Feature Deployment and Rollback (WIP) document.\n\nAffected Bitbucket repository: PowerCardSIA/pwc-db"
+      }
+    ]
+  }
+}

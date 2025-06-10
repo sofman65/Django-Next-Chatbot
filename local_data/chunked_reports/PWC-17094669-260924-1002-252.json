@@ -1,0 +1,125 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-17094669-260924-1002-252",
+    "pages_amount": 6,
+    "text_blocks_amount": 276,
+    "tables_amount": 0,
+    "pictures_amount": 7,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 252,
+        "text": "# 4. Embossing (use case 9-10)\n\n\n- How to detect where to make the changes\n- How to make the changes\n- How to Run Batch Card Embossing\n- Screenshots\n- Links\n\n\n\n## Introduction\n\nIn this document we will cover all the development steps were made in order to execute embossing procedure to export XML file.\n\n\n## How to detect where to make the changes\n\nPowerCard UI  Configure screen PAN Carrier - MAIL DELIVERY INFO (TAB)    Fill Delivery Supplier Code.\n\nUsing \"Inspect\" (Google Chrome-right click)   Sources  cardCarrier.module.chunk.js\n\nFound details for pwc-server (D:\\Git_Repo\\PowerCardSIA\\cosmote_packaging\\pwc-server\\paramsCardholder\\src\\main\\resources\\paramsCardholder. btdesign) :\n\nMODULE = 'paramsCardholder';\n\nSERVICE = 'Emb_card_carrier';\n\nOn LINUX SERVER in pwc-unix folder search in  shl folder for  script   called \"card_embossing.sh\"\n\nView card_embossing.sh  card_embossing.pc (../pwc-unix/Source/src/backoff/interfaces)\n\nFind PL/SQL",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 288,
+        "text": "View card_embossing.sh  card_embossing.pc (../pwc-unix/Source/src/backoff/interfaces)\n\nFind PL/SQL\n\nPCRD_CARD_EMBOSSING_PROCESSING.GENERATE_EMBOSSING_FILE_MAIN  PCRD_EMB_GEN_CARDCARRIER. GENERATE_XML_BLOCK_CARDCARRIER  MAIL_DELIVERY_INFO_XML_BLOCK\n\n\n## How to make the changes\n\nFeatures Group 3: Assign Courier range numbers to cards Technical Specification Document  (DTS)\n\nDB Changes:\n\nAdd PL/SQL code in  PCRD_EMB_GEN_CARDCARRIER.MAIL_DELIVERY_INFO_XML_BLOCK\n\nU.I and SERVER Changes:\n\nThe task involved in adding two info fields on payment instrument screeen\n\n\n- 1.  Delivery supplier code: It refer the Courrier name and code\n- 2.  Range number:  It refer the Courrier number which take the card.\n\n\nThe first task was first to identify whether his kind of functionality is offered from PowerCard or identify where we could intervene as to provide this functionality.\n\nThe screen of in Issuing / Operations/ Payment instrument seemed to fit the requirements. \"Payment instrument\"\n\nHow to locate the component that need to change in U.I. and Server.\n\nOne of the crucial matters is how to locate the screen, in terms of the U.I. and the Server, where the additional code must be inserted.",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 68,
+        "text": "How to locate the component that need to change in U.I. and Server.\n\nOne of the crucial matters is how to locate the screen, in terms of the U.I. and the Server, where the additional code must be inserted.\n\nThe Browser assist us in locating the code. In case of Chrome we use More Tools  Developer Tools.",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 223,
+        "text": "The open a debug window showing the posting of the page.\n\nFor the  U.I. we look under the submenu of the Sources Developer Tools:\n\nIn order to locate the element on the U.I., simply select and element (=input box), right click on the element and from the pop up menu select \" \" Inspect\n\nFor the Server we look under the submenu of the Network Developer Tools:\n\nIn order to get a request from the server pressing a button e.g. \"Search\" button will do the job in reveling the server side component.\n\nBuilding the additional two fields (= delivery_supplier_code - delivery_supplier_number )\n\n\n## 1. pwc-db (Oracle Server)\n\nFolder 002_Tables\n\nCARD.sql\n\nCARD_DF.sql\n\nCARD_VAL.sql\n\nCARD_VAL_SAVE.sql\n\nPKG_CARD_DELIV_SUPPL_DTL.sql\n\nPKG_DELIVERY_SUPPLIER_RANGES_DF.sql\n\nFolder 004_Constraints_NonFK\n\npk_pkg_card_deliv_suppl_dtl.sql unq_pkg_card_deliv_suppl_dtl.sql\n\nFolder 005_Triggers\n\nTGR_AD_CARD.sql",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 221,
+        "text": "TGR_BI_CARD.sql TGR_BU_CARD.sql tgr_ad_pkg_card_deliv_suppl_dtl.sql tgr_bu_pkg_card_deliv_suppl_dtl.sql\n\n\n# Folder 007_Constraints_FK\n\nFK_CARD_DELIVERY_SUPPLIER.sql fk_pkg_card_deliv_suppl_dtl.sql\n\n\n## Folder 013_Packages\n\nPCRD_EMB_GEN_CARDCARRIER.PBK PCRD_CARD_EMBOSSING_PROCESSING.PBK\n\n\n## Folder 016_Ressource_Bundle\n\n20210222_PKG_DELIVERY_SUPPLIER_INFO.sql\n\n\n## 2. pwc-server (application server)\n\nAgain we clone the branch. Checkout or build are own feature branch and add our changes.\n\nOn the server-side after locating the path next we go ..\\pwc-server\\cardholder\\src\\main\\resources\\cardholder.btdesign Cardholder, (IntelliJIDEA is used to open the tree structure of the server code)\n\nThe full path is therefore and the file is : cardholder/src/main/resources/ cardholder.btdesign",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 293,
+        "text": "The full path is therefore and the file is : cardholder/src/main/resources/ cardholder.btdesign\n\n\nIn the file we search for which is the name of the Entity that we will implement our changes. cardholder.btdesign Card , The sections that need to be altered are:\n- a. Card Entity\n- b. CardVO\n- c. Compilation\n- i.  After the changes save on the btddesign file, right click on the directory that contains our file changes do TortoiseGit  Clean Up\n- ii.  Next we go to the directory pwc-server\\cardholder,  do a cmd on the directory, and at command prompt, we invoke maven complication\n\n\nmvn clean install -Dmaven.test.skip=true\n\nThen we replace the *.jar produce we replace into the v3_31-web.war. Redeploy into jboss.\n\nOr by directing to the v3_31-parent directory and we execute\n\n\n## mvn install\n\nThis will produce the v3_31-web.war in the target subdirectory i.e. pwc-server\\v3-31-web\\target and we deploy the war to jboss\n\n\n- (v3-31-parent\\pom.xml ?)\n- d.  Final step is to upload our code to bitbucket.\n\n\nSince we know the file and the path of the file we add git add cardholder/src/main/resources/cardholder.btdesigngit push",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 104,
+        "text": "Since we know the file and the path of the file we add git add cardholder/src/main/resources/cardholder.btdesigngit push\n\ngit commit -m \"pkg-10: delivery supplier code and number on payment instrument screen\"\n\n\n## 3. pwc-ui (u.i.)\n\nThe pwc-ui is cloned, we make or checkout our feature branch.\n\nWe open the source code using Visual Studio (V.S.)\n\nWe comment the file mention in 0. Introduction, in order to speed up UI complilation",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 288,
+        "text": "Next we go the branch that we detected, in the U.I. in V.S. \\src\\app\\operation\\issuing\\product\\payment-instruments\n\n\nThe files that we change are located in the subdirectories:\n- ../src/app/operation/issuing/product/payment-instruments/payment-instruments.config.ts\n- ../src/app/operation/issuing/product/payment-instruments/view/steps/identification/identification-step.component.html\n- ../src/app/operation/issuing/product/payment-instruments/vo/payment-instruments.entity.ts\n- ../src/assets-test/operation/issuing/paymentInstruments.mock.json\n\n\nUploaded code (pwc-ui) in Bitbucket :  s://toolbox.sia.eu/bitbucket/projects/SIAHPS/repos/pwc-ui/compare/diff? http targetBranch=1e39752aa50cbc0838824c8577ebe3aeeb41c7b3&sourceBranch=535536742f1ad0dcac6548430aa87f72de652333&targetRepoId=5112\n\n\n## Compilation\n\nThe compilation command in given from the Terminal window in V.S. :\n\nnode --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\n(We have already run at command in the directory and correctly configured file in the User profile directory) npm install pwc-ui .npmrc",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 228,
+        "text": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\n(We have already run at command in the directory and correctly configured file in the User profile directory) npm install pwc-ui .npmrc\n\nOnce the code has been compiled \"successfully\" (Compiled with warning), we can view our code on Powercard UI. at the URL:\n\nhttp://localhost:4200/#/login\n\n\n## How to Run Batch Card Embossing\n\n\n- Open your Docker container\n- docker exec -it yourContainerId bash\n- Go to Root folder:\n- cd root\n- And run the file: \".profile\"\n- . .profile\n- Necessary Resource Binaries\n- HSM\n- CMD_SERVER\n- Go to:\n- cd /root/pwc-unix/Source/usr/shl\n- Start the \" \" resource binary: CMD_SERVER\n- sh start_cmd_srv_01\n- Go to the in VDI and open it (by clicking the red button) HSM Simulator\n\n\n(!! If HSM Simulator is not opened, HSM Resource Binary cannot start !!)",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 164,
+        "text": "(!! If HSM Simulator is not opened, HSM Resource Binary cannot start !!)\n\n\n- Start the \" \" resource binary: HSM\n- sh start_hsm_prod_01\n- To make sure that the binaries have been properly started type:\n- ps\n- You should see and resource binaries appear in the list of running processes CMD_SERVER HSM\n- If not, you need to go to \" \" folder to find out what happened to each binary trace\n- cd  /root/pwc-unix/Source/usr/trace\n- Then execute the following:\n- cd  /root/pwc-unix/Source/usr/shl\n- sh card_embossing.sh trc-000\n\n\n(For more details refer to section Links about  pwc-unix on docker)\n\n\n## Steps",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 17,
+        "text": "# Payment Instruments screen\n\n\n## Pan Carrier screen\n\n\n## Start Docker pwc-unix",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 88,
+        "text": "# Run .profile (PowerCard Enviroment )\n\n\n## Links\n\nEdit an existing screen - add a new field (use case 5-6-7)\n\nBatch Flow Run (EOD) Card Embossing\n\nLinux Server\n\nRun Card Embossing (pwc-unix on docker)\n\nPowerCard V.3.5 Card Embossing Guide\n\nPowerCARD V.3.5 XML Card Embossing File Interface",
+        "id": 11,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# 4. Embossing (use case 9-10)\n\n\n- How to detect where to make the changes\n- How to make the changes\n- How to Run Batch Card Embossing\n- Screenshots\n- Links\n\n\n\n## Introduction\n\nIn this document we will cover all the development steps were made in order to execute embossing procedure to export XML file.\n\n\n## How to detect where to make the changes\n\nPowerCard UI  Configure screen PAN Carrier - MAIL DELIVERY INFO (TAB)    Fill Delivery Supplier Code.\n\nUsing \"Inspect\" (Google Chrome-right click)   Sources  cardCarrier.module.chunk.js\n\nFound details for pwc-server (D:\\Git_Repo\\PowerCardSIA\\cosmote_packaging\\pwc-server\\paramsCardholder\\src\\main\\resources\\paramsCardholder. btdesign) :\n\nMODULE = 'paramsCardholder';\n\nSERVICE = 'Emb_card_carrier';\n\nOn LINUX SERVER in pwc-unix folder search in  shl folder for  script   called \"card_embossing.sh\"\n\nView card_embossing.sh  card_embossing.pc (../pwc-unix/Source/src/backoff/interfaces)\n\nFind PL/SQL\n\nPCRD_CARD_EMBOSSING_PROCESSING.GENERATE_EMBOSSING_FILE_MAIN  PCRD_EMB_GEN_CARDCARRIER. GENERATE_XML_BLOCK_CARDCARRIER  MAIL_DELIVERY_INFO_XML_BLOCK\n\n\n## How to make the changes\n\nFeatures Group 3: Assign Courier range numbers to cards Technical Specification Document  (DTS)\n\nDB Changes:\n\nAdd PL/SQL code in  PCRD_EMB_GEN_CARDCARRIER.MAIL_DELIVERY_INFO_XML_BLOCK\n\nU.I and SERVER Changes:\n\nThe task involved in adding two info fields on payment instrument screeen\n\n\n- 1.  Delivery supplier code: It refer the Courrier name and code\n- 2.  Range number:  It refer the Courrier number which take the card.\n\n\nThe first task was first to identify whether his kind of functionality is offered from PowerCard or identify where we could intervene as to provide this functionality.\n\nThe screen of in Issuing / Operations/ Payment instrument seemed to fit the requirements. \"Payment instrument\"\n\nHow to locate the component that need to change in U.I. and Server.\n\nOne of the crucial matters is how to locate the screen, in terms of the U.I. and the Server, where the additional code must be inserted.\n\nThe Browser assist us in locating the code. In case of Chrome we use More Tools  Developer Tools."
+      },
+      {
+        "page": 2,
+        "text": "The open a debug window showing the posting of the page.\n\nFor the  U.I. we look under the submenu of the Sources Developer Tools:\n\nIn order to locate the element on the U.I., simply select and element (=input box), right click on the element and from the pop up menu select \" \" Inspect\n\nFor the Server we look under the submenu of the Network Developer Tools:\n\nIn order to get a request from the server pressing a button e.g. \"Search\" button will do the job in reveling the server side component.\n\nBuilding the additional two fields (= delivery_supplier_code - delivery_supplier_number )\n\n\n## 1. pwc-db (Oracle Server)\n\nFolder 002_Tables\n\nCARD.sql\n\nCARD_DF.sql\n\nCARD_VAL.sql\n\nCARD_VAL_SAVE.sql\n\nPKG_CARD_DELIV_SUPPL_DTL.sql\n\nPKG_DELIVERY_SUPPLIER_RANGES_DF.sql\n\nFolder 004_Constraints_NonFK\n\npk_pkg_card_deliv_suppl_dtl.sql unq_pkg_card_deliv_suppl_dtl.sql\n\nFolder 005_Triggers\n\nTGR_AD_CARD.sql"
+      },
+      {
+        "page": 3,
+        "text": "TGR_BI_CARD.sql TGR_BU_CARD.sql tgr_ad_pkg_card_deliv_suppl_dtl.sql tgr_bu_pkg_card_deliv_suppl_dtl.sql\n\n\n# Folder 007_Constraints_FK\n\nFK_CARD_DELIVERY_SUPPLIER.sql fk_pkg_card_deliv_suppl_dtl.sql\n\n\n## Folder 013_Packages\n\nPCRD_EMB_GEN_CARDCARRIER.PBK PCRD_CARD_EMBOSSING_PROCESSING.PBK\n\n\n## Folder 016_Ressource_Bundle\n\n20210222_PKG_DELIVERY_SUPPLIER_INFO.sql\n\n\n## 2. pwc-server (application server)\n\nAgain we clone the branch. Checkout or build are own feature branch and add our changes.\n\nOn the server-side after locating the path next we go ..\\pwc-server\\cardholder\\src\\main\\resources\\cardholder.btdesign Cardholder, (IntelliJIDEA is used to open the tree structure of the server code)\n\nThe full path is therefore and the file is : cardholder/src/main/resources/ cardholder.btdesign\n\n\nIn the file we search for which is the name of the Entity that we will implement our changes. cardholder.btdesign Card , The sections that need to be altered are:\n- a. Card Entity\n- b. CardVO\n- c. Compilation\n- i.  After the changes save on the btddesign file, right click on the directory that contains our file changes do TortoiseGit  Clean Up\n- ii.  Next we go to the directory pwc-server\\cardholder,  do a cmd on the directory, and at command prompt, we invoke maven complication\n\n\nmvn clean install -Dmaven.test.skip=true\n\nThen we replace the *.jar produce we replace into the v3_31-web.war. Redeploy into jboss.\n\nOr by directing to the v3_31-parent directory and we execute\n\n\n## mvn install\n\nThis will produce the v3_31-web.war in the target subdirectory i.e. pwc-server\\v3-31-web\\target and we deploy the war to jboss\n\n\n- (v3-31-parent\\pom.xml ?)\n- d.  Final step is to upload our code to bitbucket.\n\n\nSince we know the file and the path of the file we add git add cardholder/src/main/resources/cardholder.btdesigngit push\n\ngit commit -m \"pkg-10: delivery supplier code and number on payment instrument screen\"\n\n\n## 3. pwc-ui (u.i.)\n\nThe pwc-ui is cloned, we make or checkout our feature branch.\n\nWe open the source code using Visual Studio (V.S.)\n\nWe comment the file mention in 0. Introduction, in order to speed up UI complilation"
+      },
+      {
+        "page": 4,
+        "text": "Next we go the branch that we detected, in the U.I. in V.S. \\src\\app\\operation\\issuing\\product\\payment-instruments\n\n\nThe files that we change are located in the subdirectories:\n- ../src/app/operation/issuing/product/payment-instruments/payment-instruments.config.ts\n- ../src/app/operation/issuing/product/payment-instruments/view/steps/identification/identification-step.component.html\n- ../src/app/operation/issuing/product/payment-instruments/vo/payment-instruments.entity.ts\n- ../src/assets-test/operation/issuing/paymentInstruments.mock.json\n\n\nUploaded code (pwc-ui) in Bitbucket :  s://toolbox.sia.eu/bitbucket/projects/SIAHPS/repos/pwc-ui/compare/diff? http targetBranch=1e39752aa50cbc0838824c8577ebe3aeeb41c7b3&sourceBranch=535536742f1ad0dcac6548430aa87f72de652333&targetRepoId=5112\n\n\n## Compilation\n\nThe compilation command in given from the Terminal window in V.S. :\n\nnode --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\n(We have already run at command in the directory and correctly configured file in the User profile directory) npm install pwc-ui .npmrc\n\nOnce the code has been compiled \"successfully\" (Compiled with warning), we can view our code on Powercard UI. at the URL:\n\nhttp://localhost:4200/#/login\n\n\n## How to Run Batch Card Embossing\n\n\n- Open your Docker container\n- docker exec -it yourContainerId bash\n- Go to Root folder:\n- cd root\n- And run the file: \".profile\"\n- . .profile\n- Necessary Resource Binaries\n- HSM\n- CMD_SERVER\n- Go to:\n- cd /root/pwc-unix/Source/usr/shl\n- Start the \" \" resource binary: CMD_SERVER\n- sh start_cmd_srv_01\n- Go to the in VDI and open it (by clicking the red button) HSM Simulator\n\n\n(!! If HSM Simulator is not opened, HSM Resource Binary cannot start !!)\n\n\n- Start the \" \" resource binary: HSM\n- sh start_hsm_prod_01\n- To make sure that the binaries have been properly started type:\n- ps\n- You should see and resource binaries appear in the list of running processes CMD_SERVER HSM\n- If not, you need to go to \" \" folder to find out what happened to each binary trace\n- cd  /root/pwc-unix/Source/usr/trace\n- Then execute the following:\n- cd  /root/pwc-unix/Source/usr/shl\n- sh card_embossing.sh trc-000\n\n\n(For more details refer to section Links about  pwc-unix on docker)\n\n\n## Steps"
+      },
+      {
+        "page": 5,
+        "text": "# Payment Instruments screen\n\n\n## Pan Carrier screen\n\n\n## Start Docker pwc-unix"
+      },
+      {
+        "page": 6,
+        "text": "# Run .profile (PowerCard Enviroment )\n\n\n## Links\n\nEdit an existing screen - add a new field (use case 5-6-7)\n\nBatch Flow Run (EOD) Card Embossing\n\nLinux Server\n\nRun Card Embossing (pwc-unix on docker)\n\nPowerCard V.3.5 Card Embossing Guide\n\nPowerCARD V.3.5 XML Card Embossing File Interface"
+      }
+    ]
+  }
+}

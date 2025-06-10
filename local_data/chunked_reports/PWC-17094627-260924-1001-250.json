@@ -1,0 +1,380 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-17094627-260924-1001-250",
+    "pages_amount": 12,
+    "text_blocks_amount": 88,
+    "tables_amount": 0,
+    "pictures_amount": 0,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 247,
+        "text": "# 3. Add a new screen (use case 1)\n\n\n## Introduction\n\nIn this document we will cover all the development steps were made in order to cover the needs of the following use case:  Use Case [1]: Insert SAP code . In a few words we will create a new table in database and will display this table in new screen. for a product\n\nTSD: Features Group 1: Additional fields\n\n\n## Steps before development\n\nFirst of all we need to know  where the new screen will be placed. This information will be useful for the future use. For this purpose we can find some relevant existing screen and find out where it is used in our modules.\n\nAlso we need to checkout the relevant git branches for every module we will modify.\n\n\n## Starting the development\n\n\n## UI\n\nOur new screen will be placed in the issuing parameters section, so we created a new folder named sap-code under \\pwcui\\src\\app\\parameters\\issuing\\product\\. In our new folder we created 3 new folders: tests,view and vo, along with 2 files for config and modules.\n\n\n## NEW FILES\n\n\n- 1.  sapCode.module.ts Parent module for initialization",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 299,
+        "text": "import {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {SapCodeDetailsComponent} from './view/details/sapCode-details.component'; import {SapCodeCriteriasComponent} from './view/sapCode-criterias.component'; import {SapCodeComponent} from './view/sapCode.component'; import {SCREEN} from './sapCode.config'; import { IssuingComponentsModule } from \"@op/issuing/product/abstract/components/issuing-components. module\"; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** SapCode Routes */ export const sapCodeRoutes = [ { path: '', component: SapCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: SapCodeDetailsComponent, canDeactivate: [LeaveScreenGuard]} ];",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 157,
+        "text": "Routes */ export const sapCodeRoutes = [ { path: '', component: SapCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: SapCodeDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** SapCode Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(sapCodeRoutes), StoreModule.forFeature(SCREEN, reducerToken), IssuingComponentsModule, EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ SapCodeComponent, SapCodeCriteriasComponent, SapCodeDetailsComponent, ], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class SapCodeModule { constructeur() { console.log('SapCodeModule'); } }",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 64,
+        "text": "# 2.  sapCode.config.ts\n\nThis file contains declaration of some variables for page permeations, connectivity with server and lists usage. Specifically among the others we used the static list which was created for use case 5 (Pkg_status_flag) and Vcatalogues_n_products_view for catalogue product list",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 142,
+        "text": "```\n/** * SapCode Config */ export const SCREEN = 'sap-code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Pkg_sap_code'; export const SEARCH_PARAM_REFS = ['Bank','Vcatalogues_n_products_view','Branch', 'Catalogue_product_light','Network','Currency_table']; export const SEARCH_STATIC_LISTS = ['Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# 3.  vo/sapCode.entity.ts\n\nThis file is the representation of the entity that is declared in the servers module btdesign file. For the product list two columns were created catalogue_pi_version and catalogue_pi_product",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 246,
+        "text": "# 3.  vo/sapCode.entity.ts\n\nThis file is the representation of the entity that is declared in the servers module btdesign file. For the product list two columns were created catalogue_pi_version and catalogue_pi_product\n\n\n```\nimport {AbstractEntity} from '@pwc/shared'; export class SapCodeEntity extends AbstractEntity { bank_code: string; product_code: string; sap_code: string; sap_description: string; sap_status: string; catalogue_pi_version: string; catalogue_pi_product: string; constructor({ bank_code = null, product_code = null, sap_code = null, sap_description = null, sap_status = null, catalogue_pi_version = null, catalogue_pi_product = null }: { bank_code?: string; product_code?: string; sap_code?: string; sap_description?: string; sap_status?: string; catalogue_pi_version?: string; catalogue_pi_product?: string; }) { super(); this.bank_code = bank_code; this.product_code = product_code; this.sap_code = sap_code; this.sap_description = sap_description; this.sap_status = sap_status; this.catalogue_pi_version = catalogue_pi_version; this.catalogue_pi_product = catalogue_pi_product; } }\n```",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 288,
+        "text": "# 4.  view/details/sapCode-details.component.html\n\nThis is the file for the screen where we can modify the data, the detail screen. Consists of header, action bar with all the actions we can perform in this screen, the actual fields located in criterias file and footer section.\n\n\n```\n<pwc-screen [titleValue]=\"'sap-code.header.screen_title' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\" context.grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\"  (back)=\"back()\" (save)=\"save()\"></pwc-compactionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'sap-code' | async | uppercase}} </pheader> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-sap-code-criterias #criterias [context]=\"context\" ></pwc-comp-sap-codecriterias> </div> </p-fieldset> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 39,
+        "text": "## 5.  view/details/sapCode-details.component.ts\n\nThis file is used for screens load and actions. There we need to import CatalogueProductEureka for products list usage.",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 289,
+        "text": "import { SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS } from '../../sapCode.config'; import { SapCodeEntity } from '../../vo/sapCode.entity'; import { AbstractDetailScreenComponent, PwcState } from '@pwc/shared'; import { Component, Injector, ViewChild } from '@angular/core'; import { Store } from '@ngrx/store'; import { CatalogueProductEureka } from \"@op/issuing/product/abstract/components/catalogue-product-eureka /catalogue-product-eureka.component\"; import { SapCodeCriteriasComponent } from '@param/issuing/product/sap-code/view/sapCode-criterias. component'; import { log } from 'util'; @Component({ selector: 'pwc-comp-sap-code-details', templateUrl: './sapCode-details.component.html' }) export class SapCodeDetailsComponent extends AbstractDetailScreenComponent { @ViewChild('criterias') sapCodeCriteriasComponent: SapCodeCriteriasComponent; constructor(injector: Injector) { super(injector); this.serviceConfig = { mod: MODULE, service: SERVICE, bundle: SCREEN }; this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new SapCodeEntity(this.getAllValues()); this.context.entity.product_code = this.sapCodeCriteriasComponent.PiProduct && this.",
+        "id": 11,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 86,
+        "text": "DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new SapCodeEntity(this.getAllValues()); this.context.entity.product_code = this.sapCodeCriteriasComponent.PiProduct && this. sapCodeCriteriasComponent.PiProduct.selectedItem ? this.sapCodeCriteriasComponent.PiProduct.selectedItem. pan_product_code : null; } getBundleName(): string { return SCREEN; } }",
+        "id": 12,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 13,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 55,
+        "text": "# 6.  view/sapCode-criterias.component.html\n\nThe reusable section of the search screen and details screen. The component that needs our attention is pwc-catalogue-product-eureka. This is an HPS custom component used for products list.",
+        "id": 14,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 15,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 299,
+        "text": "<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-catalogue-product-eureka #piProduct [array]=\"array\" [productType]=\"'P'\" productId=\" catalogue_pi_product\" versionId=\"catalogue_pi_version\" [required]=\"context.state === 'DETAIL'\" [showProductType]=\" true\" [showProductVersion]=\"true\" [showProductName]=\"true\" [context]=\"context\" [readOnly]=\"context.PKState\" [isCatalgConsultable]=\"true\" [data]=\"context?.ref?.get('Vcatalogues_n_products_view')\"> </pwc-catalogue-product-eureka> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"sap_code\" type=\"input\" [array]=\"array\" maxlength=\"13\" [labelKey]=\"'sap-code.input.sap_code'\" [readOnly]=\"context.PKState\" [required]=\"context.state === 'DETAIL'\"> </pwc-input>",
+        "id": 16,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 232,
+        "text": "type=\"input\" [array]=\"array\" maxlength=\"13\" [labelKey]=\"'sap-code.input.sap_code'\" [readOnly]=\"context.PKState\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"sap_description\" [array]=\"array\" type=\"textArea\" maxlength=\"100\" [labelKey]=\"'sap-code.input.sap_description'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-radiobutton id=\"sap_status\" maxlength=\"1\" [labelKey]=\"'sap-code.input.sap_status'\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'sap-code.input.sap_status_enable'| pwcTrans | async, 'D':'sap-code.input.sap_status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div>",
+        "id": 17,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 18,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 17,
+        "text": "7.  view/sapCode-criterias.component.ts Constructor for the reusable component",
+        "id": 19,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 166,
+        "text": "```\nimport {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector, ViewChild} from '@angular/core'; import { CatalogueProductEureka } from '@op/issuing/product/abstract/components/catalogue-product-eureka /catalogue-product-eureka.component'; @Component({ selector: 'pwc-comp-sap-code-criterias', templateUrl: './sapCode-criterias.component.html' }) export class SapCodeCriteriasComponent extends AbstractSubFormComponent { @ViewChild('piProduct') PiProduct: CatalogueProductEureka; constructor(injector: Injector) { super(injector); } }\n```\n\n\n# 8.  view/sapCode.component.html\n\n\n```\nThe below section of the search screen, where the results are displayed.\n```",
+        "id": 20,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 293,
+        "text": "# 8.  view/sapCode.component.html\n\n\n```\nThe below section of the search screen, where the results are displayed.\n```\n\n\n```\n<pwc-screen [titleValue]=\"'sap-code.header.screen_title' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\"  > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-sap-code-criterias [context]=\"context\" ></pwc-comp-sap-code-criterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\" clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"sapCodeDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\" showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate) =\"duplicateEntity($event)\" (onRemove)=\"removeEntity($event)\" [ref]=\"context?.ref\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```",
+        "id": 21,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 31,
+        "text": "## 9.  view/sapCode.component.ts\n\nFunction that is used for the initialize the result table, fetch the necessary labels and fetching data.",
+        "id": 22,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 23,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 292,
+        "text": "import {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../sapCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {SapCodeEntity} from '../vo/sapCode.entity'; import {Store} from '@ngrx/store'; import * as CONFIG from '../sapCode.config'; @Component({ selector: 'pwc-comp-sap-code', templateUrl: './sapCode.component.html' }) export class SapCodeComponent extends AbstractSearchScreenComponent { sapCodeEntity: SapCodeEntity = new SapCodeEntity({}); constructor(injector: Injector) { super(injector); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.pushColumn(this.columns, { field: 'catalogue_pi_product', header: 'Common.catalogue.pi', type: 'REF', sortable: true, config: {code: 'product_code', label: 'product_name', source: 'Catalogue_product_light'} }); this.addStringColumn({field:'sap_code', header:'sap-code.input.sap_code', sortable: true}); this.addStringColumn({field:'sap_description',",
+        "id": 24,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 161,
+        "text": "'product_code', label: 'product_name', source: 'Catalogue_product_light'} }); this.addStringColumn({field:'sap_code', header:'sap-code.input.sap_code', sortable: true}); this.addStringColumn({field:'sap_description', header:'sap-code.input.sap_description', sortable: true}); this.addStaticListColumn({ field: 'sap_status', header: 'sap-code.input.sap_status', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.sapCodeEntity = new SapCodeEntity(this.getAllValues()); this.searchEntity(this.sapCodeEntity); } getBundleName() { return SCREEN; } getConfig(){ return CONFIG; } // buildActionBarBtn() { //   super.buildActionBarBtn(); // } }",
+        "id": 25,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 26,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 59,
+        "text": "Also we need to edit the file pwc-ui\\src\\app\\parameters\\issuing\\issuing.routes.ts and add our new screen\n\n\n```\n{ path: 'sap-code', loadChildren: './product/sap-code/sapCode.module#SapCodeModule' },\n```",
+        "id": 27,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 130,
+        "text": "# Server\n\nOn the server side we need to add our new entity in relevant .btdesign file. For our purpose it was paramsCardholder.btdesign the located in pwcserver\\paramsCardholder\\src\\main\\resources. The code to be added was generated from package generate_dsl_2 in database. We needed to modify the foreign key, cause it is not support multi foreign key, so we added only the bank as foreign key. After the modification we need to install along with the paramsCardholder module also the v3_31 module and deploy both generated jars to the jboss deployments folder.",
+        "id": 28,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 29,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 296,
+        "text": "/**************************** Pkg_sap_code ****************************/ Entity Pkg_sap_code { databaseTable=\"Pkg_sap_code\" auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String product_code key databaseType=\"CHAR(3)\"; String sap_code key databaseType=\"NUMBER(13,0)\"; String sap_description databaseColumn = \"sap_description\" length = \"100\" nullable; String sap_status databaseColumn = \"sap_status\" length = \"1\" nullable; String catalogue_pi_version databaseColumn=\"catalogue_pi_version\" databaseType=\"VARCHAR2(10)\"; String catalogue_pi_product databaseColumn=\"catalogue_pi_product\" databaseType=\"CHAR(6)\"; Repository Pkg_sap_codeRepository { findByKeys; findByKey; findByCondition; findByCriteria; } } DataTransferObject Pkg_sap_codeVO { String bank_code; String product_code; String sap_code; String sap_description; String sap_status; String catalogue_pi_version; String catalogue_pi_product; } Service Pkg_sap_codeService { > @Pkg_sap_codeRepository String createPkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); String updatePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); String deletePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO);",
+        "id": 30,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 89,
+        "text": "pkg_sap_codeVO); String updatePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); String deletePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); List<@Pkg_sap_codeVO> getAllPkg_sap_codeService(); List<@Pkg_sap_codeVO> searchPkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); }",
+        "id": 31,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 32,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 135,
+        "text": "## Database\n\nFor the database we will modify some files located in the pwc-db/Installation/Patch/BO/Dev_DB_Repository. We need to add scripts for table creation, according with all the related indexes, constraints and triggers. Also we need a new table identical to our table, plus one extra column (sensitive_operation_record), in order to maintain the modification history.\n\nNext step is to add all the necessary label, we used in the ui, to the ressource_bundle folder, along with some  static values needed for  lists. This achieved by inserts in the ressource_labels table with  specific bundle column and insertion in static_list table.",
+        "id": 33,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 266,
+        "text": "# 016_Ressource_Bundle/20210201_SAP_CODE.sql\n\nDELETE RESSOURCE_BUNDLE WHERE BUNDLE = 'sap-code';\n\nDELETE RESSOURCE_BUNDLE WHERE BUNDLE = 'Menu_lang' and key_val = 'sap-code';\n\nDELETE RESSOURCE_BUNDLE WHERE KEY_VAL='static_list.status_disable';\n\nDELETE RESSOURCE_BUNDLE WHERE KEY_VAL='static_list.status_enable';\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('Menu_lang','en_US','sap-code','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.header.screen_title','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.input.sap_code','SAP code','SAP code',null,null,null,null);",
+        "id": 34,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 256,
+        "text": "VALUES ('sap-code','en_US','sap-code.input.sap_code','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.input.sap_description','SAP description','SAP description',null,null,null, null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN, KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status','SAP status','SAP status');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status_enable','Enable','Enable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status_disable','Disable','Disable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL, VALUE,SHORT_VALUE) VALUES ('Static_List','en_US','static_list.status_disable', 'Disable','Disable');",
+        "id": 35,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 219,
+        "text": "INSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL, VALUE,SHORT_VALUE) VALUES ('Static_List','en_US','static_list.status_disable', 'Disable','Disable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL, VALUE,SHORT_VALUE) VALUES ('Static_List','en_US','static_list.status_enable', 'Enable','Enable');\n\n\n## 018_Static_list/20210210_PKG_STATUS_FLAG.sql\n\nDELETE static_list WHERE COLLECTION_NAME='Pkg_status_flag';\n\nINSERT INTO static_list (COLLECTION_NAME,VALUE_SEQUENCE,VALUE_ID,VALUE_LABEL,VALUE_ORDER) VALUES ('Pkg_status_flag','1','E','static_list.status_enable','1');\n\nINSERT INTO static_list (COLLECTION_NAME,VALUE_SEQUENCE,VALUE_ID,VALUE_LABEL,VALUE_ORDER) VALUES ('Pkg_status_flag','2','D','static_list.status_disable','2');\n\nAlso we need to give proper rights for our screen to be render, for this purpose we insert values in tables: screen, menu,menus2roles,grant_permission",
+        "id": 36,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 169,
+        "text": "# 017_Compliance\\00_COMPLIANCE_SAP_CODE.sql\n\n\n```\nDELETE FROM menus2roles WHERE menus_fk='ISS-PRM-LEV2-sap-code';\n```\n\n\n```\nDELETE FROM grant_permission WHERE screen_fk='sap-code'; DELETE FROM menu WHERE menu_id='ISS-PRM-LEV2-sap-code'; DELETE FROM screen WHERE screen_id='sap-code';\n```\n\n\n## 017_Compliance\\01_SCREEN_SAP_CODE.sql\n\nINSERT INTO screen(SCREEN_ID,NAME,SCREEN_CODE,WORDING,URL,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('sap-code','sap-code','sap-code','sap-code','app/parameters/issuing/product/sap-code',NULL,NULL,NULL, NULL);\n\n\n## 017_Compliance\\03_MENU_SAP_CODE.sql",
+        "id": 37,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 38,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 230,
+        "text": "UPDATE menu SET MENU_ORDER = 12 WHERE  workspace='PARAM' and module ='ISS' and name = 'chip-profile'; UPDATE menu SET MENU_ORDER = 12 WHERE  workspace='PARAM' and module ='ISS' and name = 'embossing-customer-data' ; UPDATE menu SET MENU_ORDER = 13 WHERE  workspace='PARAM' and module ='ISS' and name = 'card-carrier'; UPDATE menu SET MENU_ORDER = 14 WHERE  workspace='PARAM' and module ='ISS' and name = 'card-materials'; UPDATE menu SET MENU_ORDER = 15 WHERE  workspace='PARAM' and module ='ISS' and name = 'plastic-layout'; UPDATE menu SET MENU_ORDER = 16 WHERE  workspace='PARAM' and module ='ISS' and name = 'tracks-layout'; INSERT INTO menu (MENU_ID,NAME,WORKSPACE,MODULE,WORDING,MENU_CODE,ADMIN,TYPE,SCREEN_REFERED_FK,MENU_PARENT_FK, MENU_LEVEL,MENU_ORDER,URL,KEY_WORDS,PARAMS,FE_FLAG,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)",
+        "id": 39,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 107,
+        "text": "MENU_LEVEL,MENU_ORDER,URL,KEY_WORDS,PARAMS,FE_FLAG,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('ISS-PRM-LEV2-sap-code','sap-code','PARAM','ISS','ISS-PRM-LEV2-sap-code','sap-code','Y','s','sapcode','ISS-PRM-LEV1-embossing',2,11,'param/issuing/sap-code',NULL,NULL,'N',NULL,NULL,NULL,NULL);",
+        "id": 40,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 41,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 71,
+        "text": "## 017_Compliance\\04_MENUS2ROLES_SAP_CODE.sql\n\nINSERT INTO menus2roles(ROLES_FK,MENUS_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('R_ISS_PARAM','ISS-PRM-LEV2-sap-code',NULL,NULL,NULL,NULL);",
+        "id": 42,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 285,
+        "text": "# 017_Compliance\\05_GRANT_PERMISSION_SAP_CODE.sql\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,1,1,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,2,2,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,3,3,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);",
+        "id": 43,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 235,
+        "text": "VALUES(grant_permission_x.NEXTVAL,3,3,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,4,4,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,5,5,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nFor type_permition column we can find the descriptions oat type_permission table.",
+        "id": 44,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# 3. Add a new screen (use case 1)\n\n\n## Introduction\n\nIn this document we will cover all the development steps were made in order to cover the needs of the following use case:  Use Case [1]: Insert SAP code . In a few words we will create a new table in database and will display this table in new screen. for a product\n\nTSD: Features Group 1: Additional fields\n\n\n## Steps before development\n\nFirst of all we need to know  where the new screen will be placed. This information will be useful for the future use. For this purpose we can find some relevant existing screen and find out where it is used in our modules.\n\nAlso we need to checkout the relevant git branches for every module we will modify.\n\n\n## Starting the development\n\n\n## UI\n\nOur new screen will be placed in the issuing parameters section, so we created a new folder named sap-code under \\pwcui\\src\\app\\parameters\\issuing\\product\\. In our new folder we created 3 new folders: tests,view and vo, along with 2 files for config and modules.\n\n\n## NEW FILES\n\n\n- 1.  sapCode.module.ts Parent module for initialization"
+      },
+      {
+        "page": 2,
+        "text": "```\nimport {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {SapCodeDetailsComponent} from './view/details/sapCode-details.component'; import {SapCodeCriteriasComponent} from './view/sapCode-criterias.component'; import {SapCodeComponent} from './view/sapCode.component'; import {SCREEN} from './sapCode.config'; import { IssuingComponentsModule } from \"@op/issuing/product/abstract/components/issuing-components. module\"; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** SapCode Routes */ export const sapCodeRoutes = [ { path: '', component: SapCodeComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: SapCodeDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** SapCode Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(sapCodeRoutes), StoreModule.forFeature(SCREEN, reducerToken), IssuingComponentsModule, EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ SapCodeComponent, SapCodeCriteriasComponent, SapCodeDetailsComponent, ], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class SapCodeModule { constructeur() { console.log('SapCodeModule'); } }\n```\n\n\n# 2.  sapCode.config.ts\n\nThis file contains declaration of some variables for page permeations, connectivity with server and lists usage. Specifically among the others we used the static list which was created for use case 5 (Pkg_status_flag) and Vcatalogues_n_products_view for catalogue product list"
+      },
+      {
+        "page": 3,
+        "text": "```\n/** * SapCode Config */ export const SCREEN = 'sap-code'; export const MODULE = 'paramsCardholder'; export const SERVICE = 'Pkg_sap_code'; export const SEARCH_PARAM_REFS = ['Bank','Vcatalogues_n_products_view','Branch', 'Catalogue_product_light','Network','Currency_table']; export const SEARCH_STATIC_LISTS = ['Pkg_status_flag']; export const DETAILS_PARAM_REFS = []; export const DETAILS_STATIC_LISTS = [];\n```\n\n\n# 3.  vo/sapCode.entity.ts\n\nThis file is the representation of the entity that is declared in the servers module btdesign file. For the product list two columns were created catalogue_pi_version and catalogue_pi_product\n\n\n```\nimport {AbstractEntity} from '@pwc/shared'; export class SapCodeEntity extends AbstractEntity { bank_code: string; product_code: string; sap_code: string; sap_description: string; sap_status: string; catalogue_pi_version: string; catalogue_pi_product: string; constructor({ bank_code = null, product_code = null, sap_code = null, sap_description = null, sap_status = null, catalogue_pi_version = null, catalogue_pi_product = null }: { bank_code?: string; product_code?: string; sap_code?: string; sap_description?: string; sap_status?: string; catalogue_pi_version?: string; catalogue_pi_product?: string; }) { super(); this.bank_code = bank_code; this.product_code = product_code; this.sap_code = sap_code; this.sap_description = sap_description; this.sap_status = sap_status; this.catalogue_pi_version = catalogue_pi_version; this.catalogue_pi_product = catalogue_pi_product; } }\n```"
+      },
+      {
+        "page": 4,
+        "text": "# 4.  view/details/sapCode-details.component.html\n\nThis is the file for the screen where we can modify the data, the detail screen. Consists of header, action bar with all the actions we can perform in this screen, the actual fields located in criterias file and footer section.\n\n\n```\n<pwc-screen [titleValue]=\"'sap-code.header.screen_title' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\" context.grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\"  (back)=\"back()\" (save)=\"save()\"></pwc-compactionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'sap-code' | async | uppercase}} </pheader> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-sap-code-criterias #criterias [context]=\"context\" ></pwc-comp-sap-codecriterias> </div> </p-fieldset> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```\n\n\n## 5.  view/details/sapCode-details.component.ts\n\nThis file is used for screens load and actions. There we need to import CatalogueProductEureka for products list usage."
+      },
+      {
+        "page": 5,
+        "text": "```\nimport { SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS } from '../../sapCode.config'; import { SapCodeEntity } from '../../vo/sapCode.entity'; import { AbstractDetailScreenComponent, PwcState } from '@pwc/shared'; import { Component, Injector, ViewChild } from '@angular/core'; import { Store } from '@ngrx/store'; import { CatalogueProductEureka } from \"@op/issuing/product/abstract/components/catalogue-product-eureka /catalogue-product-eureka.component\"; import { SapCodeCriteriasComponent } from '@param/issuing/product/sap-code/view/sapCode-criterias. component'; import { log } from 'util'; @Component({ selector: 'pwc-comp-sap-code-details', templateUrl: './sapCode-details.component.html' }) export class SapCodeDetailsComponent extends AbstractDetailScreenComponent { @ViewChild('criterias') sapCodeCriteriasComponent: SapCodeCriteriasComponent; constructor(injector: Injector) { super(injector); this.serviceConfig = { mod: MODULE, service: SERVICE, bundle: SCREEN }; this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new SapCodeEntity(this.getAllValues()); this.context.entity.product_code = this.sapCodeCriteriasComponent.PiProduct && this. sapCodeCriteriasComponent.PiProduct.selectedItem ? this.sapCodeCriteriasComponent.PiProduct.selectedItem. pan_product_code : null; } getBundleName(): string { return SCREEN; } }\n```\n\n\n# 6.  view/sapCode-criterias.component.html\n\nThe reusable section of the search screen and details screen. The component that needs our attention is pwc-catalogue-product-eureka. This is an HPS custom component used for products list."
+      },
+      {
+        "page": 6,
+        "text": "```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-bank id=\"bank_code\" [array]=\"array\" [bankList]=\"context.ref.get('Bank')\" labelKey=\"Common.input.bank\" [required]=\"context.state === 'DETAIL'\" [readOnly]=\"context.PKState\" [filter]=\"'ACQ'\"> </pwc-bank> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-catalogue-product-eureka #piProduct [array]=\"array\" [productType]=\"'P'\" productId=\" catalogue_pi_product\" versionId=\"catalogue_pi_version\" [required]=\"context.state === 'DETAIL'\" [showProductType]=\" true\" [showProductVersion]=\"true\" [showProductName]=\"true\" [context]=\"context\" [readOnly]=\"context.PKState\" [isCatalgConsultable]=\"true\" [data]=\"context?.ref?.get('Vcatalogues_n_products_view')\"> </pwc-catalogue-product-eureka> </div> </div> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"sap_code\" type=\"input\" [array]=\"array\" maxlength=\"13\" [labelKey]=\"'sap-code.input.sap_code'\" [readOnly]=\"context.PKState\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"sap_description\" [array]=\"array\" type=\"textArea\" maxlength=\"100\" [labelKey]=\"'sap-code.input.sap_description'\" [required]=\"context.state === 'DETAIL'\"> </pwc-input> </div> </div> <div class=\"ui-g-12\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-radiobutton id=\"sap_status\" maxlength=\"1\" [labelKey]=\"'sap-code.input.sap_status'\" [array]=\"array\" [required]=\"context.state === 'DETAIL'\" [options]=\"{'E':'sap-code.input.sap_status_enable'| pwcTrans | async, 'D':'sap-code.input.sap_status_disable'| pwcTrans | async}\"> </pwc-radiobutton> </div> </div>\n```\n\n7.  view/sapCode-criterias.component.ts Constructor for the reusable component"
+      },
+      {
+        "page": 7,
+        "text": "```\nimport {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector, ViewChild} from '@angular/core'; import { CatalogueProductEureka } from '@op/issuing/product/abstract/components/catalogue-product-eureka /catalogue-product-eureka.component'; @Component({ selector: 'pwc-comp-sap-code-criterias', templateUrl: './sapCode-criterias.component.html' }) export class SapCodeCriteriasComponent extends AbstractSubFormComponent { @ViewChild('piProduct') PiProduct: CatalogueProductEureka; constructor(injector: Injector) { super(injector); } }\n```\n\n\n# 8.  view/sapCode.component.html\n\n\n```\nThe below section of the search screen, where the results are displayed.\n```\n\n\n```\n<pwc-screen [titleValue]=\"'sap-code.header.screen_title' | pwcTrans | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\"  > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-sap-code-criterias [context]=\"context\" ></pwc-comp-sap-code-criterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\" clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"sapCodeDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\" showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate) =\"duplicateEntity($event)\" (onRemove)=\"removeEntity($event)\" [ref]=\"context?.ref\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```\n\n\n## 9.  view/sapCode.component.ts\n\nFunction that is used for the initialize the result table, fetch the necessary labels and fetching data."
+      },
+      {
+        "page": 8,
+        "text": "```\nimport {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../sapCode.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {SapCodeEntity} from '../vo/sapCode.entity'; import {Store} from '@ngrx/store'; import * as CONFIG from '../sapCode.config'; @Component({ selector: 'pwc-comp-sap-code', templateUrl: './sapCode.component.html' }) export class SapCodeComponent extends AbstractSearchScreenComponent { sapCodeEntity: SapCodeEntity = new SapCodeEntity({}); constructor(injector: Injector) { super(injector); } buildColumns() { this.addLabelRefColumn({field:'bank_code', header:'Common.input.bank', sortable: true, config: {code: 'bank_code', label: 'bank_name', source: 'Bank'}}); this.pushColumn(this.columns, { field: 'catalogue_pi_product', header: 'Common.catalogue.pi', type: 'REF', sortable: true, config: {code: 'product_code', label: 'product_name', source: 'Catalogue_product_light'} }); this.addStringColumn({field:'sap_code', header:'sap-code.input.sap_code', sortable: true}); this.addStringColumn({field:'sap_description', header:'sap-code.input.sap_description', sortable: true}); this.addStaticListColumn({ field: 'sap_status', header: 'sap-code.input.sap_status', config: { source: 'Pkg_status_flag' }, type: ColumnType.STRING }); } search() { this.sapCodeEntity = new SapCodeEntity(this.getAllValues()); this.searchEntity(this.sapCodeEntity); } getBundleName() { return SCREEN; } getConfig(){ return CONFIG; } // buildActionBarBtn() { //   super.buildActionBarBtn(); // } }\n```\n\nAlso we need to edit the file pwc-ui\\src\\app\\parameters\\issuing\\issuing.routes.ts and add our new screen\n\n\n```\n{ path: 'sap-code', loadChildren: './product/sap-code/sapCode.module#SapCodeModule' },\n```"
+      },
+      {
+        "page": 9,
+        "text": "# Server\n\nOn the server side we need to add our new entity in relevant .btdesign file. For our purpose it was paramsCardholder.btdesign the located in pwcserver\\paramsCardholder\\src\\main\\resources. The code to be added was generated from package generate_dsl_2 in database. We needed to modify the foreign key, cause it is not support multi foreign key, so we added only the bank as foreign key. After the modification we need to install along with the paramsCardholder module also the v3_31 module and deploy both generated jars to the jboss deployments folder.\n\n\n```\n/**************************** Pkg_sap_code ****************************/ Entity Pkg_sap_code { databaseTable=\"Pkg_sap_code\" auditable !optimisticLocking scaffold - @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\"; String product_code key databaseType=\"CHAR(3)\"; String sap_code key databaseType=\"NUMBER(13,0)\"; String sap_description databaseColumn = \"sap_description\" length = \"100\" nullable; String sap_status databaseColumn = \"sap_status\" length = \"1\" nullable; String catalogue_pi_version databaseColumn=\"catalogue_pi_version\" databaseType=\"VARCHAR2(10)\"; String catalogue_pi_product databaseColumn=\"catalogue_pi_product\" databaseType=\"CHAR(6)\"; Repository Pkg_sap_codeRepository { findByKeys; findByKey; findByCondition; findByCriteria; } } DataTransferObject Pkg_sap_codeVO { String bank_code; String product_code; String sap_code; String sap_description; String sap_status; String catalogue_pi_version; String catalogue_pi_product; } Service Pkg_sap_codeService { > @Pkg_sap_codeRepository String createPkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); String updatePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); String deletePkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); List<@Pkg_sap_codeVO> getAllPkg_sap_codeService(); List<@Pkg_sap_codeVO> searchPkg_sap_codeService(@Pkg_sap_codeVO pkg_sap_codeVO); }\n```\n\n\n## Database\n\nFor the database we will modify some files located in the pwc-db/Installation/Patch/BO/Dev_DB_Repository. We need to add scripts for table creation, according with all the related indexes, constraints and triggers. Also we need a new table identical to our table, plus one extra column (sensitive_operation_record), in order to maintain the modification history.\n\nNext step is to add all the necessary label, we used in the ui, to the ressource_bundle folder, along with some  static values needed for  lists. This achieved by inserts in the ressource_labels table with  specific bundle column and insertion in static_list table."
+      },
+      {
+        "page": 10,
+        "text": "# 016_Ressource_Bundle/20210201_SAP_CODE.sql\n\nDELETE RESSOURCE_BUNDLE WHERE BUNDLE = 'sap-code';\n\nDELETE RESSOURCE_BUNDLE WHERE BUNDLE = 'Menu_lang' and key_val = 'sap-code';\n\nDELETE RESSOURCE_BUNDLE WHERE KEY_VAL='static_list.status_disable';\n\nDELETE RESSOURCE_BUNDLE WHERE KEY_VAL='static_list.status_enable';\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('Menu_lang','en_US','sap-code','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.header.screen_title','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.input.sap_code','SAP code','SAP code',null,null,null,null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE,USER_CREATE,DATE_CREATE,USER_MODIF, DATE_MODIF)\n\nVALUES ('sap-code','en_US','sap-code.input.sap_description','SAP description','SAP description',null,null,null, null);\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN, KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status','SAP status','SAP status');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status_enable','Enable','Enable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL,VALUE,SHORT_VALUE) VALUES ('sap-code','en_US','sap-code.input.sap_status_disable','Disable','Disable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL, VALUE,SHORT_VALUE) VALUES ('Static_List','en_US','static_list.status_disable', 'Disable','Disable');\n\nINSERT INTO RESSOURCE_BUNDLE (BUNDLE,LOCALE_CHAIN,KEY_VAL, VALUE,SHORT_VALUE) VALUES ('Static_List','en_US','static_list.status_enable', 'Enable','Enable');\n\n\n## 018_Static_list/20210210_PKG_STATUS_FLAG.sql\n\nDELETE static_list WHERE COLLECTION_NAME='Pkg_status_flag';\n\nINSERT INTO static_list (COLLECTION_NAME,VALUE_SEQUENCE,VALUE_ID,VALUE_LABEL,VALUE_ORDER) VALUES ('Pkg_status_flag','1','E','static_list.status_enable','1');\n\nINSERT INTO static_list (COLLECTION_NAME,VALUE_SEQUENCE,VALUE_ID,VALUE_LABEL,VALUE_ORDER) VALUES ('Pkg_status_flag','2','D','static_list.status_disable','2');\n\nAlso we need to give proper rights for our screen to be render, for this purpose we insert values in tables: screen, menu,menus2roles,grant_permission"
+      },
+      {
+        "page": 11,
+        "text": "# 017_Compliance\\00_COMPLIANCE_SAP_CODE.sql\n\n\n```\nDELETE FROM menus2roles WHERE menus_fk='ISS-PRM-LEV2-sap-code';\n```\n\n\n```\nDELETE FROM grant_permission WHERE screen_fk='sap-code'; DELETE FROM menu WHERE menu_id='ISS-PRM-LEV2-sap-code'; DELETE FROM screen WHERE screen_id='sap-code';\n```\n\n\n## 017_Compliance\\01_SCREEN_SAP_CODE.sql\n\nINSERT INTO screen(SCREEN_ID,NAME,SCREEN_CODE,WORDING,URL,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('sap-code','sap-code','sap-code','sap-code','app/parameters/issuing/product/sap-code',NULL,NULL,NULL, NULL);\n\n\n## 017_Compliance\\03_MENU_SAP_CODE.sql\n\n\n```\nUPDATE menu SET MENU_ORDER = 12 WHERE  workspace='PARAM' and module ='ISS' and name = 'chip-profile'; UPDATE menu SET MENU_ORDER = 12 WHERE  workspace='PARAM' and module ='ISS' and name = 'embossing-customer-data' ; UPDATE menu SET MENU_ORDER = 13 WHERE  workspace='PARAM' and module ='ISS' and name = 'card-carrier'; UPDATE menu SET MENU_ORDER = 14 WHERE  workspace='PARAM' and module ='ISS' and name = 'card-materials'; UPDATE menu SET MENU_ORDER = 15 WHERE  workspace='PARAM' and module ='ISS' and name = 'plastic-layout'; UPDATE menu SET MENU_ORDER = 16 WHERE  workspace='PARAM' and module ='ISS' and name = 'tracks-layout'; INSERT INTO menu (MENU_ID,NAME,WORKSPACE,MODULE,WORDING,MENU_CODE,ADMIN,TYPE,SCREEN_REFERED_FK,MENU_PARENT_FK, MENU_LEVEL,MENU_ORDER,URL,KEY_WORDS,PARAMS,FE_FLAG,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('ISS-PRM-LEV2-sap-code','sap-code','PARAM','ISS','ISS-PRM-LEV2-sap-code','sap-code','Y','s','sapcode','ISS-PRM-LEV1-embossing',2,11,'param/issuing/sap-code',NULL,NULL,'N',NULL,NULL,NULL,NULL);\n```\n\n\n## 017_Compliance\\04_MENUS2ROLES_SAP_CODE.sql\n\nINSERT INTO menus2roles(ROLES_FK,MENUS_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF) VALUES('R_ISS_PARAM','ISS-PRM-LEV2-sap-code',NULL,NULL,NULL,NULL);"
+      },
+      {
+        "page": 12,
+        "text": "# 017_Compliance\\05_GRANT_PERMISSION_SAP_CODE.sql\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,1,1,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,2,2,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,3,3,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,4,4,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nINSERT INTO grant_permission (GRANT_PERMISSION_ID,TYPE_GRANT,TYPE_PERMISSION_FK,MENU_FK,SCREEN_FK,COMPONENT_FK, ROLE_FK,USER_CREATE,DATE_CREATE,USER_MODIF,DATE_MODIF)\n\nVALUES(grant_permission_x.NEXTVAL,5,5,'ISS-PRM-LEV2-sap-code','sap-code',NULL,'R_ISS_PARAM',NULL,NULL,NULL, NULL);\n\nFor type_permition column we can find the descriptions oat type_permission table."
+      }
+    ]
+  }
+}

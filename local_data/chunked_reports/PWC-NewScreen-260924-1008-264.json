@@ -1,0 +1,547 @@
+{
+  "metainfo": {
+    "sha1_name": "PWC-NewScreen-260924-1008-264",
+    "pages_amount": 17,
+    "text_blocks_amount": 162,
+    "tables_amount": 0,
+    "pictures_amount": 6,
+    "equations_amount": 0,
+    "footnotes_amount": 0
+  },
+  "content": {
+    "chunks": [
+      {
+        "page": 1,
+        "length_tokens": 291,
+        "text": "# New Screen\n\n\n- HPS training material\n- Flow\n- Changes in pwc-db module\n- Changes in pwc-server module\n- Changes in pwc-ui module\n\n\n\n## HPS training material\n\nPlease refer to HPS training as well:\n\nPWC_Training_UI_SARA_ALEM_090420.pptx\n\n\n## Flow\n\n\nDetect where the changes will take place (UISERVERDB):\n- 1.  Identify where the new screen will be located in the GUI (i.e. from where the user with interact with it) - usually will be provided by documentation (BAs, TSD, etc.) and try to connect/group the new screen with the already existing ones\n- 2.  Identify the child module of the server component that is going to be affected (in the existing screens Inspect element > Network > find the Request URL to the server component)\n- 3.  examine if update to existing tables is required as well\n\n\n\nMake changes is the code (DBSERVERUI):\n- 1.  pwc-db: update data model\n- 2.  pwc-server: update childModule.btdesing\n- 3.  pwc-ui: create new screen - try to find a similar screen for copy paste, ctrl+F is your friend (70% investigation 30% implementation)\n\n\n\n## Changes in pwc-db module\n\nUpdate db schema in your local db.",
+        "id": 0,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 284,
+        "text": "## Changes in pwc-db module\n\nUpdate db schema in your local db.\n\n\n- 000_Sequences\n- 001_Before\n- 002_Tables\n- 003_Indexes\n- 004_Constraints_NonFK\n- 005_Triggers\n- 006_Migration_Scripts\n- 007_Constraints_FK\n- 008_After\n- 009_Types\n- 010_Views\n- 011_Functions\n- 012_Scripts\n- 013_Packages\n- 015_Multi_langue_init\n- 016_Ressource_Bundle\n- 017_Compliance\n- 018_Static_list\n\n\n\nFor the changes to be committed, update the contents of the following folders:\n- pwc-db/Dev_DB_Repository (add your changes) - to be discussed if changes are going to be saved here too\n- pwc-db/Installation/Patch/BO (delete the old contents of pwc-db/Installation/Patch/BO/ folder - EXCEPT the logsDB folder - and add your changes)\n\n\nEdit files execute.bat and config.properties. Export the scripts in the pwc-db/Installation/Patch/BO/Dev_DB_Repository folder with the following command. When asked, input the absolute path of the config.properties file.\n\n\n```\njava -jar ExtractDDL_devOps_02.jar\n```",
+        "id": 1,
+        "type": "content"
+      },
+      {
+        "page": 1,
+        "length_tokens": 63,
+        "text": "```\njava -jar ExtractDDL_devOps_02.jar\n```\n\nThen run the following command in order to generate the necessary scripts required for applying the changes. When asked, input the absolute path to the BO folder (e.g. D:\\WorkGit\\pwc-db\\Installation\\Patch\\BO)",
+        "id": 2,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 276,
+        "text": "```\njava -jar generateDBInstall.jad\n```\n\nCommit the generated files. Do NOT commit the generateDBInstall.jad file!!!! The logsDB folder should contain ONLY the log.txt file!!!!\n\n\n# Changes in pwc-server module\n\n\n## Package generate_dsl_2 => generate server (btdesign) entities\n\nOracle SQL Develop > Open your local database > Packages > Apply Filter > Input package name: generate_dsl_2 > Double Click > Run (green button) > PROCEDURE_NAME> P_TABLE_NAME Input Value: table name > click OK > copy from log > paste the code in the relevant .btdesign file\n\n\n## Package GENERATE_DSL_JPUB2 => jpublisher entities (packages)\n\nOracle SQL Develop > Open your local database > Packages > Apply Filter > Input package name: GENERATE_DSL_JPUB2 > Double Click > Run (green button) > PROCEDURE_NAME> P_PACKAGE_NAME Input Value: package name > click OK > copy from log > paste the code in the relevant . btdesign file\n\nThe generated code may need extra modifications. For example, only one foreign key should be declared in each entity. Usually this fk is the bank code:\n\n\n```\n- @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\";\n```\n\n\n## Build",
+        "id": 3,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 253,
+        "text": "```\n- @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\";\n```\n\n\n## Build\n\nFrom pwc-server/v3_31-parent/pom.xml comment out all modules except the child module in which you performed the changes AND the module (at v3_31 <modules></modules>), save and build the parent (mvn clean install -Dmaven.test.skip=true)\n\nBuild again with all the modules (w/o clean: mvn install -Dmaven.test.skip=true)\n\nOR\n\nBuild only the module with the changes AND the module (mvn clean install -Dmaven.test.skip=true) v3_31\n\nFind v3_31web.war > right click > 7-Zip > Open archive > go to WEB-INF/lib/ > drag and drop the new jars > save\n\nFinally, deploy the newly created pwc-server/v3_31-web/target/v3_31-web.war to JBOSS\n\nRead carefully the document Sculptor generator!!!\n\n\n## Commit\n\nCommit only the changes you did manually (i.e. the .btdesign you changed) and NOT all the generated files of the build.\n\n\n## Changes in pwc-ui module\n\n\n## For faster build",
+        "id": 4,
+        "type": "content"
+      },
+      {
+        "page": 2,
+        "length_tokens": 287,
+        "text": "## Commit\n\nCommit only the changes you did manually (i.e. the .btdesign you changed) and NOT all the generated files of the build.\n\n\n## Changes in pwc-ui module\n\n\n## For faster build\n\nComment out modules to minimize the modules that the app will serve. When we try to access them from the ui, we will get a 404 not found. When we want to create a new screen, we can comment out everything else.\n\n\n- src\\app\\core\\route\\core.routes.ts (e.g. comment: admin)\n- src\\app\\operation\\operation.module.ts (e.g. comment: acquiring, switch, atm, xpos, fraud)\n- src\\app\\operation\\issuing\\issuing.routes.ts (e.g. comment all except: boarding and client)\n- src\\app\\parameters\\parameters.module.ts (e.g. comment: acquiring, atm, xpos, fraud, general, switch)\n- src\\app\\parameters\\issuing\\issuing.routes.ts (e.g. comment all except: catalogue and delivery-method)\n\n\nBUILD: the 1st time by running the command node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\nREBUILD: each time you save the changes you made in some file (VSCode has the option: File > Save All)\n\n(Do not commit the changes with the comments!)",
+        "id": 5,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 229,
+        "text": "# For a new screen the files below are required:\n\n\n```\nNEW FILES FROM GENERATOR (COPY FROM TEMPLATE) tests/newScreen-details.component.spec.ts ...................[1] tests/newScreen.component.spec.ts ...........................[2] view/details/newScreen-details.component.html ...............[3] view/details/newScreen-details.component.ts .................[4] view/popups/newScreen-popup.component.html ..................[5] view/popups/newScreen-popup.component.ts ....................[6] view/newScreen-criterias.component.html .....................[7] view/newScreen-criterias.component.ts .......................[8] view/newScreen.component.html ...............................[9] view/newScreen.component.ts .................................[10] vo/newScreen.entity.ts ......................................[11] newScreen.config.ts .........................................[12] newScreen.db.sql ............................................[13] newScreen.module.ts .........................................[14] TO BE CREATED new-screen.mock.json ........................................[15] TO BE EDITED issuing.routes.ts ...........................................[16] { path: 'new-screen', loadChildren: './product/new-screen/newScreen.module#newScreenModule' },\n```",
+        "id": 6,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 131,
+        "text": "For files 1-14, download files from the template (new-screen.rar) in your local environment, copy the extracted folder to the appropriate path and replace the new-screen and newScreen instances with your screen's name. Clean the code by removing the unusable parts, i.e. the parts that are not required for the screen you want to develop (not used PopUp, not used functions, commented code, generated functions refering to the old generator version, etc). Edit the remaining files to suit the new screen needs (entities and fields as defined in server and db, validation, general formatting of the screen, etc).\n\n\n## DETAILS/COMMENTS",
+        "id": 7,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 292,
+        "text": "- 1-2.. required for running the unit tests. UT are written using Jasmine Behavior-Driven syntax. The tests are run using KARMA test runner.\n- 1.... Lambda Details screen test should: create Lambda detail component, contain details HTML elements, fill fields based on mocked service (setValues())\n- 2.... Lambda Search screen test should: create the Lambda component, contain search HTML elements, search for elements, should go to details\n- 3-9.. The layout of the two main views (search and details). They both consist of: Screen title, Header Div, Footer Div, Action bar with grants & event, Criteria div reffering to an external component\n- 3.... Detail fields can be ordered in one or several tabs, splited in sub components for big screens.\n- 4.... beforeSave() is called on save action and can be overwritten. Remove .clone(this.context.entity) from beforeSave function.\n- 5-6.. edit these files when popups are required in your screen\n- 7-8.. a reusable part of the new screen, that is going to be used in the default (search) view AND in the details view\n- 9.... Datatable is the results table, with raised events on actions. Add : [ref]=\"context?.ref\"  to <pwc-datatable ..> for labelRefColumns.",
+        "id": 8,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 83,
+        "text": "- 9.... Datatable is the results table, with raised events on actions. Add : [ref]=\"context?.ref\"  to <pwc-datatable ..> for labelRefColumns.\n- 10... The buildColumns() builds the columns of the results table (Builds columns with several types: date, string, amount, custom through label functions…) The search() function can be overwritten.",
+        "id": 9,
+        "type": "content"
+      },
+      {
+        "page": 3,
+        "length_tokens": 270,
+        "text": "For the buildColumns() some of the available options are:\n- pushColumn\n- addLabelRefColumn (same with pushColumn, used for dropdowns lists, Sara prefers this one)\n- addStringColumn\n- addTypeColumn\n- addLabelColumn\n- addStaticListColumn\n- 11... data value object declaration. Input fields as defined in the dto of the relevant entity in the .btdesign file of the pwc-server component (the fields correspond to the data model table). Careful when there are Sets (sets in btdesign refers to 1 to N relation in db), each set must be defined as a new entity!\n- 12... adjust config file. Add the references and lists needed.\n- SCREEN: 'screen-name'  name of screen as in the screen url (pwc-ui)\n- MODULE: 'childModule'  name of child module (pwc-server)\n- SERVICE: 'Screen_name'  name of service used (pwc-server)\n- SEARCH_PARAM_REFS: ['Table1', 'View1']  connection/relations with other tables/views for search screen (pwc-db)\n- SEARCH_STATIC_LISTS: ['List1', 'List2']  for radio buttons/dropdowns/... of search screen. Gets lists from STATIC_LIST table (pwc-db)",
+        "id": 10,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 147,
+        "text": "- DETAILS_PARAM_REFS: []  same with SEARCH_PARAM_REFS, but for details screen\n- DETAILS_STATIC_LISTS: []  same with SEARCH_STATIC_LISTS, but for details screen\n\n\nThe details screen inherits the references and lists of the search screen, so there is no need to add them twice!!!\n\nWhen using a custom HPS component, be sure to use all the references needed for this specific component, even if they don't appear on your screen!!!\n\nIn case of sets in btdesign files, add also:\n\n\n```\nexport const FIND_ALL_OTHER_ENTITY = { mod: 'childModule', service: 'Other_entityService', vo: 'other_entityVO', method: 'getAllOther_entityService' };\n```",
+        "id": 11,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 206,
+        "text": "```\nexport const FIND_ALL_OTHER_ENTITY = { mod: 'childModule', service: 'Other_entityService', vo: 'other_entityVO', method: 'getAllOther_entityService' };\n```\n\n\n- 13... contains info about the screen that will be saved in the database (tables: screen, menu, menus2roles, grant_permission). This file will not be committed in the pwc-ui repo. Apply the changes in your local personal database along with required insertions in the table RESSOURCE_BUNDLE (for all the labels that are going to be used in the gui). After verifying the changes, update the db patch as described in the Changes in pwc-db module section.\n- 15... to execute the unit tests, add mock file in assets-tests repository. Insert dummy data.\n- 16... Add the module to the issuing.routes.ts file. Required each time a new screen is created. Without this change, you won't be able to access your screen when running the app.\n\n\n\n## questions",
+        "id": 12,
+        "type": "content"
+      },
+      {
+        "page": 4,
+        "length_tokens": 239,
+        "text": "## questions\n\n\n- 1.  how to run a specific test (ie for the new screen we created)\n- 2.  regarding pwc-catalogue-product-eureka and CatalogueProductEureka: why different implementation across pan-numbring / cardcarrier / stk-inventory-item-rule\n- also tabindex does not work for this element. why?\n- 3.  disable authentication for development (or increase time-out time)\n- 4.  find way in ui to disable password expiration\n- 5.  [10] constructor(): this.marshalingRefCodes VS this.referentialCodes\n\n\n\n## HPS generated template\n\nLet's say we want to create a new screen named newScreen in the folder issuing parameters.\n\n\n```\nHPS generator command ng g pwc-screen parameters/issuing/product/new-screen --module=ModuleName --service=ServiceName --screen=new-\n```\n\nscreen --collection=@pwc/generator\n\nGenerated files (at location: src/app/parameters/issuing/product/new-screen/):\n\nnew-screen tests newScreen-details.component.spec.ts newScreen.component.spec.ts view details newScreen-details.component.html newScreen-details.component.ts popups vo",
+        "id": 13,
+        "type": "content"
+      },
+      {
+        "page": 5,
+        "length_tokens": 129,
+        "text": "newScreen.entity.ts newScreen.config.ts\n\nnewScreen.db.sql newScreen.module.ts\n\n\n# newScreen.config.ts\n\n\n```\n/** * NewScreen Config */ export const SCREEN = 'newScreen'; export const MODULE = 'ModuleName'; export const SERVICE = 'ServiceName'; export const SEARCH_PARAM_REFS = []; export const SEARCH_STATIC_LISTS = []; export const DETAILS_PARAM_REFS = [];\n```\n\n\n```\nexport const DETAILS_STATIC_LISTS = [];\n```\n\nnewScreen-popup.component.html newScreen-popup.component.ts\n\nnewScreen-criterias.component.html newScreen-criterias.component.ts\n\nnewScreen.component.html newScreen.component.ts",
+        "id": 14,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 15,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 296,
+        "text": "newScreen.db.sql /** * NewScreen Screen/Menu/Grants Creation * Please replace ROLES_FK with actual Role * and MENU_ID with MODULE-WORKSPACE-LEVEL-NAME  ( e.g ACQ-OP-LEV1-Exchange_scenario) */ -- SCREEN INSERT INTO screen (\"SCREEN_ID\",\"NAME\",\"SCREEN_CODE\",\"WORDING\",\"USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\",\"URL\") VALUES ('new-screen','new-screen','new-screen','new-screen','admin','admin',NULL,NULL,'app/parameters/issuing/product /new-screen') --MENU INSERT INTO menu (\"MENU_ID\",\"NAME\",\"WORDING\",\"MENU_CODE\",\"ADMIN\",\"TYPE\",\"SCREEN_REFERED_FK\",\"MENU_PARENT_FK\",\"USER_CREATE\",\" USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\",\"MENU_LEVEL\",\"MENU_ORDER\",\"URL\") VALUES (\"ACQ-PARAM-LEV1-new-screen\",'new-screen','app/parameters/issuing/product/new-screen','','Y','s',\"newscreen\",'MENU_PARENT','admin','admin',NULL,NULL,'Level',0,'app/parameters/issuing/product/new-screen') ; --MENUS2ROLES INSERT INTO menus2roles (\"ROLES_FK\",\"MENUS_FK\",\"USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (\"R_OP_ACQ\",menu_x.CURRVAL,'admin','admin',NULL,NULL) ; --GRANT_PERMISSION INSERT INTO grant_permission",
+        "id": 16,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 299,
+        "text": "VALUES (\"R_OP_ACQ\",menu_x.CURRVAL,'admin','admin',NULL,NULL) ; --GRANT_PERMISSION INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,1,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,2,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,3,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\"",
+        "id": 17,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 159,
+        "text": "; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,4,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,5,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ;",
+        "id": 18,
+        "type": "content"
+      },
+      {
+        "page": 6,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 19,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 20,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 299,
+        "text": "newScreen.module.ts import {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {NewScreenDetailsComponent} from './view/details/newScreen-details.component'; import {NewScreenPopupComponent} from './view/popups/newScreen-popup.component'; import {NewScreenCriteriasComponent} from './view/newScreen-criterias.component'; import {NewScreenComponent} from './view/newScreen.component'; import {SCREEN} from './newScreen.config'; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** NewScreen Routes */ export const newScreenRoutes = [ { path: '', component: NewScreenComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: NewScreenDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** NewScreen Module Declaration */",
+        "id": 21,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 149,
+        "text": "= [ { path: '', component: NewScreenComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: NewScreenDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** NewScreen Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(newScreenRoutes), StoreModule.forFeature(SCREEN, reducerToken), EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ NewScreenComponent, NewScreenCriteriasComponent, NewScreenDetailsComponent, NewScreenPopupComponent, ], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class NewScreenModule { constructeur() { console.log('NewScreenModule'); } }",
+        "id": 22,
+        "type": "content"
+      },
+      {
+        "page": 7,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 23,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 71,
+        "text": "```\nnewScreen.entity.ts import {AbstractEntity} from '@pwc/shared'; export class NewScreenEntity extends AbstractEntity { attribute: string; totalPages: number; pageSize: number; page: number; constructor({attribute = null}: {attribute?: string}) { super(); this.attribute = attribute } }\n```\n\n\n# newScreen.component.ts",
+        "id": 24,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 25,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 292,
+        "text": "import {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../newScreen.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {NewScreenEntity} from '../vo/newScreen.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-new-screen', templateUrl: './newScreen.component.html' }) export class NewScreenComponent extends AbstractSearchScreenComponent { newScreenEntity: NewScreenEntity = new NewScreenEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.referentialCodes = this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addSimpleColumn('attribute1', 'bundle.key.1'); this.addTypeColumn('attribute2', 'bundle.key.2', ColumnType.CARDNUMBER); this.addTypeColumn('attribute3', 'bundle.key.3', ColumnType.DATE); this.addTypeColumn('attribute4', 'bundle.key.4', ColumnType.AMOUNT); this.addTypeColumn('attribute5', 'bundle.key.5', ColumnType.CURRENCY); } search() { this.newScreenEntity = new",
+        "id": 26,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 99,
+        "text": "this.addTypeColumn('attribute4', 'bundle.key.4', ColumnType.AMOUNT); this.addTypeColumn('attribute5', 'bundle.key.5', ColumnType.CURRENCY); } search() { this.newScreenEntity = new NewScreenEntity(this.getAllValues()); this.searchEntity(this.newScreenEntity); } addCustomDependencies() { this.addCustomDependency('statusList', [ {code: 'N', label: this.getLabel('optionsN')}, ]); }",
+        "id": 27,
+        "type": "content"
+      },
+      {
+        "page": 8,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 28,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 108,
+        "text": "```\ngetBundleName(): string { return SCREEN; } buildActionBarBtn() { super.buildActionBarBtn(); // this.addActionBarBtn('fa-ban', 'EVENT_NAME', 'label', this.IsStatusTH); } IsStatusTH(row) { /* if (!row) { return true; } return (row['transaction_status'] === 'TH');*/ } custoAction(event) { if (event.code === 'EVENT_NAME') { console.log(event.row); return; } } }\n```\n\n\n# newScreen.component.html",
+        "id": 29,
+        "type": "content"
+      },
+      {
+        "page": 9,
+        "length_tokens": 276,
+        "text": "# newScreen.component.html\n\n\n```\n<pwc-screen [titleValue]=\"'newSCreen' | pwcTranslate : 'newSCreen'| async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-new-screen-criterias [context]=\"context\" ></pwc-comp-new-screen-criterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\"clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"newScreenDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\"showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate)=\"duplicateEntity ($event)\" (onRemove)=\"removeEntity($event)\" (onTriggerCustoActionEvent)=\"custoAction($event)\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```",
+        "id": 30,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 121,
+        "text": "```\nnewScreen-criterias.component.ts import {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-new-screen-criterias', templateUrl: './newScreen-criterias.component.html' }) export class NewScreenCriteriasComponent extends AbstractSubFormComponent { displayPopup: boolean = false; constructor(injector: Injector) { super(injector); } callPopup() { this.displayPopup = true; } }\n```\n\n\n# newScreen-criterias.component.html",
+        "id": 31,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 32,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 298,
+        "text": "<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"attribute1\" type=\"input\" [labelKey]=\"'bundle.key.1' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> <pwc-input id=\"attribute2\" type=\"dropdown\" [labelKey]=\"'bundle.key.2' | pwcTranslate : 'newSCreen' | async\" [data]=\"context.ref.get('DEP1')\" [array]=\"array\"></pwc-input> <pwc-date id=\"attribute3\" display=\"date\" [labelKey]=\"'bundle.key.3' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-date> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"attribute4\" type=\"input\" [labelKey]=\"'bundle.key.4' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> <pwc-eureka id=\"attribute5\" eurekaLabel=\"currency_name\" eurekaCode=\"currency_code\" [array]=\"array\" [labelKey] =\"'bundle.key.5' | pwcTranslate : 'newSCreen' | async\" [data]=\"context.ref.get('Currency_table')\"></pwc-eureka> <pwc-button",
+        "id": 33,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 208,
+        "text": "[array]=\"array\" [labelKey] =\"'bundle.key.5' | pwcTranslate : 'newSCreen' | async\" [data]=\"context.ref.get('Currency_table')\"></pwc-eureka> <pwc-button id=\"PopupBtn\" type=\"button\" iconPos=\"right\" [labelKey]=\"'bundle.key.6' | pwcTranslate : 'newscreen' | async\" (click)=\"callPopup()\" customStyleClass=\"buttonPadding\"></pwc-button> </div> <div class=\"ui-g-12 ui-md-12\"> <!--pwc-advancedsearch> <pwc-input id=\"attribute1\" type=\"input\" [labelKey]=\"'bundle.key.1' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </pwc-advancedsearch--> </div> </div> <pwc-comp-new-screen-popup [context]=\"context\" [displayPopup]=\"displayPopup\"></pwc-comp-new-screen-popup>",
+        "id": 34,
+        "type": "content"
+      },
+      {
+        "page": 10,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 35,
+        "type": "content"
+      },
+      {
+        "page": 11,
+        "length_tokens": 265,
+        "text": "```\nnewScreen-details.component.ts import {SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS} from '../../newScreen.config'; import {NewScreenEntity} from '../../vo/newScreen.entity'; import {AbstractDetailScreenComponent, PwcState} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-new-screen-details', templateUrl: './newScreen-details.component.html' }) export class NewScreenDetailsComponent extends AbstractDetailScreenComponent { constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.referentialCodes = this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new NewScreenEntity(this.getAllValues()).clone(this.context.entity); } getBundleName(): string { return SCREEN; } /*buildActionBarBtn() { super.buildActionBarBtn(); this.addActionBarBtn('fa-adn', 'EVENT_NAME', 'identification'); } custoAction(event) { if (event.code === 'EVENT_NAME') { console.log(event.code); return; } }*/ }\n```",
+        "id": 36,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 9,
+        "text": "```\nnewScreen-details.component.html\n```",
+        "id": 37,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 38,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 299,
+        "text": "<pwc-screen [titleValue]=\"'new-screen' | pwcTranslate : 'newSCreen' | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\"context.grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\" (back)=\"back()\" (save)=\"save()\" (onTriggerCustoActionEvent)=\"custoAction($event)\"></pwc-comp-actionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'newSCreen' | async | uppercase}} </p-header> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-new-screen-criterias [context]=\"context\" ></pwc-comp-new-screen-criterias> </div> </p-fieldset> <p-tabView> <p-tabPanel [header]=\"'details' | pwcTranslate : 'newSCreen' | async\" leftIcon=\"fa-shopping-cart\"> </p-tabPanel> <p-tabPanel [header]=\"'bundle.tab2' | pwcTranslate : 'newSCreen' | async\" leftIcon=\"fa-clock-o\"> </p-tabPanel> </p-tabView> </div> <!-- Footer -->",
+        "id": 39,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 66,
+        "text": "<p-tabPanel [header]=\"'bundle.tab2' | pwcTranslate : 'newSCreen' | async\" leftIcon=\"fa-clock-o\"> </p-tabPanel> </p-tabView> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>",
+        "id": 40,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 41,
+        "type": "content"
+      },
+      {
+        "page": 12,
+        "length_tokens": 129,
+        "text": "# newScreen-popup.component.ts\n\n\n```\nimport {AbstractPopupComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-new-screen-popup', templateUrl: './newScreen-popup.component.html' }) export class NewScreenPopupComponent extends AbstractPopupComponent { constructor( injector: Injector) { super(injector); } cancel() { // Action on cancel this.commonService.displayInfoMessage('Cancel', 'Cancel Popup Action'); } validate() { // Action on save this.commonService.displayInfoMessage('Validate', 'Validate Popup Action'); } }\n```",
+        "id": 42,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 296,
+        "text": "# newScreen-popup.component.html\n\n\n```\n<pwc-popup [header]=\"'bundle.popup.header' | pwcTranslate : 'newSCreen' | async\" [(displayPopup)]=\" displayPopup\" width=\"900\" okLabel=\"Validate\" (onCancel)=\"cancel()\" (onValidate)=\"validate()\"> <!-- Header --> <div class=\"pageHeader\"></div> <!-- Content --> <div class=\"content\"> <p-fieldset> <p-header>Popup With Content</p-header> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-input id=\"input1\" type=\"input\" [labelKey]=\"'bundle1' |  pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-input id=\"input2\" type=\"input\" [labelKey]=\"'bundle2' |  pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-button id=\"button1\" type=\"button\" iconPos=\"left\" customStyleClass=\"buttonPadding\">< /pwc-button> </div> </div> </p-fieldset> </div> </pwc-popup>\n```\n\n\n## newScreen.component.spec.ts",
+        "id": 43,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 44,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 298,
+        "text": "import {async, ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing'; import {SCREEN} from '../newScreen.config'; import {RouterTestingModule} from '@angular/router/testing'; import {Router} from '@angular/router'; import {HttpClient} from '@angular/common/http'; import {BrowserAnimationsModule} from '@angular/platform-browser/animations'; import { modelReducer, PwcState, HttpService, CommonService, GrowlService, PopupService, CrudMockEffects , CommonBackEndMockService, CommonBackEndService, RessourceBundleService, LoadDependenciesService, GrantPermissionService, CrudMockService, KeyboardShortcutService, TestUtils, SEARCH_CRITERIA_SET, SEARCH, ENTITY_SELECTED, DUPLICATION_SET, LOGIN_COMPLETE, screenContextReducer, ScreenContextMockEffects, ScreenContextEffects, CrudEffects } from '@pwc/shared'; import {Store, StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {NgModule, InjectionToken} from '@angular/core'; import {EffectsModule} from '@ngrx/effects'; import {ConfirmationService} from 'primeng/primeng'; import {sharedReducers} from '../../../../../core/store/shared.reducers'; import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenComponent} from '../view/newScreen.component'; describe('NewScreen",
+        "id": 45,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 99,
+        "text": "import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenComponent} from '../view/newScreen.component'; describe('NewScreen Screen', () => { // Common variables let fixture: ComponentFixture<NewScreenComponent>; let component: NewScreenComponent; let native: any; let service: CrudMockService; let routerSpy: any; // Store Config let store: Store<PwcState>;",
+        "id": 46,
+        "type": "content"
+      },
+      {
+        "page": 13,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 47,
+        "type": "content"
+      },
+      {
+        "page": 14,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 48,
+        "type": "content"
+      },
+      {
+        "page": 14,
+        "length_tokens": 297,
+        "text": "const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN), }; const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); const reducerProvider = [ {provide: reducerToken, useValue: reducers} ]; TestUtils.initializeTests(); // Run Before each test beforeEach(async(() => { TestBed.configureTestingModule({ imports: [ // Import mandatory modules BrowserAnimationsModule, RouterTestingModule, NewScreenModule, PwcCommonModule, StoreModule.forRoot({...sharedReducers, SCREEN: reducerToken}), EffectsModule.forRoot([CrudMockEffects]), ], providers: [reducerProvider, HttpService, GrowlService, PopupService, ConfirmationService, CommonService, CrudMockEffects, {provide: ComponentFixtureAutoDetect, useValue: true}, {provide: ScreenContextEffects, useClass: ScreenContextMockEffects}, {provide: CrudEffects, useClass: CrudMockEffects}, { provide: CrudMockService, useFactory: () => new CrudMockService(require('../../../../../../assets-test/parameters/acquiring/center.mock.json')) }, { provide: CommonBackEndMockService, useFactory: () => new CommonBackEndMockService({}) }, ], }).compileComponents(); // Create fixtures & components // Store store = TestBed.get(Store); spyOn(store, 'dispatch').and.callThrough(); service = TestBed.get(CrudMockService); // fixture // LOGIN store.dispatch({type:",
+        "id": 49,
+        "type": "content"
+      },
+      {
+        "page": 14,
+        "length_tokens": 229,
+        "text": "}, ], }).compileComponents(); // Create fixtures & components // Store store = TestBed.get(Store); spyOn(store, 'dispatch').and.callThrough(); service = TestBed.get(CrudMockService); // fixture // LOGIN store.dispatch({type: LOGIN_COMPLETE, payload: service.getContext()}); fixture = TestBed.createComponent(NewScreenComponent); component = fixture.componentInstance; native = fixture.debugElement.nativeElement; fixture.detectChanges(); spyOn(component, 'navigate').and.callThrough(); spyOn(component, 'navigateBack').and.callThrough(); spyOn(component, 'navigateForward').and.callThrough(); })); it('should create the newScreen component', async(() => { // Search Component expectations expect(component).toBeTruthy(); expect(component.state).toBe('SEARCH'); })); it('should contains search HTML elements', async(() => { // Check if action bar buttons are present // expect(fixture.nativeElement.querySelector('#searchButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#addButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#clearListButton')).toBeTruthy();",
+        "id": 50,
+        "type": "content"
+      },
+      {
+        "page": 14,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 51,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 167,
+        "text": "```\n// Check if several inputs are present })); it('should search for elements', async(() => { // Search for elements and check if entities are loaded component.search(); expect(component.entities).toBeTruthy(); // Check HTML Code example fixture.detectChanges(); })); it('should add element and redirect', async(() => { component.currentUrl = '/newScreen'; component.add(); expect(component.navigate).toHaveBeenCalledWith('/newScreen/details'); })); it('should go to details', async(() => { component.currentUrl = '/newScreen'; component.search(); // Get entities, then select the first one component.selectEntity(component.entities[0]); expect(component.newScreenEntity).toBeTruthy(); expect(component.navigate).toHaveBeenCalledWith('/newScreen/details'); })); });\n```\n\n\n# newScreen-details.component.spec.ts",
+        "id": 52,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 53,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 297,
+        "text": "import {async, ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing'; import {SCREEN} from '../newScreen.config'; import {RouterTestingModule} from '@angular/router/testing'; import {Router} from '@angular/router'; import {HttpClient} from '@angular/common/http'; import {BrowserAnimationsModule} from '@angular/platform-browser/animations'; import { modelReducer, PwcState, HttpService, CommonService, GrowlService, PopupService, CrudMockEffects , CommonBackEndMockService, CommonBackEndService, RessourceBundleService, LoadDependenciesService, GrantPermissionService, CrudMockService, KeyboardShortcutService, TestUtils, SEARCH_CRITERIA_SET, SEARCH, ENTITY_SELECTED, DUPLICATION_SET, LOGIN_COMPLETE, screenContextReducer, ScreenContextMockEffects, ScreenContextEffects, CrudEffects } from '@pwc/shared'; import {Store, StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {NgModule, InjectionToken} from '@angular/core'; import {EffectsModule} from '@ngrx/effects'; import {ConfirmationService} from 'primeng/primeng'; import {sharedReducers} from '../../../../../core/store/shared.reducers'; import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenDetailsComponent} from '../view/details/newScreen-details.component';",
+        "id": 54,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 103,
+        "text": "import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenDetailsComponent} from '../view/details/newScreen-details.component'; describe('NewScreen Details Screen', () => { // Common variables let fixture: ComponentFixture<NewScreenDetailsComponent>; let component: NewScreenDetailsComponent; let native: any; let service: CrudMockService; // Store Config let store: Store<PwcState>; const reducers = {",
+        "id": 55,
+        "type": "content"
+      },
+      {
+        "page": 15,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 56,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 57,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 297,
+        "text": "model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN), }; const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); const reducerProvider = [ {provide: reducerToken, useValue: reducers} ]; TestUtils.initializeTests(); // Run Before each test beforeEach(async(() => { TestBed.configureTestingModule({ imports: [ // Import mandatory modules BrowserAnimationsModule, RouterTestingModule, NewScreenModule, PwcCommonModule, StoreModule.forRoot({...sharedReducers, SCREEN: reducerToken}), EffectsModule.forRoot([]), ], providers: [reducerProvider, HttpService, GrowlService, PopupService, ConfirmationService, CommonService, CrudMockEffects, KeyboardShortcutService, {provide: ComponentFixtureAutoDetect, useValue: true}, {provide: ScreenContextEffects, useClass: ScreenContextMockEffects}, {provide: CrudEffects, useClass: CrudMockEffects}, { provide: CrudMockService, useFactory: () => new CrudMockService(require('../../../../../../assets-test/parameters/acquiring/priority.mock.json')) }, { provide: CommonBackEndMockService, useFactory: () => new CommonBackEndMockService({}) }, ], }).compileComponents(); // Create fixtures & components // Store store = TestBed.get(Store); service = TestBed.get(CrudMockService); spyOn(store, 'dispatch').and.callThrough(); // fixture // Dispatch SEARCH CRITERIA SET ACTION // LOGIN",
+        "id": 58,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 178,
+        "text": "// Create fixtures & components // Store store = TestBed.get(Store); service = TestBed.get(CrudMockService); spyOn(store, 'dispatch').and.callThrough(); // fixture // Dispatch SEARCH CRITERIA SET ACTION // LOGIN store.dispatch({type: LOGIN_COMPLETE, payload: service.getContext()}); // SELECT ENTITY store.dispatch({type: ENTITY_SELECTED.concat(SCREEN), payload: service.getEntity()}); fixture = TestBed.createComponent(NewScreenDetailsComponent); component = fixture.componentInstance; native = fixture.debugElement.nativeElement; fixture.detectChanges(); spyOn(component, 'navigate').and.callThrough(); spyOn(component, 'navigateBack').and.callThrough(); spyOn(component, 'navigateForward').and.callThrough(); })); it('should create the newScreen detail component', async(() => { expect(component).toBeTruthy(); expect(component.context).toBeTruthy();",
+        "id": 59,
+        "type": "content"
+      },
+      {
+        "page": 16,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 60,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 61,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 299,
+        "text": "expect(component.array).toBeTruthy(); expect(component.screenComponent).toBeTruthy(); expect(component.formComponent).toBeTruthy(); expect(component.actionBarComponent).toBeTruthy(); expect(component.referentialCodes).toBeTruthy(); expect(component.state).toBe('DETAIL'); })); it('should contains details HTML elements', async(() => { // Check if action bar buttons are present // expect(fixture.nativeElement.querySelector('#backButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#saveButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#duplicateButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#removeButton')).toBeTruthy(); // Check if several inputs are present })); it('should fill fields based on mocked service (setValues())', async(() => { expect(component.context.entity).toBeTruthy(); })); it('should remove and redirect', async(() => { component.currentUrl = '/newScreen/details'; component.remove(); expect(component.navigateBack).toHaveBeenCalled(); })); it('should respond to shortcuts', async(() => { const shortcutService: KeyboardShortcutService = TestBed.get(KeyboardShortcutService); shortcutService.manageShortcut({keyCode: 83, preventDefault: () => {}}); // Simulate Ctrl + S component.currentUrl = '/newScreen/details'; shortcutService.manageShortcut({keyCode: 46, preventDefault: () => {}}); // Simulate Ctrl",
+        "id": 62,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 96,
+        "text": "83, preventDefault: () => {}}); // Simulate Ctrl + S component.currentUrl = '/newScreen/details'; shortcutService.manageShortcut({keyCode: 46, preventDefault: () => {}}); // Simulate Ctrl + Suppr expect(component.navigateBack).toHaveBeenCalled(); })); it('should duplicate', async(() => { component.duplicate(); expect(component.actionBarComponent.duplicationState).toBe(true); component.save() })); });",
+        "id": 63,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 1,
+        "text": "```",
+        "id": 64,
+        "type": "content"
+      },
+      {
+        "page": 17,
+        "length_tokens": 71,
+        "text": "# Add the module to the issuing.routes.ts file:\n\n\n```\nissuing.routes.ts { path: 'new-screen', loadChildren: './product/new-screen/newScreen.module#NewScreenModule' },\n```\n\nTo execute the unit tests, add mock file in assets-tests repository:\n\n\n```\npromotion-list.mock.json { \"attribute\": \"test\" }\n```",
+        "id": 65,
+        "type": "content"
+      }
+    ],
+    "pages": [
+      {
+        "page": 1,
+        "text": "# New Screen\n\n\n- HPS training material\n- Flow\n- Changes in pwc-db module\n- Changes in pwc-server module\n- Changes in pwc-ui module\n\n\n\n## HPS training material\n\nPlease refer to HPS training as well:\n\nPWC_Training_UI_SARA_ALEM_090420.pptx\n\n\n## Flow\n\n\nDetect where the changes will take place (UISERVERDB):\n- 1.  Identify where the new screen will be located in the GUI (i.e. from where the user with interact with it) - usually will be provided by documentation (BAs, TSD, etc.) and try to connect/group the new screen with the already existing ones\n- 2.  Identify the child module of the server component that is going to be affected (in the existing screens Inspect element > Network > find the Request URL to the server component)\n- 3.  examine if update to existing tables is required as well\n\n\n\nMake changes is the code (DBSERVERUI):\n- 1.  pwc-db: update data model\n- 2.  pwc-server: update childModule.btdesing\n- 3.  pwc-ui: create new screen - try to find a similar screen for copy paste, ctrl+F is your friend (70% investigation 30% implementation)\n\n\n\n## Changes in pwc-db module\n\nUpdate db schema in your local db.\n\n\n- 000_Sequences\n- 001_Before\n- 002_Tables\n- 003_Indexes\n- 004_Constraints_NonFK\n- 005_Triggers\n- 006_Migration_Scripts\n- 007_Constraints_FK\n- 008_After\n- 009_Types\n- 010_Views\n- 011_Functions\n- 012_Scripts\n- 013_Packages\n- 015_Multi_langue_init\n- 016_Ressource_Bundle\n- 017_Compliance\n- 018_Static_list\n\n\n\nFor the changes to be committed, update the contents of the following folders:\n- pwc-db/Dev_DB_Repository (add your changes) - to be discussed if changes are going to be saved here too\n- pwc-db/Installation/Patch/BO (delete the old contents of pwc-db/Installation/Patch/BO/ folder - EXCEPT the logsDB folder - and add your changes)\n\n\nEdit files execute.bat and config.properties. Export the scripts in the pwc-db/Installation/Patch/BO/Dev_DB_Repository folder with the following command. When asked, input the absolute path of the config.properties file.\n\n\n```\njava -jar ExtractDDL_devOps_02.jar\n```\n\nThen run the following command in order to generate the necessary scripts required for applying the changes. When asked, input the absolute path to the BO folder (e.g. D:\\WorkGit\\pwc-db\\Installation\\Patch\\BO)"
+      },
+      {
+        "page": 2,
+        "text": "```\njava -jar generateDBInstall.jad\n```\n\nCommit the generated files. Do NOT commit the generateDBInstall.jad file!!!! The logsDB folder should contain ONLY the log.txt file!!!!\n\n\n# Changes in pwc-server module\n\n\n## Package generate_dsl_2 => generate server (btdesign) entities\n\nOracle SQL Develop > Open your local database > Packages > Apply Filter > Input package name: generate_dsl_2 > Double Click > Run (green button) > PROCEDURE_NAME> P_TABLE_NAME Input Value: table name > click OK > copy from log > paste the code in the relevant .btdesign file\n\n\n## Package GENERATE_DSL_JPUB2 => jpublisher entities (packages)\n\nOracle SQL Develop > Open your local database > Packages > Apply Filter > Input package name: GENERATE_DSL_JPUB2 > Double Click > Run (green button) > PROCEDURE_NAME> P_PACKAGE_NAME Input Value: package name > click OK > copy from log > paste the code in the relevant . btdesign file\n\nThe generated code may need extra modifications. For example, only one foreign key should be declared in each entity. Usually this fk is the bank code:\n\n\n```\n- @Bank fk_bank_code key hint = \"BaseColumn1=bank_code\" fetch = \"lazy\";\n```\n\n\n## Build\n\nFrom pwc-server/v3_31-parent/pom.xml comment out all modules except the child module in which you performed the changes AND the module (at v3_31 <modules></modules>), save and build the parent (mvn clean install -Dmaven.test.skip=true)\n\nBuild again with all the modules (w/o clean: mvn install -Dmaven.test.skip=true)\n\nOR\n\nBuild only the module with the changes AND the module (mvn clean install -Dmaven.test.skip=true) v3_31\n\nFind v3_31web.war > right click > 7-Zip > Open archive > go to WEB-INF/lib/ > drag and drop the new jars > save\n\nFinally, deploy the newly created pwc-server/v3_31-web/target/v3_31-web.war to JBOSS\n\nRead carefully the document Sculptor generator!!!\n\n\n## Commit\n\nCommit only the changes you did manually (i.e. the .btdesign you changed) and NOT all the generated files of the build.\n\n\n## Changes in pwc-ui module\n\n\n## For faster build\n\nComment out modules to minimize the modules that the app will serve. When we try to access them from the ui, we will get a 404 not found. When we want to create a new screen, we can comment out everything else.\n\n\n- src\\app\\core\\route\\core.routes.ts (e.g. comment: admin)\n- src\\app\\operation\\operation.module.ts (e.g. comment: acquiring, switch, atm, xpos, fraud)\n- src\\app\\operation\\issuing\\issuing.routes.ts (e.g. comment all except: boarding and client)\n- src\\app\\parameters\\parameters.module.ts (e.g. comment: acquiring, atm, xpos, fraud, general, switch)\n- src\\app\\parameters\\issuing\\issuing.routes.ts (e.g. comment all except: catalogue and delivery-method)\n\n\nBUILD: the 1st time by running the command node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng serve\n\nREBUILD: each time you save the changes you made in some file (VSCode has the option: File > Save All)\n\n(Do not commit the changes with the comments!)"
+      },
+      {
+        "page": 3,
+        "text": "# For a new screen the files below are required:\n\n\n```\nNEW FILES FROM GENERATOR (COPY FROM TEMPLATE) tests/newScreen-details.component.spec.ts ...................[1] tests/newScreen.component.spec.ts ...........................[2] view/details/newScreen-details.component.html ...............[3] view/details/newScreen-details.component.ts .................[4] view/popups/newScreen-popup.component.html ..................[5] view/popups/newScreen-popup.component.ts ....................[6] view/newScreen-criterias.component.html .....................[7] view/newScreen-criterias.component.ts .......................[8] view/newScreen.component.html ...............................[9] view/newScreen.component.ts .................................[10] vo/newScreen.entity.ts ......................................[11] newScreen.config.ts .........................................[12] newScreen.db.sql ............................................[13] newScreen.module.ts .........................................[14] TO BE CREATED new-screen.mock.json ........................................[15] TO BE EDITED issuing.routes.ts ...........................................[16] { path: 'new-screen', loadChildren: './product/new-screen/newScreen.module#newScreenModule' },\n```\n\nFor files 1-14, download files from the template (new-screen.rar) in your local environment, copy the extracted folder to the appropriate path and replace the new-screen and newScreen instances with your screen's name. Clean the code by removing the unusable parts, i.e. the parts that are not required for the screen you want to develop (not used PopUp, not used functions, commented code, generated functions refering to the old generator version, etc). Edit the remaining files to suit the new screen needs (entities and fields as defined in server and db, validation, general formatting of the screen, etc).\n\n\n## DETAILS/COMMENTS\n\n\n- 1-2.. required for running the unit tests. UT are written using Jasmine Behavior-Driven syntax. The tests are run using KARMA test runner.\n- 1.... Lambda Details screen test should: create Lambda detail component, contain details HTML elements, fill fields based on mocked service (setValues())\n- 2.... Lambda Search screen test should: create the Lambda component, contain search HTML elements, search for elements, should go to details\n- 3-9.. The layout of the two main views (search and details). They both consist of: Screen title, Header Div, Footer Div, Action bar with grants & event, Criteria div reffering to an external component\n- 3.... Detail fields can be ordered in one or several tabs, splited in sub components for big screens.\n- 4.... beforeSave() is called on save action and can be overwritten. Remove .clone(this.context.entity) from beforeSave function.\n- 5-6.. edit these files when popups are required in your screen\n- 7-8.. a reusable part of the new screen, that is going to be used in the default (search) view AND in the details view\n- 9.... Datatable is the results table, with raised events on actions. Add : [ref]=\"context?.ref\"  to <pwc-datatable ..> for labelRefColumns.\n- 10... The buildColumns() builds the columns of the results table (Builds columns with several types: date, string, amount, custom through label functions…) The search() function can be overwritten.\n\n\n\nFor the buildColumns() some of the available options are:\n- pushColumn\n- addLabelRefColumn (same with pushColumn, used for dropdowns lists, Sara prefers this one)\n- addStringColumn\n- addTypeColumn\n- addLabelColumn\n- addStaticListColumn\n- 11... data value object declaration. Input fields as defined in the dto of the relevant entity in the .btdesign file of the pwc-server component (the fields correspond to the data model table). Careful when there are Sets (sets in btdesign refers to 1 to N relation in db), each set must be defined as a new entity!\n- 12... adjust config file. Add the references and lists needed.\n- SCREEN: 'screen-name'  name of screen as in the screen url (pwc-ui)\n- MODULE: 'childModule'  name of child module (pwc-server)\n- SERVICE: 'Screen_name'  name of service used (pwc-server)\n- SEARCH_PARAM_REFS: ['Table1', 'View1']  connection/relations with other tables/views for search screen (pwc-db)\n- SEARCH_STATIC_LISTS: ['List1', 'List2']  for radio buttons/dropdowns/... of search screen. Gets lists from STATIC_LIST table (pwc-db)"
+      },
+      {
+        "page": 4,
+        "text": "- DETAILS_PARAM_REFS: []  same with SEARCH_PARAM_REFS, but for details screen\n- DETAILS_STATIC_LISTS: []  same with SEARCH_STATIC_LISTS, but for details screen\n\n\nThe details screen inherits the references and lists of the search screen, so there is no need to add them twice!!!\n\nWhen using a custom HPS component, be sure to use all the references needed for this specific component, even if they don't appear on your screen!!!\n\nIn case of sets in btdesign files, add also:\n\n\n```\nexport const FIND_ALL_OTHER_ENTITY = { mod: 'childModule', service: 'Other_entityService', vo: 'other_entityVO', method: 'getAllOther_entityService' };\n```\n\n\n- 13... contains info about the screen that will be saved in the database (tables: screen, menu, menus2roles, grant_permission). This file will not be committed in the pwc-ui repo. Apply the changes in your local personal database along with required insertions in the table RESSOURCE_BUNDLE (for all the labels that are going to be used in the gui). After verifying the changes, update the db patch as described in the Changes in pwc-db module section.\n- 15... to execute the unit tests, add mock file in assets-tests repository. Insert dummy data.\n- 16... Add the module to the issuing.routes.ts file. Required each time a new screen is created. Without this change, you won't be able to access your screen when running the app.\n\n\n\n## questions\n\n\n- 1.  how to run a specific test (ie for the new screen we created)\n- 2.  regarding pwc-catalogue-product-eureka and CatalogueProductEureka: why different implementation across pan-numbring / cardcarrier / stk-inventory-item-rule\n- also tabindex does not work for this element. why?\n- 3.  disable authentication for development (or increase time-out time)\n- 4.  find way in ui to disable password expiration\n- 5.  [10] constructor(): this.marshalingRefCodes VS this.referentialCodes\n\n\n\n## HPS generated template\n\nLet's say we want to create a new screen named newScreen in the folder issuing parameters.\n\n\n```\nHPS generator command ng g pwc-screen parameters/issuing/product/new-screen --module=ModuleName --service=ServiceName --screen=new-\n```\n\nscreen --collection=@pwc/generator\n\nGenerated files (at location: src/app/parameters/issuing/product/new-screen/):\n\nnew-screen tests newScreen-details.component.spec.ts newScreen.component.spec.ts view details newScreen-details.component.html newScreen-details.component.ts popups vo"
+      },
+      {
+        "page": 5,
+        "text": "newScreen.entity.ts newScreen.config.ts\n\nnewScreen.db.sql newScreen.module.ts\n\n\n# newScreen.config.ts\n\n\n```\n/** * NewScreen Config */ export const SCREEN = 'newScreen'; export const MODULE = 'ModuleName'; export const SERVICE = 'ServiceName'; export const SEARCH_PARAM_REFS = []; export const SEARCH_STATIC_LISTS = []; export const DETAILS_PARAM_REFS = [];\n```\n\n\n```\nexport const DETAILS_STATIC_LISTS = [];\n```\n\nnewScreen-popup.component.html newScreen-popup.component.ts\n\nnewScreen-criterias.component.html newScreen-criterias.component.ts\n\nnewScreen.component.html newScreen.component.ts"
+      },
+      {
+        "page": 6,
+        "text": "```\nnewScreen.db.sql /** * NewScreen Screen/Menu/Grants Creation * Please replace ROLES_FK with actual Role * and MENU_ID with MODULE-WORKSPACE-LEVEL-NAME  ( e.g ACQ-OP-LEV1-Exchange_scenario) */ -- SCREEN INSERT INTO screen (\"SCREEN_ID\",\"NAME\",\"SCREEN_CODE\",\"WORDING\",\"USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\",\"URL\") VALUES ('new-screen','new-screen','new-screen','new-screen','admin','admin',NULL,NULL,'app/parameters/issuing/product /new-screen') --MENU INSERT INTO menu (\"MENU_ID\",\"NAME\",\"WORDING\",\"MENU_CODE\",\"ADMIN\",\"TYPE\",\"SCREEN_REFERED_FK\",\"MENU_PARENT_FK\",\"USER_CREATE\",\" USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\",\"MENU_LEVEL\",\"MENU_ORDER\",\"URL\") VALUES (\"ACQ-PARAM-LEV1-new-screen\",'new-screen','app/parameters/issuing/product/new-screen','','Y','s',\"newscreen\",'MENU_PARENT','admin','admin',NULL,NULL,'Level',0,'app/parameters/issuing/product/new-screen') ; --MENUS2ROLES INSERT INTO menus2roles (\"ROLES_FK\",\"MENUS_FK\",\"USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (\"R_OP_ACQ\",menu_x.CURRVAL,'admin','admin',NULL,NULL) ; --GRANT_PERMISSION INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,1,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,2,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,3,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,4,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ; INSERT INTO grant_permission (\"GRANT_PERMISSION_ID\",\"TYPE_GRANT\",\"TYPE_PERMISSION_FK\",\"MENU_FK\",\"SCREEN_FK\",\"COMPONENT_FK\",\"ROLE_FK\",\" USER_CREATE\",\"USER_MODIF\",\"DATE_CREATE\",\"DATE_MODIF\") VALUES (grant_permission_x.NEXTVAL,5,1,NULL,\"new-screen\",NULL,76,'admin','admin',NULL,NULL) ;\n```"
+      },
+      {
+        "page": 7,
+        "text": "```\nnewScreen.module.ts import {CrudEffects, modelReducer, PwcState, screenContextReducer, ScreenContextEffects, LeaveScreenGuard} from '@pwc/shared'; import {StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {EffectsModule} from '@ngrx/effects'; import {Route, RouterModule, Router} from '@angular/router'; import {NgModule, InjectionToken} from '@angular/core'; import {PwcCommonModule} from '@common/pwc-common.module'; import {NewScreenDetailsComponent} from './view/details/newScreen-details.component'; import {NewScreenPopupComponent} from './view/popups/newScreen-popup.component'; import {NewScreenCriteriasComponent} from './view/newScreen-criterias.component'; import {NewScreenComponent} from './view/newScreen.component'; import {SCREEN} from './newScreen.config'; export const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); export const reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN) }; export function getReducers(): ActionReducerMap<PwcState> { return reducers; } /** NewScreen Routes */ export const newScreenRoutes = [ { path: '', component: NewScreenComponent, canDeactivate: [LeaveScreenGuard]}, { path: 'details', component: NewScreenDetailsComponent, canDeactivate: [LeaveScreenGuard]} ]; /** NewScreen Module Declaration */ @NgModule({ imports: [ PwcCommonModule, RouterModule.forChild(newScreenRoutes), StoreModule.forFeature(SCREEN, reducerToken), EffectsModule.forFeature([CrudEffects, ScreenContextEffects]), ], declarations: [ NewScreenComponent, NewScreenCriteriasComponent, NewScreenDetailsComponent, NewScreenPopupComponent, ], providers: [{provide: reducerToken, useFactory: getReducers}] }) export class NewScreenModule { constructeur() { console.log('NewScreenModule'); } }\n```"
+      },
+      {
+        "page": 8,
+        "text": "```\nnewScreen.entity.ts import {AbstractEntity} from '@pwc/shared'; export class NewScreenEntity extends AbstractEntity { attribute: string; totalPages: number; pageSize: number; page: number; constructor({attribute = null}: {attribute?: string}) { super(); this.attribute = attribute } }\n```\n\n\n# newScreen.component.ts\n\n\n```\nimport {SCREEN, MODULE, SERVICE, SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS} from '../newScreen.config'; import {AbstractSearchScreenComponent, ColumnType, ComponentStateEnum, PwcState, RouteParams} from '@pwc /shared'; import {Component, Injector} from '@angular/core'; import {NewScreenEntity} from '../vo/newScreen.entity'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-new-screen', templateUrl: './newScreen.component.html' }) export class NewScreenComponent extends AbstractSearchScreenComponent { newScreenEntity: NewScreenEntity = new NewScreenEntity({}); constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.referentialCodes = this.marshalingRefCodes(SEARCH_PARAM_REFS, SEARCH_STATIC_LISTS); } buildColumns() { this.addSimpleColumn('attribute1', 'bundle.key.1'); this.addTypeColumn('attribute2', 'bundle.key.2', ColumnType.CARDNUMBER); this.addTypeColumn('attribute3', 'bundle.key.3', ColumnType.DATE); this.addTypeColumn('attribute4', 'bundle.key.4', ColumnType.AMOUNT); this.addTypeColumn('attribute5', 'bundle.key.5', ColumnType.CURRENCY); } search() { this.newScreenEntity = new NewScreenEntity(this.getAllValues()); this.searchEntity(this.newScreenEntity); } addCustomDependencies() { this.addCustomDependency('statusList', [ {code: 'N', label: this.getLabel('optionsN')}, ]); }\n```"
+      },
+      {
+        "page": 9,
+        "text": "```\ngetBundleName(): string { return SCREEN; } buildActionBarBtn() { super.buildActionBarBtn(); // this.addActionBarBtn('fa-ban', 'EVENT_NAME', 'label', this.IsStatusTH); } IsStatusTH(row) { /* if (!row) { return true; } return (row['transaction_status'] === 'TH');*/ } custoAction(event) { if (event.code === 'EVENT_NAME') { console.log(event.row); return; } } }\n```\n\n\n# newScreen.component.html\n\n\n```\n<pwc-screen [titleValue]=\"'newSCreen' | pwcTranslate : 'newSCreen'| async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-new-screen-criterias [context]=\"context\" ></pwc-comp-new-screen-criterias> </div> <!-- Action Bar --> <pwc-comp-actionbar [formGroup]=\"context.group\" [grants]=\"context.grants\" (add)=\"add()\" (clear)=\"clear()\" (search)=\"search()\"></pwc-comp-actionbar> <!-- Result Table --> <pwc-datatable #dt id=\"newScreenDt\" [datasource]=\"entities\" [showEmptyResultMsg]=\"showEmptyResultMsg\" [actionBarBtns]=\"actionBarBtns\" [grants]=\"context.grants\" [columns]=\"columns\" (onSelect)=\"selectEntity($event)\" (onDuplicate)=\"duplicateEntity ($event)\" (onRemove)=\"removeEntity($event)\" (onTriggerCustoActionEvent)=\"custoAction($event)\"> </pwc-datatable> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```"
+      },
+      {
+        "page": 10,
+        "text": "```\nnewScreen-criterias.component.ts import {AbstractSubFormComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-new-screen-criterias', templateUrl: './newScreen-criterias.component.html' }) export class NewScreenCriteriasComponent extends AbstractSubFormComponent { displayPopup: boolean = false; constructor(injector: Injector) { super(injector); } callPopup() { this.displayPopup = true; } }\n```\n\n\n# newScreen-criterias.component.html\n\n\n```\n<div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"attribute1\" type=\"input\" [labelKey]=\"'bundle.key.1' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> <pwc-input id=\"attribute2\" type=\"dropdown\" [labelKey]=\"'bundle.key.2' | pwcTranslate : 'newSCreen' | async\" [data]=\"context.ref.get('DEP1')\" [array]=\"array\"></pwc-input> <pwc-date id=\"attribute3\" display=\"date\" [labelKey]=\"'bundle.key.3' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-date> </div> <div class=\"ui-g-12 ui-md-6\"> <pwc-input id=\"attribute4\" type=\"input\" [labelKey]=\"'bundle.key.4' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> <pwc-eureka id=\"attribute5\" eurekaLabel=\"currency_name\" eurekaCode=\"currency_code\" [array]=\"array\" [labelKey] =\"'bundle.key.5' | pwcTranslate : 'newSCreen' | async\" [data]=\"context.ref.get('Currency_table')\"></pwc-eureka> <pwc-button id=\"PopupBtn\" type=\"button\" iconPos=\"right\" [labelKey]=\"'bundle.key.6' | pwcTranslate : 'newscreen' | async\" (click)=\"callPopup()\" customStyleClass=\"buttonPadding\"></pwc-button> </div> <div class=\"ui-g-12 ui-md-12\"> <!--pwc-advancedsearch> <pwc-input id=\"attribute1\" type=\"input\" [labelKey]=\"'bundle.key.1' | pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </pwc-advancedsearch--> </div> </div> <pwc-comp-new-screen-popup [context]=\"context\" [displayPopup]=\"displayPopup\"></pwc-comp-new-screen-popup>\n```"
+      },
+      {
+        "page": 11,
+        "text": "```\nnewScreen-details.component.ts import {SCREEN, MODULE, SERVICE, DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS} from '../../newScreen.config'; import {NewScreenEntity} from '../../vo/newScreen.entity'; import {AbstractDetailScreenComponent, PwcState} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; import {Store} from '@ngrx/store'; @Component({ selector: 'pwc-comp-new-screen-details', templateUrl: './newScreen-details.component.html' }) export class NewScreenDetailsComponent extends AbstractDetailScreenComponent { constructor(injector: Injector) { super(injector); this.serviceConfig = {mod: MODULE, service: SERVICE, bundle: SCREEN}; this.referentialCodes = this.marshalingRefCodes(DETAILS_PARAM_REFS, DETAILS_STATIC_LISTS); } beforeSave() { this.context.entity = new NewScreenEntity(this.getAllValues()).clone(this.context.entity); } getBundleName(): string { return SCREEN; } /*buildActionBarBtn() { super.buildActionBarBtn(); this.addActionBarBtn('fa-adn', 'EVENT_NAME', 'identification'); } custoAction(event) { if (event.code === 'EVENT_NAME') { console.log(event.code); return; } }*/ }\n```"
+      },
+      {
+        "page": 12,
+        "text": "```\nnewScreen-details.component.html\n```\n\n\n```\n<pwc-screen [titleValue]=\"'new-screen' | pwcTranslate : 'newSCreen' | async\"> <!-- Form --> <pwc-form #form [formGroup]=\"context.group\" > <!-- Header --> <div class=\"pageHeader\"></div> <!-- Action Bar --> <pwc-comp-actionbar [actionBarBtns]=\"actionBarBtns\" [formGroup]=\"context.group\" [grants]=\"context.grants\" (duplicate)=\"duplicate()\" (remove)=\"remove()\" (back)=\"back()\" (save)=\"save()\" (onTriggerCustoActionEvent)=\"custoAction($event)\"></pwc-comp-actionbar> <div class=\"entityFields\"> <p-fieldset> <p-header>{{'identification' | pwcTranslate : 'newSCreen' | async | uppercase}} </p-header> <!-- Criterias --> <div class=\"criterias\"> <pwc-comp-new-screen-criterias [context]=\"context\" ></pwc-comp-new-screen-criterias> </div> </p-fieldset> <p-tabView> <p-tabPanel [header]=\"'details' | pwcTranslate : 'newSCreen' | async\" leftIcon=\"fa-shopping-cart\"> </p-tabPanel> <p-tabPanel [header]=\"'bundle.tab2' | pwcTranslate : 'newSCreen' | async\" leftIcon=\"fa-clock-o\"> </p-tabPanel> </p-tabView> </div> <!-- Footer --> <div class=\"pageFooter\"></div> </pwc-form> </pwc-screen>\n```\n\n\n# newScreen-popup.component.ts\n\n\n```\nimport {AbstractPopupComponent, CommonService} from '@pwc/shared'; import {Component, Injector} from '@angular/core'; @Component({ selector: 'pwc-comp-new-screen-popup', templateUrl: './newScreen-popup.component.html' }) export class NewScreenPopupComponent extends AbstractPopupComponent { constructor( injector: Injector) { super(injector); } cancel() { // Action on cancel this.commonService.displayInfoMessage('Cancel', 'Cancel Popup Action'); } validate() { // Action on save this.commonService.displayInfoMessage('Validate', 'Validate Popup Action'); } }\n```"
+      },
+      {
+        "page": 13,
+        "text": "# newScreen-popup.component.html\n\n\n```\n<pwc-popup [header]=\"'bundle.popup.header' | pwcTranslate : 'newSCreen' | async\" [(displayPopup)]=\" displayPopup\" width=\"900\" okLabel=\"Validate\" (onCancel)=\"cancel()\" (onValidate)=\"validate()\"> <!-- Header --> <div class=\"pageHeader\"></div> <!-- Content --> <div class=\"content\"> <p-fieldset> <p-header>Popup With Content</p-header> <div class=\"ui-g\"> <div class=\"ui-g-12 ui-md-4\"> <pwc-input id=\"input1\" type=\"input\" [labelKey]=\"'bundle1' |  pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-input id=\"input2\" type=\"input\" [labelKey]=\"'bundle2' |  pwcTranslate : 'newSCreen' | async\" [array]=\"array\"></pwc-input> </div> <div class=\"ui-g-12 ui-md-4\"> <pwc-button id=\"button1\" type=\"button\" iconPos=\"left\" customStyleClass=\"buttonPadding\">< /pwc-button> </div> </div> </p-fieldset> </div> </pwc-popup>\n```\n\n\n## newScreen.component.spec.ts\n\n\n```\nimport {async, ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing'; import {SCREEN} from '../newScreen.config'; import {RouterTestingModule} from '@angular/router/testing'; import {Router} from '@angular/router'; import {HttpClient} from '@angular/common/http'; import {BrowserAnimationsModule} from '@angular/platform-browser/animations'; import { modelReducer, PwcState, HttpService, CommonService, GrowlService, PopupService, CrudMockEffects , CommonBackEndMockService, CommonBackEndService, RessourceBundleService, LoadDependenciesService, GrantPermissionService, CrudMockService, KeyboardShortcutService, TestUtils, SEARCH_CRITERIA_SET, SEARCH, ENTITY_SELECTED, DUPLICATION_SET, LOGIN_COMPLETE, screenContextReducer, ScreenContextMockEffects, ScreenContextEffects, CrudEffects } from '@pwc/shared'; import {Store, StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {NgModule, InjectionToken} from '@angular/core'; import {EffectsModule} from '@ngrx/effects'; import {ConfirmationService} from 'primeng/primeng'; import {sharedReducers} from '../../../../../core/store/shared.reducers'; import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenComponent} from '../view/newScreen.component'; describe('NewScreen Screen', () => { // Common variables let fixture: ComponentFixture<NewScreenComponent>; let component: NewScreenComponent; let native: any; let service: CrudMockService; let routerSpy: any; // Store Config let store: Store<PwcState>;\n```"
+      },
+      {
+        "page": 14,
+        "text": "```\nconst reducers = { model: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN), }; const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); const reducerProvider = [ {provide: reducerToken, useValue: reducers} ]; TestUtils.initializeTests(); // Run Before each test beforeEach(async(() => { TestBed.configureTestingModule({ imports: [ // Import mandatory modules BrowserAnimationsModule, RouterTestingModule, NewScreenModule, PwcCommonModule, StoreModule.forRoot({...sharedReducers, SCREEN: reducerToken}), EffectsModule.forRoot([CrudMockEffects]), ], providers: [reducerProvider, HttpService, GrowlService, PopupService, ConfirmationService, CommonService, CrudMockEffects, {provide: ComponentFixtureAutoDetect, useValue: true}, {provide: ScreenContextEffects, useClass: ScreenContextMockEffects}, {provide: CrudEffects, useClass: CrudMockEffects}, { provide: CrudMockService, useFactory: () => new CrudMockService(require('../../../../../../assets-test/parameters/acquiring/center.mock.json')) }, { provide: CommonBackEndMockService, useFactory: () => new CommonBackEndMockService({}) }, ], }).compileComponents(); // Create fixtures & components // Store store = TestBed.get(Store); spyOn(store, 'dispatch').and.callThrough(); service = TestBed.get(CrudMockService); // fixture // LOGIN store.dispatch({type: LOGIN_COMPLETE, payload: service.getContext()}); fixture = TestBed.createComponent(NewScreenComponent); component = fixture.componentInstance; native = fixture.debugElement.nativeElement; fixture.detectChanges(); spyOn(component, 'navigate').and.callThrough(); spyOn(component, 'navigateBack').and.callThrough(); spyOn(component, 'navigateForward').and.callThrough(); })); it('should create the newScreen component', async(() => { // Search Component expectations expect(component).toBeTruthy(); expect(component.state).toBe('SEARCH'); })); it('should contains search HTML elements', async(() => { // Check if action bar buttons are present // expect(fixture.nativeElement.querySelector('#searchButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#addButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#clearListButton')).toBeTruthy();\n```"
+      },
+      {
+        "page": 15,
+        "text": "```\n// Check if several inputs are present })); it('should search for elements', async(() => { // Search for elements and check if entities are loaded component.search(); expect(component.entities).toBeTruthy(); // Check HTML Code example fixture.detectChanges(); })); it('should add element and redirect', async(() => { component.currentUrl = '/newScreen'; component.add(); expect(component.navigate).toHaveBeenCalledWith('/newScreen/details'); })); it('should go to details', async(() => { component.currentUrl = '/newScreen'; component.search(); // Get entities, then select the first one component.selectEntity(component.entities[0]); expect(component.newScreenEntity).toBeTruthy(); expect(component.navigate).toHaveBeenCalledWith('/newScreen/details'); })); });\n```\n\n\n# newScreen-details.component.spec.ts\n\n\n```\nimport {async, ComponentFixture, ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing'; import {SCREEN} from '../newScreen.config'; import {RouterTestingModule} from '@angular/router/testing'; import {Router} from '@angular/router'; import {HttpClient} from '@angular/common/http'; import {BrowserAnimationsModule} from '@angular/platform-browser/animations'; import { modelReducer, PwcState, HttpService, CommonService, GrowlService, PopupService, CrudMockEffects , CommonBackEndMockService, CommonBackEndService, RessourceBundleService, LoadDependenciesService, GrantPermissionService, CrudMockService, KeyboardShortcutService, TestUtils, SEARCH_CRITERIA_SET, SEARCH, ENTITY_SELECTED, DUPLICATION_SET, LOGIN_COMPLETE, screenContextReducer, ScreenContextMockEffects, ScreenContextEffects, CrudEffects } from '@pwc/shared'; import {Store, StoreModule, combineReducers, compose, ActionReducerMap} from '@ngrx/store'; import {NgModule, InjectionToken} from '@angular/core'; import {EffectsModule} from '@ngrx/effects'; import {ConfirmationService} from 'primeng/primeng'; import {sharedReducers} from '../../../../../core/store/shared.reducers'; import {PwcCommonModule} from '../../../../../core/pwc-common.module'; import {NewScreenModule} from '../newScreen.module'; import {NewScreenDetailsComponent} from '../view/details/newScreen-details.component'; describe('NewScreen Details Screen', () => { // Common variables let fixture: ComponentFixture<NewScreenDetailsComponent>; let component: NewScreenDetailsComponent; let native: any; let service: CrudMockService; // Store Config let store: Store<PwcState>; const reducers = {\n```"
+      },
+      {
+        "page": 16,
+        "text": "```\nmodel: modelReducer(SCREEN), screenContextState: screenContextReducer(SCREEN), }; const reducerToken = new InjectionToken<ActionReducerMap<PwcState>>('Reducers'); const reducerProvider = [ {provide: reducerToken, useValue: reducers} ]; TestUtils.initializeTests(); // Run Before each test beforeEach(async(() => { TestBed.configureTestingModule({ imports: [ // Import mandatory modules BrowserAnimationsModule, RouterTestingModule, NewScreenModule, PwcCommonModule, StoreModule.forRoot({...sharedReducers, SCREEN: reducerToken}), EffectsModule.forRoot([]), ], providers: [reducerProvider, HttpService, GrowlService, PopupService, ConfirmationService, CommonService, CrudMockEffects, KeyboardShortcutService, {provide: ComponentFixtureAutoDetect, useValue: true}, {provide: ScreenContextEffects, useClass: ScreenContextMockEffects}, {provide: CrudEffects, useClass: CrudMockEffects}, { provide: CrudMockService, useFactory: () => new CrudMockService(require('../../../../../../assets-test/parameters/acquiring/priority.mock.json')) }, { provide: CommonBackEndMockService, useFactory: () => new CommonBackEndMockService({}) }, ], }).compileComponents(); // Create fixtures & components // Store store = TestBed.get(Store); service = TestBed.get(CrudMockService); spyOn(store, 'dispatch').and.callThrough(); // fixture // Dispatch SEARCH CRITERIA SET ACTION // LOGIN store.dispatch({type: LOGIN_COMPLETE, payload: service.getContext()}); // SELECT ENTITY store.dispatch({type: ENTITY_SELECTED.concat(SCREEN), payload: service.getEntity()}); fixture = TestBed.createComponent(NewScreenDetailsComponent); component = fixture.componentInstance; native = fixture.debugElement.nativeElement; fixture.detectChanges(); spyOn(component, 'navigate').and.callThrough(); spyOn(component, 'navigateBack').and.callThrough(); spyOn(component, 'navigateForward').and.callThrough(); })); it('should create the newScreen detail component', async(() => { expect(component).toBeTruthy(); expect(component.context).toBeTruthy();\n```"
+      },
+      {
+        "page": 17,
+        "text": "```\nexpect(component.array).toBeTruthy(); expect(component.screenComponent).toBeTruthy(); expect(component.formComponent).toBeTruthy(); expect(component.actionBarComponent).toBeTruthy(); expect(component.referentialCodes).toBeTruthy(); expect(component.state).toBe('DETAIL'); })); it('should contains details HTML elements', async(() => { // Check if action bar buttons are present // expect(fixture.nativeElement.querySelector('#backButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#saveButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#duplicateButton')).toBeTruthy(); // expect(fixture.nativeElement.querySelector('#removeButton')).toBeTruthy(); // Check if several inputs are present })); it('should fill fields based on mocked service (setValues())', async(() => { expect(component.context.entity).toBeTruthy(); })); it('should remove and redirect', async(() => { component.currentUrl = '/newScreen/details'; component.remove(); expect(component.navigateBack).toHaveBeenCalled(); })); it('should respond to shortcuts', async(() => { const shortcutService: KeyboardShortcutService = TestBed.get(KeyboardShortcutService); shortcutService.manageShortcut({keyCode: 83, preventDefault: () => {}}); // Simulate Ctrl + S component.currentUrl = '/newScreen/details'; shortcutService.manageShortcut({keyCode: 46, preventDefault: () => {}}); // Simulate Ctrl + Suppr expect(component.navigateBack).toHaveBeenCalled(); })); it('should duplicate', async(() => { component.duplicate(); expect(component.actionBarComponent.duplicationState).toBe(true); component.save() })); });\n```\n\n\n# Add the module to the issuing.routes.ts file:\n\n\n```\nissuing.routes.ts { path: 'new-screen', loadChildren: './product/new-screen/newScreen.module#NewScreenModule' },\n```\n\nTo execute the unit tests, add mock file in assets-tests repository:\n\n\n```\npromotion-list.mock.json { \"attribute\": \"test\" }\n```"
+      }
+    ]
+  }
+}

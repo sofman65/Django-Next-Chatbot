@@ -1,0 +1,55 @@
+{
+  "answers": [
+    {
+      "question_text": "List and describe the main PowerCard tables involved in catalogue operations.",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "What is the purpose of the CATALOGUE_TRACES table in PowerCard?",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "Explain the meaning of the 'ACTION_DATE' column in the catalogue operation tables.",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "What are the possible values for the 'PRODUCT_TYPE' column and what do they represent?",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "Describe the function of the CATALOGUE_UPGRADE and CATALOGUE_UPGRADE_INSTRUCTION tables.",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "What information is stored in the 'USER_MODIF' column?",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "Summarize the high-level development operating model for PowerCard.",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    },
+    {
+      "question_text": "What is the purpose of the CATALOGUE_UPGRADE_TARGET_PRODS table?",
+      "kind": "name",
+      "value": "N/A",
+      "references": []
+    }
+  ],
+  "team_email": "79250515615@yandex.com",
+  "submission_name": "Ilia Ris v.4",
+  "details": "Custom pdf parsing + vDB + Router + Parent Document Retrieval + reranking + SO CoT; llm = o3-mini"
+}
