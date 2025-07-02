@@ -37,7 +37,7 @@ export default function RAGPage() {
             <div className="flex items-center justify-center h-screen">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
-                    <p className="text-gray-600">You don't have permission to access RAG management.</p>
+                    <p className="text-gray-600">You don&apos;t have permission to access RAG management.</p>
                     <button
                         onClick={() => router.push("/")}
                         className="btn btn-primary mt-4"

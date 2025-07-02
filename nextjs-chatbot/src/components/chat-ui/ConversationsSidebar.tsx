@@ -1,32 +1,25 @@
-"use client";
+"use client"
 
-import { MessageSquare, Plus, X } from "lucide-react";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { useIsMobile } from "@/hooks/use-mobile"; // <-- Import your hook here
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { MessageSquare, Plus, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useState, useEffect } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface Conversation {
-  id: string;
-  title: string;
-  createdAt: string;
+  id: string
+  title: string
+  createdAt: string
 }
 
 interface ConversationsSidebarProps {
-  conversations: Conversation[];
-  currentId?: string;
-  onNewChat: () => void;
-  onSelectConversation: (id: string) => void;
-  className?: string;
-  isSidebarOpen?: boolean;
-  closeSidebar?: () => void;
+  conversations: Conversation[]
+  currentId?: string
+  onNewChat: () => void
+  onSelectConversation: (id: string) => void
+  className?: string
+  isSidebarOpen?: boolean
+  closeSidebar?: () => void
 }
 
 export function ConversationsSidebar({
@@ -38,41 +31,40 @@ export function ConversationsSidebar({
   isSidebarOpen = false,
   closeSidebar,
 }: ConversationsSidebarProps) {
-  const [storedConversations, setStoredConversations] = useState<Conversation[]>(conversations);
-  const isMobile = useIsMobile();
+  const [storedConversations, setStoredConversations] = useState<Conversation[]>(conversations)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
-    setStoredConversations(conversations);
-  }, [conversations]);
+    setStoredConversations(conversations)
+  }, [conversations])
 
   return (
     <>
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-[#3333CC]/20 bg-[#3333CC] text-white transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r border-gray-800 bg-gray-900/95 backdrop-blur-sm text-white transition-transform duration-300 ease-in-out shadow-2xl",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
-          className
+          className,
         )}
       >
-        {/* Top Bar: Plus and X */}
-        <div className="flex h-14 items-center gap-2 border-b border-white/10 px-2 justify-between">
-          {/* New Chat (Plus) */}
+        {/* Top Bar */}
+        <div className="flex h-16 items-center gap-3 border-b border-gray-800 px-4 justify-between bg-gray-900/50">
           <Button
             onClick={() => {
-              onNewChat();
-              if (isMobile && closeSidebar) closeSidebar();
+              onNewChat()
+              if (isMobile && closeSidebar) closeSidebar()
             }}
-            variant="ghost"
-            className="gap-2 text-white hover:bg-white/10"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/25 rounded-full px-4 py-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
+            <span className="text-sm font-medium">New Chat</span>
           </Button>
-          {/* X Button  */}
+
           {closeSidebar && (
             <Button
               onClick={closeSidebar}
               variant="ghost"
-              className="text-white hover:bg-white/10 ml-auto"
+              className="text-gray-400 hover:text-white hover:bg-gray-800 rounded-full p-2"
               aria-label="Close sidebar"
             >
               <X className="h-5 w-5" />
@@ -81,45 +73,59 @@ export function ConversationsSidebar({
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
-          <SidebarMenu>
+        <div className="flex-1 overflow-y-auto p-2">
+          <div className="space-y-2">
             {storedConversations.map((conversation) => (
-              <SidebarMenuItem key={conversation.id}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={currentId === conversation.id}
-                  className={cn(
-                    "w-full justify-start gap-2",
-                    currentId === conversation.id
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  )}
-                  onClick={() => {
-                    onSelectConversation(conversation.id);
-                    if (isMobile && closeSidebar) closeSidebar();
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    <span className="truncate">{conversation.title}</span>
+              <button
+                key={conversation.id}
+                onClick={() => {
+                  onSelectConversation(conversation.id)
+                  if (isMobile && closeSidebar) closeSidebar()
+                }}
+                className={cn(
+                  "w-full text-left p-3 rounded-xl transition-all duration-200 group",
+                  currentId === conversation.id
+                    ? "bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 shadow-lg shadow-blue-500/10"
+                    : "hover:bg-gray-800/50 border border-transparent",
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <MessageSquare
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      currentId === conversation.id ? "text-blue-400" : "text-gray-400 group-hover:text-gray-300",
+                    )}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={cn(
+                        "text-sm font-medium truncate transition-colors",
+                        currentId === conversation.id ? "text-white" : "text-gray-300 group-hover:text-white",
+                      )}
+                    >
+                      {conversation.title}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(conversation.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                </div>
+              </button>
             ))}
-          </SidebarMenu>
+          </div>
         </div>
       </div>
 
       {/* Mobile overlay */}
       {isSidebarOpen && isMobile && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={closeSidebar}
           aria-label="Close sidebar"
         />
       )}
     </>
-  );
+  )
 }
 
-export default ConversationsSidebar;
+export default ConversationsSidebar
