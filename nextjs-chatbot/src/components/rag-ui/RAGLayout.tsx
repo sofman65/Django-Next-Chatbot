@@ -153,7 +153,7 @@ export default function RAGLayout() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-space-black">
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
                 <RAGHeader
@@ -171,39 +171,39 @@ export default function RAGLayout() {
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Tab Navigation */}
-                    <div className="bg-white border-b border-gray-200">
+                    <div className="glass border-b border-white/10">
                         <div className="px-4 sm:px-6">
-                            <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto">
+                            <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto custom-scrollbar">
                                 <button
                                     onClick={() => setActiveTab('upload')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'upload'
-                                        ? 'border-[#3333CC] text-[#3333CC]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'upload'
+                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
+                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     Upload
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('documents')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'documents'
-                                        ? 'border-[#3333CC] text-[#3333CC]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'documents'
+                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
+                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     Documents
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('chat')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'chat'
-                                        ? 'border-[#3333CC] text-[#3333CC]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'chat'
+                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
+                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
                                         }`}
                                     disabled={!selectedDocumentSet}
                                 >
                                     <span className="hidden sm:inline">RAG Chat</span>
                                     <span className="sm:hidden">Chat</span>
                                     {selectedDocumentSet && (
-                                        <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-1 text-xs bg-[#3333CC] text-white rounded-full">
+                                        <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-1 text-xs gradient-space text-white rounded-full animate-pulse-slow">
                                             <span className="hidden sm:inline">{selectedDocumentSet}</span>
                                             <span className="sm:hidden">•</span>
                                         </span>
@@ -211,9 +211,9 @@ export default function RAGLayout() {
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('admin')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'admin'
-                                        ? 'border-[#3333CC] text-[#3333CC]'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'admin'
+                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
+                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     <span className="hidden sm:inline">Admin</span>
@@ -224,7 +224,7 @@ export default function RAGLayout() {
                     </div>
 
                     {/* Tab Content */}
-                    <div className="flex-1 overflow-auto">
+                    <div className="flex-1 overflow-auto bg-space-black">
                         {activeTab === 'upload' && (
                             <DocumentUpload
                                 fetchWithAuth={fetchWithAuth}
@@ -253,26 +253,28 @@ export default function RAGLayout() {
                         )}
 
                         {activeTab === 'chat' && !selectedDocumentSet && (
-                            <div className="flex items-center justify-center h-full">
-                                <div className="text-center">
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                        Select a Document Set
-                                    </h3>
-                                    <p className="text-gray-500 mb-4">
-                                        Choose a processed document set to start chatting.
-                                    </p>
-                                    <button
-                                        onClick={() => setActiveTab('documents')}
-                                        className="btn btn-primary"
-                                    >
-                                        View Document Sets
-                                    </button>
+                            <div className="flex items-center justify-center h-full bg-space-black">
+                                <div className="text-center p-8">
+                                    <div className="card-space rounded-2xl p-8 max-w-md mx-auto">
+                                        <h3 className="text-lg font-medium text-stellar-white mb-2">
+                                            Select a Document Set
+                                        </h3>
+                                        <p className="text-lunar-grey mb-6">
+                                            Choose a processed document set to start chatting.
+                                        </p>
+                                        <button
+                                            onClick={() => setActiveTab('documents')}
+                                            className="btn-space px-6 py-3 rounded-lg font-medium text-stellar-white transition-all duration-200 hover:scale-105"
+                                        >
+                                            View Document Sets
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'admin' && (
-                            <div className="p-6">
+                            <div className="p-6 bg-space-black">
                                 <AdminActions
                                     fetchWithAuth={fetchWithAuth}
                                     onRefresh={fetchDocumentSets}

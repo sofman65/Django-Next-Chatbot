@@ -100,27 +100,27 @@ export function PipelineStatus({
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <div className={`bg-white rounded-lg shadow-xl border border-gray-200 transition-all duration-300 ${isExpanded ? 'w-96' : 'w-80'
+            <div className={`card-space rounded-2xl shadow-2xl transition-all duration-300 animate-float ${isExpanded ? 'w-96' : 'w-80'
                 }`}>
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                <div className="flex items-center justify-between p-4 border-b border-white/10">
                     <div className="flex items-center space-x-2">
-                        <h3 className="text-sm font-semibold text-gray-900">Pipeline Status</h3>
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        <h3 className="text-sm font-semibold text-stellar-white">Pipeline Status</h3>
+                        <span className="text-xs bg-blue-400/20 text-blue-400 border border-blue-400/30 px-2 py-1 rounded-full">
                             {processingDocSets.length} active
                         </span>
                     </div>
                     <div className="flex items-center space-x-1">
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                            className="text-lunar-grey hover:text-stellar-white p-1 rounded transition-colors hover:scale-110"
                             title={isExpanded ? "Collapse details" : "Expand details"}
                         >
                             <Eye className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => setIsVisible(false)}
-                            className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                            className="text-lunar-grey hover:text-stellar-white p-1 rounded transition-colors hover:scale-110"
                         >
                             <X className="h-4 w-4" />
                         </button>
@@ -128,24 +128,24 @@ export function PipelineStatus({
                 </div>
 
                 {/* Processing Document Sets */}
-                <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
+                <div className="p-4 space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
                     {processingDocSets.map((docSet) => {
                         const detailStatus = detailedStatuses[docSet.name];
                         const progress = detailStatus?.progress_percentage || docSet.progress || 0;
                         const currentStage = getCurrentStage(progress);
 
                         return (
-                            <div key={docSet.name} className="space-y-3 p-3 bg-gray-50 rounded-lg">
+                            <div key={docSet.name} className="space-y-3 p-3 glass-dark rounded-xl border border-white/10">
                                 {/* Document Set Header */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
-                                        <Clock className="h-4 w-4 text-blue-500 animate-spin" />
-                                        <span className="text-sm font-medium text-gray-900 truncate">
+                                        <Clock className="h-4 w-4 text-blue-400 animate-spin" />
+                                        <span className="text-sm font-medium text-stellar-white truncate">
                                             {docSet.name}
                                         </span>
                                     </div>
                                     {detailStatus?.started_at && (
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-lunar-grey">
                                             {formatElapsedTime(detailStatus.started_at)}
                                         </span>
                                     )}
@@ -153,10 +153,8 @@ export function PipelineStatus({
 
                                 {/* Current Stage Indicator */}
                                 <div className="flex items-center space-x-2 text-xs">
-                                    <div
-                                        className={`w-3 h-3 rounded-full ${currentStage.color} animate-pulse`}
-                                    ></div>
-                                    <span className="font-medium text-gray-700">
+                                    <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></div>
+                                    <span className="font-medium text-stellar-white">
                                         {currentStage.name}
                                     </span>
                                     <span className="text-gray-500">
@@ -222,12 +220,12 @@ export function PipelineStatus({
                                                     return (
                                                         <div key={index} className="flex items-center space-x-2 text-xs">
                                                             <div className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-green-500' :
-                                                                    isActive ? `${stage.color} animate-pulse` :
-                                                                        'bg-gray-300'
+                                                                isActive ? `${stage.color} animate-pulse` :
+                                                                    'bg-gray-300'
                                                                 }`}></div>
                                                             <span className={`${isActive ? 'font-semibold text-gray-900' :
-                                                                    isCompleted ? 'text-green-700' :
-                                                                        'text-gray-500'
+                                                                isCompleted ? 'text-green-700' :
+                                                                    'text-gray-500'
                                                                 }`}>
                                                                 {stage.name}
                                                             </span>

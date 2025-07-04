@@ -49,7 +49,7 @@ export function DocumentSets({
     // Separate useEffect for polling to avoid recreating intervals
     useEffect(() => {
         console.log('Setting up polling interval...');
-        
+
         const interval = setInterval(() => {
             const now = Date.now();
             const timeSinceLastPoll = now - lastPollTimeRef.current;
@@ -154,13 +154,13 @@ export function DocumentSets({
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'completed':
-                return <CheckCircle className="h-5 w-5 text-green-500" />;
+                return <CheckCircle className="h-5 w-5 text-green-400" />;
             case 'processing':
-                return <Clock className="h-5 w-5 text-blue-500 animate-spin" />;
+                return <Clock className="h-5 w-5 text-blue-400 animate-spin" />;
             case 'failed':
-                return <AlertCircle className="h-5 w-5 text-red-500" />;
+                return <AlertCircle className="h-5 w-5 text-red-400" />;
             default:
-                return <Database className="h-5 w-5 text-gray-400" />;
+                return <Database className="h-5 w-5 text-orbit-grey" />;
         }
     };
 
@@ -197,53 +197,53 @@ export function DocumentSets({
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3333CC]"></div>
+            <div className="flex items-center justify-center h-64 bg-space-black">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
             </div>
         );
     }
 
     return (
-        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 bg-space-black min-h-full">
+            <div className="card-space rounded-2xl">
                 <div className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2">
-                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Document Sets</h2>
-                        <div className="text-sm text-gray-500">
+                        <h2 className="text-xl sm:text-2xl font-bold text-stellar-white">Document Sets</h2>
+                        <div className="text-sm text-lunar-grey">
                             {documentSets.length} document set{documentSets.length !== 1 ? 's' : ''}
                         </div>
                     </div>
 
                     {documentSets.length === 0 ? (
                         <div className="text-center py-12">
-                            <Database className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No Document Sets</h3>
-                            <p className="text-gray-500">Upload some documents to get started.</p>
+                            <Database className="mx-auto h-12 w-12 text-orbit-grey mb-4 animate-pulse-slow" />
+                            <h3 className="text-lg font-medium text-stellar-white mb-2">No Document Sets</h3>
+                            <p className="text-lunar-grey">Upload some documents to get started.</p>
                         </div>
                     ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {documentSets.map((docSet) => (
                                 <div
                                     key={docSet.name}
-                                    className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${selectedDocumentSet === docSet.name
-                                        ? 'border-[#3333CC] bg-[#3333CC]/5'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                    className={`glass-dark rounded-xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${selectedDocumentSet === docSet.name
+                                        ? 'border-blue-400 bg-blue-400/10 shadow-lg shadow-blue-400/25'
+                                        : 'border-white/10 hover:border-blue-400/50'
                                         }`}
                                     onClick={() => onSelectDocumentSet(docSet.name)}
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center space-x-2">
                                             {getStatusIcon(docSet.status)}
-                                            <h3 className="font-medium text-gray-900 truncate">
+                                            <h3 className="font-medium text-stellar-white truncate">
                                                 {docSet.name}
                                             </h3>
                                         </div>
                                         {selectedDocumentSet === docSet.name && (
-                                            <div className="w-2 h-2 bg-[#3333CC] rounded-full"></div>
+                                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                                         )}
                                     </div>
 
-                                    <div className="space-y-2 text-sm text-gray-600">
+                                    <div className="space-y-2 text-sm text-lunar-grey">
                                         <div className="flex items-center space-x-2">
                                             <FileText className="h-4 w-4" />
                                             <span>{docSet.document_count} document{docSet.document_count !== 1 ? 's' : ''}</span>
@@ -255,10 +255,10 @@ export function DocumentSets({
                                         </div>
 
                                         <div className="flex items-center justify-between">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${docSet.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                ['processing', 'parsing', 'indexing', 'pending'].includes(docSet.status) ? 'bg-blue-100 text-blue-800' :
-                                                    docSet.status === 'failed' ? 'bg-red-100 text-red-800' :
-                                                        'bg-gray-100 text-gray-800'
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${docSet.status === 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                                                ['processing', 'parsing', 'indexing', 'pending'].includes(docSet.status) ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                                                    docSet.status === 'failed' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                                        'bg-orbit-grey/20 text-orbit-grey border border-orbit-grey/30'
                                                 }`}>
                                                 {getStatusText(docSet.status)}
                                             </span>
@@ -268,35 +268,35 @@ export function DocumentSets({
                                     {/* Progress bar for processing */}
                                     {['processing', 'parsing', 'indexing', 'pending'].includes(docSet.status) && docSet.progress !== undefined && (
                                         <div className="mt-3">
-                                            <div className="w-full bg-gray-200 rounded-full h-2 relative overflow-hidden">
+                                            <div className="w-full bg-charcoal rounded-full h-2 relative overflow-hidden">
                                                 <div
-                                                    className="bg-[#3333CC] h-2 rounded-full transition-all duration-300 relative"
+                                                    className="gradient-space h-2 rounded-full transition-all duration-300 relative animate-pulse-slow"
                                                     style={{ width: `${docSet.progress}%` }}
                                                 >
-                                                    <div className="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
+                                                    <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
                                                 </div>
                                             </div>
-                                            <div className="text-xs text-gray-500 mt-2 space-y-2">
+                                            <div className="text-xs text-lunar-grey mt-2 space-y-2">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="font-semibold">{docSet.progress}% complete</span>
-                                                    <span className="text-gray-400">Processing...</span>
+                                                    <span className="font-semibold text-stellar-white">{docSet.progress}% complete</span>
+                                                    <span className="text-blue-400">Processing...</span>
                                                 </div>
                                                 {docSet.current_step && (
-                                                    <div className="text-gray-700 bg-white px-3 py-2 rounded border border-gray-200">
-                                                        <div className="font-medium text-xs text-gray-600 mb-1">Current step:</div>
-                                                        <div className="text-xs leading-relaxed">
+                                                    <div className="text-lunar-grey glass rounded border border-white/10 px-3 py-2">
+                                                        <div className="font-medium text-xs text-blue-400 mb-1">Current step:</div>
+                                                        <div className="text-xs leading-relaxed text-stellar-white">
                                                             {docSet.current_step}
                                                         </div>
                                                     </div>
                                                 )}
                                                 {/* Stage indicator */}
                                                 <div className="flex items-center space-x-2 text-xs">
-                                                    <div className={`w-2 h-2 rounded-full animate-pulse ${docSet.progress < 20 ? 'bg-blue-500' :
-                                                        docSet.progress < 60 ? 'bg-orange-500' :
-                                                            docSet.progress < 80 ? 'bg-green-500' :
-                                                                'bg-indigo-500'
+                                                    <div className={`w-2 h-2 rounded-full animate-pulse ${docSet.progress < 20 ? 'bg-blue-400' :
+                                                        docSet.progress < 60 ? 'bg-orange-400' :
+                                                            docSet.progress < 80 ? 'bg-green-400' :
+                                                                'bg-purple-400'
                                                         }`}></div>
-                                                    <span className="text-gray-600 font-medium">
+                                                    <span className="text-lunar-grey font-medium">
                                                         {docSet.progress < 20 ? 'Preparing documents' :
                                                             docSet.progress < 60 ? 'Parsing PDFs with Docling' :
                                                                 docSet.progress < 80 ? 'Processing text' :
@@ -308,15 +308,15 @@ export function DocumentSets({
                                     )}
 
                                     {/* Action buttons */}
-                                    <div className="mt-4 pt-3 border-t border-gray-100">
+                                    <div className="mt-4 pt-3 border-t border-white/10">
                                         {docSet.status === 'completed' ? (
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-xs text-green-600 font-medium flex items-center space-x-1">
+                                                    <div className="text-xs text-green-400 font-medium flex items-center space-x-1">
                                                         <CheckCircle className="h-3 w-3" />
                                                         <span>Ready for Chat</span>
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-lunar-grey">
                                                         Fully indexed
                                                     </div>
                                                 </div>
@@ -326,7 +326,7 @@ export function DocumentSets({
                                                         handleRebuildPipeline(docSet.name);
                                                     }}
                                                     disabled={rebuildingPipeline === docSet.name}
-                                                    className="flex items-center space-x-1 text-xs bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700 disabled:bg-gray-400 transition-colors w-full justify-center"
+                                                    className="flex items-center space-x-1 text-xs btn-space px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all w-full justify-center"
                                                 >
                                                     {rebuildingPipeline === docSet.name ? (
                                                         <>
@@ -344,7 +344,7 @@ export function DocumentSets({
                                         ) : ['processing', 'parsing', 'indexing', 'pending'].includes(docSet.status) ? (
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
-                                                    <div className="text-xs text-blue-600 font-medium flex items-center space-x-1">
+                                                    <div className="text-xs text-blue-400 font-medium flex items-center space-x-1">
                                                         <Clock className="h-3 w-3 animate-spin" />
                                                         <span>
                                                             {docSet.status === 'parsing' ? 'Parsing documents...' :
@@ -353,24 +353,24 @@ export function DocumentSets({
                                                                         'Processing documents...'}
                                                         </span>
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-lunar-grey">
                                                         {docSet.progress && docSet.progress < 60 ? 'Please wait' : 'Almost done'}
                                                     </div>
                                                 </div>
                                                 {docSet.status === 'parsing' && docSet.progress && docSet.progress < 60 && (
-                                                    <div className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                                                    <div className="text-xs text-orange-400 bg-orange-400/10 border border-orange-400/20 px-2 py-1 rounded">
                                                         ⏱️ PDF parsing may take several minutes
                                                     </div>
                                                 )}
                                                 {docSet.status === 'indexing' && (
-                                                    <div className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                                                    <div className="text-xs text-green-400 bg-green-400/10 border border-green-400/20 px-2 py-1 rounded">
                                                         🔍 Creating search embeddings...
                                                     </div>
                                                 )}
                                             </div>
                                         ) : docSet.status === 'failed' ? (
                                             <div className="space-y-2">
-                                                <div className="text-xs text-red-600 font-medium flex items-center space-x-1">
+                                                <div className="text-xs text-red-400 font-medium flex items-center space-x-1">
                                                     <AlertCircle className="h-3 w-3" />
                                                     <span>Processing Failed</span>
                                                 </div>
@@ -380,11 +380,11 @@ export function DocumentSets({
                                                         handleStartPipeline(docSet.name);
                                                     }}
                                                     disabled={startingPipeline === docSet.name}
-                                                    className="flex items-center space-x-1 text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:bg-gray-400 transition-colors"
+                                                    className="flex items-center space-x-1 text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-lg hover:bg-red-500/30 disabled:opacity-50 transition-all"
                                                 >
                                                     {startingPipeline === docSet.name ? (
                                                         <>
-                                                            <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                                                            <div className="animate-spin rounded-full h-3 w-3 border-b border-red-400"></div>
                                                             <span>Retrying...</span>
                                                         </>
                                                     ) : (
@@ -397,7 +397,7 @@ export function DocumentSets({
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
-                                                <div className="text-xs text-gray-600 font-medium">
+                                                <div className="text-xs text-lunar-grey font-medium">
                                                     Ready to process
                                                 </div>
                                                 <button
@@ -406,7 +406,7 @@ export function DocumentSets({
                                                         handleStartPipeline(docSet.name);
                                                     }}
                                                     disabled={startingPipeline === docSet.name}
-                                                    className="flex items-center space-x-1 text-xs bg-[#3333CC] text-white px-3 py-1 rounded hover:bg-[#2929AA] disabled:bg-gray-400 transition-colors"
+                                                    className="flex items-center space-x-1 text-xs btn-space px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
                                                 >
                                                     {startingPipeline === docSet.name ? (
                                                         <>

@@ -118,14 +118,14 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-space-black min-h-full">
+            <div className="card-space rounded-2xl">
                 <div className="p-4 sm:p-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Upload Documents</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-stellar-white mb-4 sm:mb-6">Upload Documents</h2>
 
                     {/* Document Set Name */}
                     <div className="mb-6">
-                        <label htmlFor="documentSetName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="documentSetName" className="block text-sm font-medium text-lunar-grey mb-2">
                             Document Set Name
                         </label>
                         <input
@@ -133,7 +133,7 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                             id="documentSetName"
                             value={documentSetName}
                             onChange={(e) => setDocumentSetName(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#3333CC] focus:border-[#3333CC]"
+                            className="w-full px-3 py-2 glass border border-white/10 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-stellar-white placeholder-lunar-grey transition-all duration-200"
                             placeholder="Enter a name for this document set (e.g., 'Q1 Financial Reports')"
                             disabled={uploading}
                         />
@@ -141,18 +141,18 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
 
                     {/* File Upload Area */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-lunar-grey mb-2">
                             PDF Documents
                         </label>
                         <div
-                            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#3333CC] transition-colors cursor-pointer"
+                            className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-blue-400 hover:bg-blue-400/5 transition-all duration-300 cursor-pointer glass-dark"
                             onClick={() => fileInputRef.current?.click()}
                         >
-                            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                            <p className="text-sm text-gray-600 mb-2">
+                            <Upload className="mx-auto h-12 w-12 text-blue-400 mb-4 animate-float" />
+                            <p className="text-sm text-stellar-white mb-2">
                                 Click to select PDF files or drag and drop
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-lunar-grey">
                                 Multiple PDF files supported
                             </p>
                             <input
@@ -170,23 +170,23 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                     {/* Selected Files */}
                     {files.length > 0 && (
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-gray-700 mb-3">
+                            <h3 className="text-sm font-medium text-lunar-grey mb-3">
                                 Selected Files ({files.length})
                             </h3>
                             <div className="space-y-2">
                                 {files.map((file, index) => (
-                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                                    <div key={index} className="flex items-center justify-between p-3 glass rounded-lg border border-white/10">
                                         <div className="flex items-center space-x-3">
-                                            <File className="h-5 w-5 text-red-500" />
+                                            <File className="h-5 w-5 text-red-400" />
                                             <div>
-                                                <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                                                <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                                                <p className="text-sm font-medium text-stellar-white">{file.name}</p>
+                                                <p className="text-xs text-lunar-grey">{formatFileSize(file.size)}</p>
                                             </div>
                                         </div>
                                         {!uploading && (
                                             <button
                                                 onClick={() => removeFile(index)}
-                                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                                className="p-1 text-lunar-grey hover:text-red-400 transition-colors hover:scale-110"
                                             >
                                                 <X className="h-4 w-4" />
                                             </button>
@@ -199,9 +199,9 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
 
                     {/* Status Message */}
                     {uploadStatus.message && (
-                        <div className={`mb-6 p-4 rounded-md flex items-center space-x-2 ${uploadStatus.type === 'success'
-                            ? 'bg-green-50 text-green-800 border border-green-200'
-                            : 'bg-red-50 text-red-800 border border-red-200'
+                        <div className={`mb-6 p-4 rounded-lg flex items-center space-x-2 ${uploadStatus.type === 'success'
+                            ? 'bg-green-400/10 text-green-400 border border-green-400/20'
+                            : 'bg-red-400/10 text-red-400 border border-red-400/20'
                             }`}>
                             {uploadStatus.type === 'success' ? (
                                 <CheckCircle className="h-5 w-5" />
@@ -217,7 +217,7 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                         <button
                             onClick={handleUpload}
                             disabled={uploading || !documentSetName.trim() || files.length === 0}
-                            className="bg-[#3333CC] text-white px-6 py-2 rounded-md hover:bg-[#2929AA] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                            className="btn-space px-6 py-3 rounded-lg font-medium text-stellar-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 hover:scale-105 flex items-center space-x-2"
                         >
                             {uploading ? (
                                 <>
