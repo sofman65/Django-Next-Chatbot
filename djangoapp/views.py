@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Conversation, Message, Role, Document, DocumentSet, ProcessingPipeline
-from .logic import answer_query, generate_title, build_database, database_exists
+from .logic import general_chat_query, generate_title, database_exists, build_database
 from .advanced_rag_logic import rag_manager
 from rest_framework import status
 from rest_framework_simplejwt.exceptions import TokenError
@@ -40,13 +40,57 @@ class SignupView(APIView):
     def post(self, request):
         data = request.data
         username = data.get('username')
+        email = data.get('email')
         password = data.get('password')
-        role_name = data.get('role_name')
-        role = Role.objects.get(name=role_name)
+        first_name = data.get('first_name', '')
+        last_name = data.get('last_name', '')
+        
+        # Validate required fields
+        if not username or not password:
+            return Response({'detail': 'Username and password are required'}, status=400)
+        
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            return Response({'detail': 'User with this username already exists'}, status=400)
+        
+        # Check if email already exists (if provided)
+        if email and User.objects.filter(email=email).exists():
+            return Response({'detail': 'User with this email already exists'}, status=400)
+        
+        try:
+            # Get default role or set to None if roles aren't used
+            default_role = None
+            try:
+                default_role = Role.objects.get(name='user')
+            except:
+                pass  # Role model might not be used
+            
+            # Create the user
+            user_data = {
+                'username': username,
+                'password': password,
+                'first_name': first_name,
+                'last_name': last_name,
+            }
+            
+            if email:
+                user_data['email'] = email
+                
+            if default_role:
+                user_data['role'] = default_role
+                
+            user = User.objects.create_user(**user_data)
 
-        user = User.objects.create_user(username=username, password=password, role=role)
-
-        return Response({'message': 'User created successfully'}, status=201)
+            return Response({
+                'message': 'User created successfully',
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name
+            }, status=201)
+            
+        except Exception as e:
+            return Response({'detail': str(e)}, status=500)
     
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -121,7 +165,7 @@ def index(request):
             def event_stream():
                 """Stream tokens from the chatbot."""
                 try:
-                    for token in answer_query(query):
+                    for token in general_chat_query(query):
                         yield f"data: {json.dumps(token)}\n\n"  # SSE format
                 except Exception as e:
                     logger.error(f"Error during streaming: {e}")
@@ -175,8 +219,22 @@ def chat(request):
             body = json.loads(request.body)
             query = body.get("query", "")
             conversation_id = body.get("conversation_id")
-            model = body.get("model", "mistralai/Mistral-7B-Instruct-v0.3")  # Default to Mistral
-            provider = "huggingface" if model.startswith("mistralai") else "openai"  # Determine provider
+            model = body.get("model")  # Let logic.py handle the default model
+            
+            # Determine provider based on model name or use default
+            if model:
+                if model.startswith("mistralai/") or model.startswith("microsoft/") or model.startswith("HuggingFaceH4/") or model == "gpt2":
+                    provider = "huggingface"
+                elif model.startswith("gpt-") or model.startswith("text-") or model.startswith("chatgpt"):
+                    provider = "openai"
+                else:
+                    # Default to huggingface for unknown models
+                    provider = "huggingface"
+            else:
+                # No model specified, use default provider
+                provider = "huggingface"
+                model = None  # Let logic.py choose the default model
+                
             logger.info(f"Chat endpoint called with model: {model}, provider: {provider}")
 
             if not query:
@@ -205,7 +263,7 @@ def chat(request):
                 """Stream tokens from the chatbot."""
                 response_content = []
                 try:
-                    for token in answer_query(query, model=model, provider=provider):
+                    for token in general_chat_query(query, model=model, provider=provider):
                         response_content.append(token.get('answer', ''))
                         yield f"data: {json.dumps(token)}\n\n"
                 except Exception as e:
@@ -512,9 +570,9 @@ def rag_chat(request):
                             )
                             logger.info(f"Saved assistant message - Length: {len(response_content)}")
                     else:
-                        # Fallback to basic RAG system
+                        # Fallback to general chat (no RAG)
                         response_content = ""
-                        for token_data in answer_query(query):
+                        for token_data in general_chat_query(query):
                             if "answer" in token_data:
                                 response_content += token_data["answer"]
                                 yield f"data: {json.dumps(token_data)}\n\n"
@@ -774,6 +832,22 @@ def rag_force_cleanup(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def supported_models(request):
+    """Get list of supported models for general chat."""
+    try:
+        from .logic import SUPPORTED_MODELS, DEFAULT_MODELS
+        
+        return JsonResponse({
+            'supported_models': SUPPORTED_MODELS,
+            'default_models': DEFAULT_MODELS,
+            'providers': list(SUPPORTED_MODELS.keys())
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting supported models: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 

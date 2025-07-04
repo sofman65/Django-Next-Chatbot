@@ -42,19 +42,19 @@ export function ConversationsSidebar({
     <>
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r border-gray-800 bg-gray-900/95 backdrop-blur-sm text-white transition-transform duration-300 ease-in-out shadow-2xl",
+          "fixed inset-y-0 left-0 z-40 flex w-80 flex-col border-r border-white/10 bg-background/95 backdrop-blur-sm text-white transition-transform duration-300 ease-in-out shadow-2xl",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full",
           className,
         )}
       >
         {/* Top Bar */}
-        <div className="flex h-16 items-center gap-3 border-b border-gray-800 px-4 justify-between bg-gray-900/50">
+        <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4 justify-between bg-background/80">
           <Button
             onClick={() => {
               onNewChat()
               if (isMobile && closeSidebar) closeSidebar()
             }}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/25 rounded-full px-4 py-2"
+            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white shadow-lg shadow-blue-500/25 rounded-full px-4 py-2"
           >
             <Plus className="h-4 w-4" />
             <span className="text-sm font-medium">New Chat</span>
@@ -64,7 +64,7 @@ export function ConversationsSidebar({
             <Button
               onClick={closeSidebar}
               variant="ghost"
-              className="text-gray-400 hover:text-white hover:bg-gray-800 rounded-full p-2"
+              className="text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-full p-2"
               aria-label="Close sidebar"
             >
               <X className="h-5 w-5" />
@@ -85,27 +85,27 @@ export function ConversationsSidebar({
                 className={cn(
                   "w-full text-left p-3 rounded-xl transition-all duration-200 group",
                   currentId === conversation.id
-                    ? "bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 shadow-lg shadow-blue-500/10"
-                    : "hover:bg-gray-800/50 border border-transparent",
+                    ? "bg-gradient-to-r from-blue-500/20 to-teal-500/20 border border-blue-500/30 shadow-lg shadow-blue-500/10"
+                    : "hover:bg-slate-800/50 border border-transparent",
                 )}
               >
                 <div className="flex items-center gap-3">
                   <MessageSquare
                     className={cn(
                       "h-5 w-5 transition-colors",
-                      currentId === conversation.id ? "text-blue-400" : "text-gray-400 group-hover:text-gray-300",
+                      currentId === conversation.id ? "text-blue-500" : "text-slate-400 group-hover:text-white",
                     )}
                   />
                   <div className="flex-1 min-w-0">
                     <p
                       className={cn(
                         "text-sm font-medium truncate transition-colors",
-                        currentId === conversation.id ? "text-white" : "text-gray-300 group-hover:text-white",
+                        currentId === conversation.id ? "text-white" : "text-[#64748B] group-hover:text-white",
                       )}
                     >
                       {conversation.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-[#64748B] mt-1">
                       {new Date(conversation.createdAt).toLocaleDateString()}
                     </p>
                   </div>

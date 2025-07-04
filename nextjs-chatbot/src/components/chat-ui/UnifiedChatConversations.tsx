@@ -3,6 +3,7 @@ import { ChatMessage } from "./ChatMessage";
 import { Bot, User } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { StreamingTextEffect } from "@/components/ui/streaming-text-effect";
 import type { Conversations } from "../../types";
 
 interface RAGMessage {
@@ -54,11 +55,11 @@ export function UnifiedChatConversations({
                     <div key={message.id} className="flex space-x-4">
                         {/* Avatar */}
                         <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === 'user'
-                            ? 'bg-gray-200'
-                            : 'bg-[#3333CC]'
+                            ? 'bg-gradient-to-br from-gray-600 to-gray-800 shadow-gray-500/25'
+                            : 'bg-gradient-to-br from-blue-500 to-blue-700 shadow-blue-500/25'
                             }`}>
                             {message.role === 'user' ? (
-                                <User className="w-4 h-4 text-gray-600" />
+                                <User className="w-4 h-4 text-white" />
                             ) : (
                                 <Bot className="w-4 h-4 text-white" />
                             )}
@@ -67,38 +68,47 @@ export function UnifiedChatConversations({
                         {/* Message Content */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-white">
                                     {message.role === 'user' ? 'You' : 'Nexi Assistant'}
                                 </span>
                                 {message.timestamp && (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-gray-400">
                                         {formatTime(message.timestamp)}
                                     </span>
                                 )}
                             </div>
 
                             <div className={`rounded-lg p-4 ${message.role === 'user'
-                                ? 'bg-gray-100 border border-gray-200'
-                                : 'bg-white border border-gray-200 shadow-sm'
+                                ? 'bg-gray-800/50 border border-gray-700'
+                                : 'bg-gray-900/50 border border-gray-600 shadow-sm'
                                 }`}>
                                 {message.role === 'assistant' ? (
-                                    <ReactMarkdown
-                                        remarkPlugins={[remarkGfm]}
-                                        className="prose prose-sm max-w-none prose-p:mb-2 prose-ul:mb-2 prose-ol:mb-2"
-                                    >
-                                        {message.content}
-                                    </ReactMarkdown>
+                                    // Check if this is the last assistant message and we're currently querying
+                                    isQuerying && index === ragMessages.length - 1 ? (
+                                        <StreamingTextEffect
+                                            text={message.content}
+                                            isStreaming={true}
+                                            className="text-white"
+                                        />
+                                    ) : (
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            className="prose prose-sm max-w-none prose-p:mb-2 prose-ul:mb-2 prose-ol:mb-2 prose-invert text-white"
+                                        >
+                                            {message.content}
+                                        </ReactMarkdown>
+                                    )
                                 ) : (
-                                    <p className="text-gray-800 whitespace-pre-wrap">{message.content}</p>
+                                    <p className="text-white whitespace-pre-wrap">{message.content}</p>
                                 )}
 
                                 {/* Sources */}
                                 {message.sources && message.sources.length > 0 && (
-                                    <div className="mt-3 pt-3 border-t border-gray-100">
-                                        <p className="text-xs font-medium text-gray-600 mb-2">Sources:</p>
+                                    <div className="mt-3 pt-3 border-t border-gray-600">
+                                        <p className="text-xs font-medium text-gray-300 mb-2">Sources:</p>
                                         <div className="space-y-1">
                                             {message.sources.map((source, index) => (
-                                                <div key={index} className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                                                <div key={index} className="text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded">
                                                     {source}
                                                 </div>
                                             ))}
@@ -108,8 +118,8 @@ export function UnifiedChatConversations({
 
                                 {/* Response metrics for assistant messages */}
                                 {message.role === 'assistant' && message.metrics && (
-                                    <div className="mt-2 pt-2 border-t border-gray-100">
-                                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                                    <div className="mt-2 pt-2 border-t border-gray-600">
+                                        <div className="flex items-center space-x-4 text-xs text-gray-400">
                                             <span className="flex items-center space-x-1">
                                                 <span className={`w-2 h-2 rounded-full ${message.metrics.completed ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                                                 <span>{message.metrics.completed ? 'Complete' : 'Partial'}</span>
@@ -132,12 +142,12 @@ export function UnifiedChatConversations({
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">
-                                <span className="text-sm font-medium text-gray-900">Nexi Assistant</span>
+                                <span className="text-sm font-medium text-white">Nexi Assistant</span>
                             </div>
-                            <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
+                            <div className="bg-gray-900/50 border border-gray-600 shadow-sm rounded-lg p-4">
                                 <div className="flex items-center space-x-2">
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#3333CC]"></div>
-                                    <span className="text-sm text-gray-600">Thinking...</span>
+                                    <span className="text-sm text-gray-300">Thinking...</span>
                                 </div>
                             </div>
                         </div>

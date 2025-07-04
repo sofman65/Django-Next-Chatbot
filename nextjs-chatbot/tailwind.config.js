@@ -8,6 +8,11 @@ module.exports = {
 	],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: ['var(--font-inter)', 'sans-serif'],
+				orbitron: ['var(--font-orbitron)', 'sans-serif'],
+				spaceGrotesk: ['var(--font-space-grotesk)', 'sans-serif']
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',

@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useScrollToBottom } from "@/hooks/useScrollToBottom"
 import { useRouter } from "next/navigation"
 import { ExternalLink, Sparkles } from "lucide-react"
+import Link from "next/link"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -157,11 +158,202 @@ export default function ChatLayout() {
   const sendMessage = useCallback(
     async (data: string) => {
       setIsQuerying(true)
-      // Add your message sending logic here
-      console.log("Sending message:", data)
-      setIsQuerying(false)
+
+      try {
+        if (selectedDocumentSet) {
+          // RAG mode - call RAG endpoint
+          const userMessage: ChatMessage = {
+            id: `user-${Date.now()}`,
+            role: "user",
+            content: data,
+            timestamp: new Date(),
+          }
+
+          setRagMessages(prev => [...prev, userMessage])
+
+          const response = await fetchWithAuth(`${BACKEND_URL}/api/rag/chat/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              query: data,
+              document_set_name: selectedDocumentSet,
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error(`RAG API call failed: ${response.statusText}`)
+          }
+
+          // Handle streaming response
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder()
+          let assistantMessage = ""
+          let sources: string[] = []
+          let metrics = { chunks: 0, length: 0, completed: false }
+
+          if (reader) {
+            const assistantMessageObj: ChatMessage = {
+              id: `assistant-${Date.now()}`,
+              role: "assistant",
+              content: "",
+              timestamp: new Date(),
+              sources: [],
+              metrics: { chunks: 0, length: 0, completed: false },
+            }
+            setRagMessages(prev => [...prev, assistantMessageObj])
+
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                const chunk = decoder.decode(value)
+                const lines = chunk.split('\n')
+
+                for (const line of lines) {
+                  if (line.startsWith('data: ')) {
+                    try {
+                      const data = JSON.parse(line.slice(6))
+
+                      if (data.answer) {
+                        assistantMessage += data.answer
+                        setRagMessages(prev =>
+                          prev.map((msg, index) =>
+                            index === prev.length - 1
+                              ? { ...msg, content: assistantMessage }
+                              : msg
+                          )
+                        )
+                      }
+
+                      if (data.sources) {
+                        sources = data.sources
+                      }
+
+                      if (data.completion) {
+                        metrics = { chunks: data.chunks_used || 0, length: assistantMessage.length, completed: true }
+                        setRagMessages(prev =>
+                          prev.map((msg, index) =>
+                            index === prev.length - 1
+                              ? { ...msg, sources, metrics }
+                              : msg
+                          )
+                        )
+                      }
+
+                      if (data.error) {
+                        throw new Error(data.error)
+                      }
+                    } catch (e) {
+                      console.warn("Failed to parse streaming data:", e)
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              console.error("Error reading RAG stream:", error)
+              throw error
+            }
+          }
+        } else {
+          // Regular chat mode - call regular chat endpoint
+          const userMessage = {
+            id: `user-${Date.now()}`,
+            role: MessageRole.USER,
+            message: data,
+          }
+
+          setChatConversations(prev => [...prev, userMessage])
+
+          const response = await fetchWithAuth(`${BACKEND_URL}/api/chat/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              query: data,
+              conversation_id: currentConversationId || null,
+              model: selectedModel,
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error(`Chat API call failed: ${response.statusText}`)
+          }
+
+          // Handle streaming response
+          const reader = response.body?.getReader()
+          const decoder = new TextDecoder()
+          let assistantMessage = ""
+
+          if (reader) {
+            const assistantMessageObj = {
+              id: `assistant-${Date.now()}`,
+              role: MessageRole.ASSISTANT,
+              message: "",
+            }
+            setChatConversations(prev => [...prev, assistantMessageObj])
+
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                const chunk = decoder.decode(value)
+                const lines = chunk.split('\n')
+
+                for (const line of lines) {
+                  if (line.startsWith('data: ')) {
+                    try {
+                      const data = JSON.parse(line.slice(6))
+                      if (data.answer) {
+                        assistantMessage += data.answer
+                        setChatConversations(prev =>
+                          prev.map((msg, index) =>
+                            index === prev.length - 1
+                              ? { ...msg, message: assistantMessage }
+                              : msg
+                          )
+                        )
+                      }
+                    } catch (e) {
+                      console.warn("Failed to parse streaming data:", e)
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              console.error("Error reading stream:", error)
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error sending message:", error)
+
+        // Add error message to chat
+        if (selectedDocumentSet) {
+          const errorMessage: ChatMessage = {
+            id: `error-${Date.now()}`,
+            role: "assistant",
+            content: "Sorry, there was an error processing your request. Please try again.",
+            timestamp: new Date(),
+          }
+          setRagMessages(prev => [...prev, errorMessage])
+        } else {
+          const errorMessage = {
+            id: `error-${Date.now()}`,
+            role: MessageRole.ASSISTANT,
+            message: "Sorry, there was an error processing your request. Please try again.",
+          }
+          setChatConversations(prev => [...prev, errorMessage])
+        }
+      } finally {
+        setIsQuerying(false)
+      }
     },
-    [selectedDocumentSet],
+    [selectedDocumentSet, fetchWithAuth, currentConversationId, selectedModel],
   )
 
   const loadConversation = useCallback(
@@ -259,6 +451,7 @@ export default function ChatLayout() {
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors group"
             >
+              {/* <Link href="/rag" className="flex items-center space-x-2" /> */}
               <span>Manage Documents</span>
               <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </a>

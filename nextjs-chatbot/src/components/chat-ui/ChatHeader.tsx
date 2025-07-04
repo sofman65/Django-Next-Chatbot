@@ -1,7 +1,14 @@
 "use client"
 
-import { Menu, X, MessageSquare } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { UserMenu } from "./UserMenu"
+import { Space_Grotesk } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ['400', '700'],
+  variable: '--font-space-grotesk',
+});
 
 interface ChatHeaderProps {
   onToggleSidebar: () => void
@@ -10,29 +17,28 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ onToggleSidebar, isSidebarOpen }: ChatHeaderProps) {
   return (
-    <header className="w-full border-b border-gray-800 bg-black/90 backdrop-blur-sm shadow-lg">
+    <header className="w-full border-b border-border bg-background/80 backdrop-blur-sm shadow-md">
       <div className="flex items-center h-16 px-4">
-        {/* Hamburger/Close icon */}
-        <button
-          className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-blue-600/20 transition-colors"
-          onClick={onToggleSidebar}
-          aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-        >
-          {isSidebarOpen ? <X className="h-6 w-6 text-blue-400" /> : <Menu className="h-6 w-6 text-blue-400" />}
-        </button>
+        {/* Left: Hamburger/Close icon */}
+        <div className="flex items-center w-20">
+          <button
+            className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-primary/20 transition-colors"
+            onClick={onToggleSidebar}
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            {isSidebarOpen ? <X className="h-6 w-6 text-primary" /> : <Menu className="h-6 w-6 text-primary" />}
+          </button>
+        </div>
 
         {/* Center: Logo */}
         <div className="flex-1 flex justify-center">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <MessageSquare className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-wider">DOCHAT</span>
+          <div className={`${spaceGrotesk.className} text-2xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent`}>
+            DoChat.ai
           </div>
         </div>
 
         {/* Right: User menu */}
-        <div className="w-32 flex justify-end">
+        <div className="flex justify-end w-20">
           <UserMenu />
         </div>
       </div>

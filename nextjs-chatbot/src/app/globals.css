@@ -2,124 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-#__next {
-  height: 100%;
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-  margin: 0 auto;
-}
-
-:root {
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono:
-    ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
-    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-
-  /* Space Slam Theme Colors */
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 15, 23, 42;
-
-  /* Space-themed glows */
-  --primary-glow: radial-gradient(circle at 50% 50%,
-      rgba(30, 64, 175, 0.3) 0%,
-      rgba(59, 130, 246, 0.2) 25%,
-      rgba(147, 197, 253, 0.1) 50%,
-      transparent 70%);
-  --secondary-glow: conic-gradient(from 180deg at 50% 50%,
-      rgba(30, 64, 175, 0.4) 0deg,
-      rgba(59, 130, 246, 0.3) 90deg,
-      rgba(147, 197, 253, 0.2) 180deg,
-      rgba(30, 58, 138, 0.3) 270deg,
-      rgba(30, 64, 175, 0.4) 360deg);
-
-  /* Space-themed tiles and cards */
-  --tile-start-rgb: 15, 23, 42;
-  --tile-end-rgb: 30, 41, 59;
-  --tile-border: conic-gradient(rgba(59, 130, 246, 0.8),
-      rgba(30, 64, 175, 0.4),
-      rgba(147, 197, 253, 0.3),
-      rgba(30, 58, 138, 0.2),
-      rgba(59, 130, 246, 0.1),
-      rgba(30, 64, 175, 0.1),
-      rgba(59, 130, 246, 0.8));
-
-  --callout-rgb: 30, 41, 59;
-  --callout-border-rgb: 59, 130, 246;
-  --card-rgb: 15, 23, 42;
-  --card-border-rgb: 30, 64, 175;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-body {
-  background: var(--primary-glow) center / cover no-repeat, var(--secondary-glow) center / cover no-repeat, #000000 fixed;
-  color: rgb(var(--foreground-rgb));
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-overflow-scrolling: touch;
-  @apply bg-background text-foreground;
-}
-
-html {
-  color-scheme: dark;
-}
-
 @layer base {
   :root {
-    /* Space Slam Dark Theme */
-    --background: 0 0% 0%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    /* Space blue */
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217.2 91.2% 59.8%;
-    --chart-1: 217.2 91.2% 59.8%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --radius: 0.75rem;
+    /* DoChat.ai Branding */
+    --background: 222 84% 4.9%;
+    /* Deep Navy */
+    --foreground: 0 0% 100%;
+    /* Warm White */
 
-    /* Space Slam Sidebar Theme */
-    --sidebar-background: 0 0% 0%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --card: 222 84% 4.9%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 221 83% 53%;
+    /* Primary Blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 172 75% 42%;
+    /* Accent Aqua */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 172 75% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    /* Danger Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 48 96% 53%;
+    /* Warning Yellow */
+
+    --success: 142 71% 45%;
+    /* Success Green */
+
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.5rem;
   }
 }
 
@@ -131,6 +56,36 @@ html {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html,
+body,
+#__next {
+  height: 100%;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  background-color: #0F172A;
+  /* Deep Navy */
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: white;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  color-scheme: dark;
 }
 
 /* Space Theme Styles */
