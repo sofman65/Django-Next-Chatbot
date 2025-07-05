@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, FileText } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import BrandedLoading from "@/components/ui/branded-loading";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -208,12 +209,12 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-space-black">
+        <div className="flex flex-col h-full bg-slate-950">
             {/* Document Set Header */}
-            <div className="glass border-b border-white/10 px-6 py-4">
+            <div className="bg-slate-900/50 border-b border-white/10 px-6 py-4">
                 <div className="flex items-center space-x-2">
                     <FileText className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-lg font-medium text-stellar-white">
+                    <h3 className="text-lg font-medium text-white">
                         Chatting with: {documentSetName}
                     </h3>
                 </div>
@@ -226,11 +227,11 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                         <div key={message.id} className="flex space-x-4">
                             {/* Avatar */}
                             <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.role === 'user'
-                                ? 'glass border border-white/20'
-                                : 'gradient-space'
+                                ? 'bg-slate-800/70 border border-white/20'
+                                : 'bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500'
                                 }`}>
                                 {message.role === 'user' ? (
-                                    <User className="w-4 h-4 text-stellar-white" />
+                                    <User className="w-4 h-4 text-white" />
                                 ) : (
                                     <Bot className="w-4 h-4 text-white" />
                                 )}
@@ -239,17 +240,17 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                             {/* Message Content */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-2 mb-1">
-                                    <span className="text-sm font-medium text-stellar-white">
-                                        {message.role === 'user' ? 'You' : 'Nexi Assistant'}
+                                    <span className="text-sm font-medium text-white">
+                                        {message.role === 'user' ? 'You' : 'DoChat Assistant'}
                                     </span>
-                                    <span className="text-xs text-lunar-grey">
+                                    <span className="text-xs text-slate-400">
                                         {formatTime(message.timestamp)}
                                     </span>
                                 </div>
 
                                 <div className={`rounded-xl p-4 ${message.role === 'user'
-                                    ? 'glass border border-white/20'
-                                    : 'card-space'
+                                    ? 'bg-slate-800/70 border border-white/20'
+                                    : 'bg-slate-900/50 border border-white/10'
                                     }`}>
                                     {message.role === 'assistant' ? (
                                         <ReactMarkdown
@@ -259,7 +260,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                                             {message.content}
                                         </ReactMarkdown>
                                     ) : (
-                                        <p className="text-stellar-white whitespace-pre-wrap">{message.content}</p>
+                                        <p className="text-white whitespace-pre-wrap">{message.content}</p>
                                     )}
 
                                     {/* Sources */}
@@ -268,7 +269,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                                             <p className="text-xs font-medium text-blue-400 mb-2">Sources:</p>
                                             <div className="space-y-1">
                                                 {message.sources.map((source, index) => (
-                                                    <div key={index} className="text-xs text-lunar-grey glass-dark px-2 py-1 rounded border border-white/10">
+                                                    <div key={index} className="text-xs text-slate-400 bg-slate-800/70 px-2 py-1 rounded border border-white/10">
                                                         {source}
                                                     </div>
                                                 ))}
@@ -279,7 +280,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                                     {/* Response metrics for assistant messages */}
                                     {message.role === 'assistant' && message.metrics && (
                                         <div className="mt-2 pt-2 border-t border-white/10">
-                                            <div className="flex items-center space-x-4 text-xs text-lunar-grey">
+                                            <div className="flex items-center space-x-4 text-xs text-slate-400">
                                                 <span className="flex items-center space-x-1">
                                                     <span className={`w-2 h-2 rounded-full ${message.metrics.completed ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                                                     <span>{message.metrics.completed ? 'Complete' : 'Partial'}</span>
@@ -297,18 +298,15 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                     {/* Loading indicator */}
                     {isLoading && (
                         <div className="flex space-x-4">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full gradient-space flex items-center justify-center">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 flex items-center justify-center">
                                 <Bot className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-2 mb-1">
-                                    <span className="text-sm font-medium text-stellar-white">Nexi Assistant</span>
+                                    <span className="text-sm font-medium text-white">DoChat Assistant</span>
                                 </div>
-                                <div className="card-space rounded-xl p-4">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-                                        <span className="text-sm text-stellar-white">Thinking...</span>
-                                    </div>
+                                <div className="bg-slate-900/50 border border-white/10 rounded-xl p-4">
+                                    <BrandedLoading minimal text="Thinking..." />
                                 </div>
                             </div>
                         </div>
@@ -319,7 +317,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
             </div>
 
             {/* Input Form */}
-            <div className="glass border-t border-white/10 px-6 py-4">
+            <div className="bg-slate-900/50 border-t border-white/10 px-6 py-4">
                 <div className="max-w-4xl mx-auto">
                     <form onSubmit={handleSubmit} className="flex space-x-4">
                         <div className="flex-1">
@@ -329,7 +327,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder={`Ask a question about ${documentSetName}...`}
-                                className="w-full px-4 py-3 glass border border-white/20 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-stellar-white placeholder-lunar-grey transition-all duration-200"
+                                className="w-full px-4 py-3 bg-slate-800/70 border border-white/20 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white placeholder-slate-400 transition-all duration-200"
                                 rows={1}
                                 disabled={isLoading}
                                 style={{
@@ -342,7 +340,7 @@ export function RAGChat({ fetchWithAuth, documentSetName }: RAGChatProps) {
                         <button
                             type="submit"
                             disabled={!input.trim() || isLoading}
-                            className="btn-space px-6 py-3 rounded-xl font-medium text-stellar-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 hover:scale-105 flex items-center space-x-2"
+                            className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 hover:scale-105 flex items-center space-x-2"
                         >
                             <Send className="w-4 h-4" />
                             <span>Send</span>

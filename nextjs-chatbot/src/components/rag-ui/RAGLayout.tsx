@@ -153,7 +153,7 @@ export default function RAGLayout() {
     };
 
     return (
-        <div className="flex h-screen bg-space-black">
+        <div className="w-screen h-screen bg-slate-950">
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
                 <RAGHeader
@@ -171,14 +171,14 @@ export default function RAGLayout() {
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Tab Navigation */}
-                    <div className="glass border-b border-white/10">
+                    <div className="bg-slate-900/50 border-b border-white/10">
                         <div className="px-4 sm:px-6">
                             <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto custom-scrollbar">
                                 <button
                                     onClick={() => setActiveTab('upload')}
                                     className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'upload'
                                         ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
+                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     Upload
@@ -187,7 +187,7 @@ export default function RAGLayout() {
                                     onClick={() => setActiveTab('documents')}
                                     className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'documents'
                                         ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
+                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     Documents
@@ -196,14 +196,14 @@ export default function RAGLayout() {
                                     onClick={() => setActiveTab('chat')}
                                     className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'chat'
                                         ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
+                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
                                         }`}
                                     disabled={!selectedDocumentSet}
                                 >
                                     <span className="hidden sm:inline">RAG Chat</span>
                                     <span className="sm:hidden">Chat</span>
                                     {selectedDocumentSet && (
-                                        <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-1 text-xs gradient-space text-white rounded-full animate-pulse-slow">
+                                        <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-1 text-xs bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 text-white rounded-full animate-pulse-slow">
                                             <span className="hidden sm:inline">{selectedDocumentSet}</span>
                                             <span className="sm:hidden">•</span>
                                         </span>
@@ -213,7 +213,7 @@ export default function RAGLayout() {
                                     onClick={() => setActiveTab('admin')}
                                     className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'admin'
                                         ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-lunar-grey hover:text-stellar-white hover:border-blue-400/50'
+                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
                                         }`}
                                 >
                                     <span className="hidden sm:inline">Admin</span>
@@ -224,7 +224,7 @@ export default function RAGLayout() {
                     </div>
 
                     {/* Tab Content */}
-                    <div className="flex-1 overflow-auto bg-space-black">
+                    <div className="flex-1 overflow-auto bg-slate-950">
                         {activeTab === 'upload' && (
                             <DocumentUpload
                                 fetchWithAuth={fetchWithAuth}
@@ -253,18 +253,18 @@ export default function RAGLayout() {
                         )}
 
                         {activeTab === 'chat' && !selectedDocumentSet && (
-                            <div className="flex items-center justify-center h-full bg-space-black">
+                            <div className="flex items-center justify-center h-full bg-slate-950">
                                 <div className="text-center p-8">
-                                    <div className="card-space rounded-2xl p-8 max-w-md mx-auto">
-                                        <h3 className="text-lg font-medium text-stellar-white mb-2">
+                                    <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-8 max-w-md mx-auto">
+                                        <h3 className="text-lg font-medium text-white mb-2">
                                             Select a Document Set
                                         </h3>
-                                        <p className="text-lunar-grey mb-6">
+                                        <p className="text-slate-400 mb-6">
                                             Choose a processed document set to start chatting.
                                         </p>
                                         <button
                                             onClick={() => setActiveTab('documents')}
-                                            className="btn-space px-6 py-3 rounded-lg font-medium text-stellar-white transition-all duration-200 hover:scale-105"
+                                            className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-6 py-3 rounded-lg font-medium text-white transition-all duration-200 hover:scale-105"
                                         >
                                             View Document Sets
                                         </button>
@@ -274,7 +274,7 @@ export default function RAGLayout() {
                         )}
 
                         {activeTab === 'admin' && (
-                            <div className="p-6 bg-space-black">
+                            <div className="p-6 bg-slate-950">
                                 <AdminActions
                                     fetchWithAuth={fetchWithAuth}
                                     onRefresh={fetchDocumentSets}

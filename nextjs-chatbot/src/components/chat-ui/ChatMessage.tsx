@@ -3,7 +3,7 @@ import { cn } from "../../lib/utils"
 import { Bot, User } from "lucide-react"
 import { CustomSkeleton } from "@/components/ui/CustomSkeleton"
 import { Markdown } from "@/components/ui/Markdown"
-import { StreamingTextEffect } from "@/components/ui/streaming-text-effect"
+import FormattedStreamingText from "@/components/ui/formatted-streaming-text"
 import { CopyButton } from "../ui/copy-button"
 
 interface ChatMessageProps {
@@ -48,10 +48,10 @@ export function ChatMessage({ role, message, isStreaming }: ChatMessageProps) {
             <CustomSkeleton />
           ) : (
             <>
-              {isStreaming && role === MessageRole.ASSISTANT ? (
-                <StreamingTextEffect
+              {role === MessageRole.ASSISTANT ? (
+                <FormattedStreamingText
                   text={message}
-                  isStreaming={isStreaming}
+                  isStreaming={isStreaming || false}
                   className="text-white"
                 />
               ) : (

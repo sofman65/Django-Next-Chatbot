@@ -92,7 +92,7 @@ export function PipelineStatus({
 
             return () => clearInterval(interval);
         }
-    }, [documentSets, refreshTrigger]);
+    }, [documentSets, refreshTrigger, fetchWithAuth, onStatusUpdate]);
 
     if (!isVisible || processingDocSets.length === 0) {
         return null;
@@ -100,12 +100,11 @@ export function PipelineStatus({
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <div className={`card-space rounded-2xl shadow-2xl transition-all duration-300 animate-float ${isExpanded ? 'w-96' : 'w-80'
-                }`}>
+            <div className={`bg-slate-900/50 border border-white/10 rounded-2xl shadow-2xl transition-all duration-300 animate-float ${isExpanded ? 'w-96' : 'w-80'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-white/10">
                     <div className="flex items-center space-x-2">
-                        <h3 className="text-sm font-semibold text-stellar-white">Pipeline Status</h3>
+                        <h3 className="text-sm font-semibold text-white">Pipeline Status</h3>
                         <span className="text-xs bg-blue-400/20 text-blue-400 border border-blue-400/30 px-2 py-1 rounded-full">
                             {processingDocSets.length} active
                         </span>
@@ -113,14 +112,14 @@ export function PipelineStatus({
                     <div className="flex items-center space-x-1">
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="text-lunar-grey hover:text-stellar-white p-1 rounded transition-colors hover:scale-110"
+                            className="text-slate-400 hover:text-white p-1 rounded transition-colors hover:scale-110"
                             title={isExpanded ? "Collapse details" : "Expand details"}
                         >
                             <Eye className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => setIsVisible(false)}
-                            className="text-lunar-grey hover:text-stellar-white p-1 rounded transition-colors hover:scale-110"
+                            className="text-slate-400 hover:text-white p-1 rounded transition-colors hover:scale-110"
                         >
                             <X className="h-4 w-4" />
                         </button>
@@ -135,17 +134,17 @@ export function PipelineStatus({
                         const currentStage = getCurrentStage(progress);
 
                         return (
-                            <div key={docSet.name} className="space-y-3 p-3 glass-dark rounded-xl border border-white/10">
+                            <div key={docSet.name} className="space-y-3 p-3 bg-slate-800/70 rounded-xl border border-white/10">
                                 {/* Document Set Header */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
                                         <Clock className="h-4 w-4 text-blue-400 animate-spin" />
-                                        <span className="text-sm font-medium text-stellar-white truncate">
+                                        <span className="text-sm font-medium text-white truncate">
                                             {docSet.name}
                                         </span>
                                     </div>
                                     {detailStatus?.started_at && (
-                                        <span className="text-xs text-lunar-grey">
+                                        <span className="text-xs text-slate-400">
                                             {formatElapsedTime(detailStatus.started_at)}
                                         </span>
                                     )}
@@ -154,17 +153,17 @@ export function PipelineStatus({
                                 {/* Current Stage Indicator */}
                                 <div className="flex items-center space-x-2 text-xs">
                                     <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></div>
-                                    <span className="font-medium text-stellar-white">
+                                    <span className="font-medium text-white">
                                         {currentStage.name}
                                     </span>
-                                    <span className="text-gray-500">
+                                    <span className="text-slate-500">
                                         ({currentStage.range[0]}-{currentStage.range[1]}%)
                                     </span>
                                 </div>
 
                                 {/* Progress Bar */}
                                 <div className="space-y-2">
-                                    <div className="w-full bg-gray-200 rounded-full h-3 relative overflow-hidden">
+                                    <div className="w-full bg-slate-700 rounded-full h-3 relative overflow-hidden">
                                         <div
                                             className={`${currentStage.color} h-3 rounded-full transition-all duration-500 relative`}
                                             style={{ width: `${progress}%` }}
@@ -177,7 +176,7 @@ export function PipelineStatus({
                                             {pipelineStages.slice(0, -1).map((stage, index) => (
                                                 <div
                                                     key={index}
-                                                    className="border-r border-gray-300"
+                                                    className="border-r border-slate-600"
                                                     style={{ width: `${stage.range[1]}%` }}
                                                 ></div>
                                             ))}
@@ -185,106 +184,108 @@ export function PipelineStatus({
                                     </div>
 
                                     <div className="flex justify-between items-center text-xs">
-                                        <span className="font-semibold text-gray-700">
+                                        <span className="font-semibold text-white">
                                             {progress}% complete
                                         </span>
-                                        <span className="text-gray-500">
+                                        <span className="text-slate-400">
                                             Updated {lastUpdate.toLocaleTimeString()}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Current Step Details */}
-                                <div className="bg-white p-3 rounded border border-gray-200">
-                                    <div className="text-xs font-medium text-gray-600 mb-1">
-                                        Current Step:
+                                <div className="bg-slate-900/70 p-3 rounded border border-slate-700">
+                                    <div className="text-xs font-medium mb-1">
+                                        <div className="text-xs font-medium text-blue-400 mb-1">
+                                            Current Step:
+                                        </div>
+                                        <div className="text-sm text-white">
+                                            {detailStatus?.current_step || docSet.current_step || "Initializing..."}
+                                        </div>
                                     </div>
-                                    <div className="text-sm text-gray-800">
-                                        {detailStatus?.current_step || docSet.current_step || "Initializing..."}
-                                    </div>
-                                </div>
 
-                                {/* Expanded Details */}
-                                {isExpanded && (
-                                    <div className="space-y-3">
-                                        {/* Stage Breakdown */}
-                                        <div className="bg-white p-3 rounded border border-gray-200">
-                                            <div className="text-xs font-medium text-gray-600 mb-2">
-                                                Processing Stages:
+                                    {/* Expanded Details */}
+                                    {isExpanded && (
+                                        <div className="space-y-3 mt-3">
+                                            {/* Stage Breakdown */}
+                                            <div className="bg-slate-900/70 p-3 rounded border border-slate-700">
+                                                <div className="text-xs font-medium text-blue-400 mb-2">
+                                                    Processing Stages:
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {pipelineStages.map((stage, index) => {
+                                                        const isActive = progress >= stage.range[0] && progress <= stage.range[1];
+                                                        const isCompleted = progress > stage.range[1];
+
+                                                        return (
+                                                            <div key={index} className="flex items-center space-x-2 text-xs">
+                                                                <div className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-green-500' :
+                                                                    isActive ? `${stage.color} animate-pulse` :
+                                                                        'bg-slate-600'
+                                                                    }`}></div>
+                                                                <span className={`${isActive ? 'font-semibold text-white' :
+                                                                    isCompleted ? 'text-green-400' :
+                                                                        'text-slate-400'
+                                                                    }`}>
+                                                                    {stage.name}
+                                                                </span>
+                                                                <span className="text-slate-500">
+                                                                    ({stage.range[0]}-{stage.range[1]}%)
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                {pipelineStages.map((stage, index) => {
-                                                    const isActive = progress >= stage.range[0] && progress <= stage.range[1];
-                                                    const isCompleted = progress > stage.range[1];
 
-                                                    return (
-                                                        <div key={index} className="flex items-center space-x-2 text-xs">
-                                                            <div className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-green-500' :
-                                                                isActive ? `${stage.color} animate-pulse` :
-                                                                    'bg-gray-300'
-                                                                }`}></div>
-                                                            <span className={`${isActive ? 'font-semibold text-gray-900' :
-                                                                isCompleted ? 'text-green-700' :
-                                                                    'text-gray-500'
-                                                                }`}>
-                                                                {stage.name}
-                                                            </span>
-                                                            <span className="text-gray-400">
-                                                                ({stage.range[0]}-{stage.range[1]}%)
-                                                            </span>
+                                            {/* Technical Details */}
+                                            <div className="bg-slate-900/70 p-3 rounded border border-slate-700">
+                                                <div className="text-xs font-medium text-blue-400 mb-2">
+                                                    Technical Details:
+                                                </div>
+                                                <div className="space-y-1 text-xs text-slate-400">
+                                                    <div>Document Count: {docSet.document_count}</div>
+                                                    <div>Status: {detailStatus?.status || docSet.status}</div>
+                                                    {detailStatus?.started_at && (
+                                                        <div>Started: {new Date(detailStatus.started_at).toLocaleString()}</div>
+                                                    )}
+                                                    {detailStatus?.error_message && (
+                                                        <div className="text-red-400 font-medium">
+                                                            Error: {detailStatus.error_message}
                                                         </div>
-                                                    );
-                                                })}
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Technical Details */}
-                                        <div className="bg-white p-3 rounded border border-gray-200">
-                                            <div className="text-xs font-medium text-gray-600 mb-2">
-                                                Technical Details:
-                                            </div>
-                                            <div className="space-y-1 text-xs text-gray-600">
-                                                <div>Document Count: {docSet.document_count}</div>
-                                                <div>Status: {detailStatus?.status || docSet.status}</div>
-                                                {detailStatus?.started_at && (
-                                                    <div>Started: {new Date(detailStatus.started_at).toLocaleString()}</div>
-                                                )}
-                                                {detailStatus?.error_message && (
-                                                    <div className="text-red-600 font-medium">
-                                                        Error: {detailStatus.error_message}
-                                                    </div>
-                                                )}
+                                            {/* Performance Notes */}
+                                            <div className="bg-slate-800/70 p-3 rounded border border-slate-700">
+                                                <div className="text-xs font-medium text-blue-400 mb-1">
+                                                    💡 Performance Notes:
+                                                </div>
+                                                <ul className="text-xs text-slate-300 space-y-1">
+                                                    <li>• PDF parsing (20-60%) takes the longest time</li>
+                                                    <li>• Docling AI model processes each document sequentially</li>
+                                                    <li>• Vector indexing (80-100%) is typically quick</li>
+                                                    <li>• Total time varies by document count and complexity</li>
+                                                </ul>
                                             </div>
                                         </div>
-
-                                        {/* Performance Notes */}
-                                        <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                                            <div className="text-xs font-medium text-blue-800 mb-1">
-                                                💡 Performance Notes:
-                                            </div>
-                                            <ul className="text-xs text-blue-700 space-y-1">
-                                                <li>• PDF parsing (20-60%) takes the longest time</li>
-                                                <li>• Docling AI model processes each document sequentially</li>
-                                                <li>• Vector indexing (80-100%) is typically quick</li>
-                                                <li>• Total time varies by document count and complexity</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
 
                 {/* Footer */}
-                <div className="p-3 border-t border-gray-100 bg-gray-50 rounded-b-lg">
+                <div className="p-3 border-t border-white/10 bg-slate-800/50 rounded-b-2xl">
                     <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-slate-400">
                             Auto-refresh every 3 seconds
                         </div>
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-xs text-blue-400 hover:text-blue-300 font-medium"
                         >
                             {isExpanded ? 'Show Less' : 'Show More'}
                         </button>

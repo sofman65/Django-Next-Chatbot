@@ -122,13 +122,13 @@ export function LiveProcessingLogs({
     const getLogColor = (type: string) => {
         switch (type) {
             case 'progress':
-                return 'text-blue-600';
+                return 'text-blue-400';
             case 'warning':
-                return 'text-yellow-600';
+                return 'text-yellow-400';
             case 'error':
-                return 'text-red-600';
+                return 'text-red-400';
             default:
-                return 'text-gray-600';
+                return 'text-slate-300';
         }
     };
 
@@ -137,34 +137,34 @@ export function LiveProcessingLogs({
     }
 
     return (
-        <div className="w-full bg-gray-900 text-white shadow-lg border-b border-gray-700">
+        <div className="w-full bg-slate-900 text-white shadow-lg border-b border-white/10">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-white/10">
                 <div className="flex items-center space-x-3">
-                    <Terminal className="h-5 w-5 text-green-400" />
+                    <Terminal className="h-5 w-5 text-teal-400" />
                     <span className="font-mono text-sm font-semibold">Live Processing Logs</span>
-                    <span className="text-xs bg-green-600 text-white px-2 py-1 rounded-full">
+                    <span className="text-xs bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 text-white px-2 py-1 rounded-full">
                         {processingDocSets.length} active
                     </span>
                 </div>
                 <div className="flex items-center space-x-2">
                     <button
                         onClick={() => setIsPaused(!isPaused)}
-                        className="text-gray-400 hover:text-white p-1 rounded"
+                        className="text-slate-400 hover:text-white p-1 rounded"
                         title={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
                     >
                         {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                     </button>
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-gray-400 hover:text-white p-1 rounded"
+                        className="text-slate-400 hover:text-white p-1 rounded"
                         title={isExpanded ? "Collapse" : "Expand"}
                     >
                         {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                     <button
                         onClick={() => setIsVisible(false)}
-                        className="text-gray-400 hover:text-white p-1 rounded"
+                        className="text-slate-400 hover:text-white p-1 rounded"
                         title="Close"
                     >
                         <X className="h-4 w-4" />
@@ -173,19 +173,19 @@ export function LiveProcessingLogs({
             </div>
 
             {/* Progress Summary */}
-            <div className="px-4 py-2 bg-gray-850 border-b border-gray-700">
+            <div className="px-4 py-2 bg-slate-850 border-b border-white/10">
                 <div className="flex items-center space-x-6">
                     {processingDocSets.map((docSet) => (
                         <div key={docSet.name} className="flex items-center space-x-2">
-                            <span className="text-sm font-mono text-gray-300">{docSet.name}:</span>
+                            <span className="text-sm font-mono text-slate-300">{docSet.name}:</span>
                             <div className="flex items-center space-x-1">
-                                <div className="w-16 bg-gray-700 rounded h-1.5">
+                                <div className="w-16 bg-slate-700 rounded h-1.5">
                                     <div
-                                        className="bg-green-500 h-1.5 rounded transition-all duration-300"
+                                        className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 h-1.5 rounded transition-all duration-300"
                                         style={{ width: `${docSet.progress || 0}%` }}
                                     ></div>
                                 </div>
-                                <span className="text-xs text-green-400 font-mono">
+                                <span className="text-xs text-teal-400 font-mono">
                                     {docSet.progress || 0}%
                                 </span>
                             </div>
@@ -197,18 +197,18 @@ export function LiveProcessingLogs({
             {/* Logs */}
             {isExpanded && (
                 <div
-                    className="px-4 py-2 max-h-64 overflow-y-auto bg-gray-900 font-mono text-xs"
+                    className="px-4 py-2 max-h-64 overflow-y-auto bg-slate-900 font-mono text-xs"
                     style={{ maxHeight: isExpanded ? '16rem' : '0' }}
                 >
                     {logs.length === 0 ? (
-                        <div className="text-gray-500 italic py-4">
+                        <div className="text-slate-500 italic py-4">
                             Waiting for processing logs...
                         </div>
                     ) : (
                         <div className="space-y-1">
                             {logs.map((log, index) => (
                                 <div key={index} className="flex items-start space-x-2 py-1">
-                                    <span className="text-gray-500 text-xs shrink-0">
+                                    <span className="text-slate-500 text-xs shrink-0">
                                         [{formatTimestamp(log.timestamp)}]
                                     </span>
                                     <span className="text-blue-400 shrink-0">
@@ -220,7 +220,7 @@ export function LiveProcessingLogs({
                                     <span className={`${getLogColor(log.type)} leading-relaxed`}>
                                         {log.message}
                                         {log.progress !== undefined && (
-                                            <span className="text-green-400 ml-2">
+                                            <span className="text-emerald-400 ml-2">
                                                 [{log.progress}%]
                                             </span>
                                         )}

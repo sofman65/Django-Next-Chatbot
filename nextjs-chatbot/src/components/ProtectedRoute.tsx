@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import BrandedLoading from '@/components/ui/branded-loading';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -15,7 +16,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading || !isAuthenticated) {
-    return null; // or a loading spinner
+    return isLoading ? <BrandedLoading minimal text="Verifying authentication..." /> : null;
   }
 
   return children;

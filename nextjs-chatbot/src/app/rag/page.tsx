@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RAGLayout from "@/components/rag-ui/RAGLayout";
+import BrandedLoading from "@/components/ui/branded-loading";
 
 export default function RAGPage() {
     const { isAuthenticated, isLoading, authState } = useAuth();
@@ -17,11 +18,7 @@ export default function RAGPage() {
     }, [isAuthenticated, isLoading, router]);
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="loading loading-spinner loading-lg"></div>
-            </div>
-        );
+        return <BrandedLoading text="Loading RAG Interface" />;
     }
 
     // Check if user has appropriate role for RAG management

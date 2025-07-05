@@ -13,6 +13,16 @@ module.exports = {
 				orbitron: ['var(--font-orbitron)', 'sans-serif'],
 				spaceGrotesk: ['var(--font-space-grotesk)', 'sans-serif']
 			},
+			keyframes: {
+				loadingProgress: {
+					'0%': { width: '0%', marginLeft: '0%' },
+					'50%': { width: '80%', marginLeft: '10%' },
+					'100%': { width: '0%', marginLeft: '100%' }
+				}
+			},
+			animation: {
+				loadingProgress: 'loadingProgress 2s ease-in-out infinite'
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',

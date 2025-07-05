@@ -1,10 +1,12 @@
 "use client"
 
-import { MessageSquare, Plus, X } from "lucide-react"
+import { MessageSquare, Plus, X, Database } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Separator } from "@/components/ui/separator"
+import { DocumentSelectorModal } from "./DocumentSelectorModal"
 
 interface Conversation {
   id: string
@@ -20,6 +22,10 @@ interface ConversationsSidebarProps {
   className?: string
   isSidebarOpen?: boolean
   closeSidebar?: () => void
+  // Add new props for document selection
+  fetchWithAuth?: (input: RequestInfo, init?: RequestInit) => Promise<Response>
+  selectedDocumentSet?: string | null
+  onSelectDocumentSet?: (setName: string | null) => void
 }
 
 export function ConversationsSidebar({
@@ -30,8 +36,13 @@ export function ConversationsSidebar({
   className,
   isSidebarOpen = false,
   closeSidebar,
+  // Include new props in destructuring
+  fetchWithAuth,
+  selectedDocumentSet,
+  onSelectDocumentSet,
 }: ConversationsSidebarProps) {
   const [storedConversations, setStoredConversations] = useState<Conversation[]>(conversations)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -71,6 +82,67 @@ export function ConversationsSidebar({
             </Button>
           )}
         </div>
+
+        {/* Document Selector Section - Added at top of sidebar */}
+        {fetchWithAuth && onSelectDocumentSet && (
+          <div className="p-4 border-b border-white/10">
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4 text-blue-400" />
+                  <h3 className="text-sm font-medium text-white">Document Set</h3>
+                </div>
+                {selectedDocumentSet && (
+                  <Button
+                    onClick={() => onSelectDocumentSet(null)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 rounded-full hover:bg-red-500/20"
+                    title="Clear document set"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+
+              {selectedDocumentSet ? (
+                <div className="flex flex-col space-y-3">
+                  <div className="flex items-center space-x-2 px-3 py-2.5 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+                    <Database className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                    <span className="text-sm text-blue-300 font-medium truncate">{selectedDocumentSet}</span>
+                  </div>
+                  <Button
+                    onClick={() => setIsModalOpen(true)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-center text-xs bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300"
+                  >
+                    <Database className="h-3 w-3 mr-1.5" />
+                    Change Document Set
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setIsModalOpen(true)}
+                  variant="outline"
+                  className="w-full justify-start text-sm bg-gray-800/40 border-gray-700 hover:bg-gray-700/60"
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  Select Document Set
+                </Button>
+              )}
+
+              {/* Document Selector Modal - only render once */}
+              <DocumentSelectorModal
+                fetchWithAuth={fetchWithAuth}
+                selectedDocumentSet={selectedDocumentSet || null}
+                onSelectDocumentSet={onSelectDocumentSet}
+                isOpen={isModalOpen}
+                onOpenChange={setIsModalOpen}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Conversations List */}
         <div className="flex-1 overflow-y-auto p-2">

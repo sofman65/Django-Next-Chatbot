@@ -7,14 +7,15 @@ import { ChatInput } from "@/components/chat-ui/ChatInput"
 import { UnifiedChatConversations } from "@/components/chat-ui/UnifiedChatConversations"
 import { ChatHeader } from "@/components/chat-ui/ChatHeader"
 import { ConversationsSidebar } from "@/components/chat-ui/ConversationsSidebar"
-import { DocumentSetSelector } from "@/components/chat-ui/DocumentSetSelector"
 import { useSidebar } from "@/components/ui/sidebar"
+import BrandedLoading from "@/components/ui/branded-loading"
 import { useAuth } from "@/contexts/auth-context"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useScrollToBottom } from "@/hooks/useScrollToBottom"
 import { useRouter } from "next/navigation"
 import { ExternalLink, Sparkles } from "lucide-react"
 import Link from "next/link"
+import { HeroHighlight } from "@/components/ui/hero-highlight"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -381,19 +382,7 @@ export default function ChatLayout() {
   }, [isLoading, isAuthenticated, router])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-black">
-        <div className="text-center">
-          <div className="loading-dots mb-4">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-          <h1 className="text-2xl font-bold text-white">Loading Dochat.ai...</h1>
-          <p className="text-gray-400 mt-2">Preparing your AI assistant</p>
-        </div>
-      </div>
-    )
+    return <BrandedLoading text="Loading DoChat.ai..." subText="Preparing your AI assistant" />;
   }
 
   if (!isAuthenticated) {
@@ -401,7 +390,9 @@ export default function ChatLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden w-screen bg-black">
+    <div className="flex h-screen overflow-hidden w-screen bg-black z-10">
+
+
       {/* Sidebar */}
       <ConversationsSidebar
         conversations={storedConversations}
@@ -411,52 +402,43 @@ export default function ChatLayout() {
         className="w-[320px]"
         isSidebarOpen={openMobile}
         closeSidebar={() => setOpenMobile(false)}
+        fetchWithAuth={fetchWithAuth}
+        selectedDocumentSet={selectedDocumentSet}
+        onSelectDocumentSet={setName => {
+          setSelectedDocumentSet(setName);
+          setCurrentConversationId("");
+        }}
       />
+
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col h-full min-w-0">
         {/* Header */}
         <ChatHeader onToggleSidebar={() => setOpenMobile(!openMobile)} isSidebarOpen={openMobile} />
 
-        {/* Document Set Selector Bar */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 px-6 py-4">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <DocumentSetSelector
-                fetchWithAuth={fetchWithAuth}
-                selectedDocumentSet={selectedDocumentSet}
-                onSelectDocumentSet={(setName) => {
-                  setSelectedDocumentSet(setName)
-                  setCurrentConversationId("")
-                }}
-              />
-
-              <div className="flex items-center space-x-2">
-                {selectedDocumentSet ? (
-                  <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm text-blue-300 font-medium">RAG Mode: {selectedDocumentSet}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2 px-3 py-1 bg-gray-800/50 border border-gray-700 rounded-full">
-                    <span className="text-sm text-gray-400">General Chat Mode</span>
-                  </div>
-                )}
+        {/* Chat Mode Indicator Bar */}
+        {selectedDocumentSet && (
+          <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 px-6 py-4">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                  <Sparkles className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm text-blue-300 font-medium">RAG Mode: {selectedDocumentSet}</span>
+                </div>
               </div>
-            </div>
 
-            <a
-              href="/rag"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors group"
-            >
-              {/* <Link href="/rag" className="flex items-center space-x-2" /> */}
-              <span>Manage Documents</span>
-              <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+              <a
+                href="/rag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors group"
+              >
+                <span>Manage Documents</span>
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </a>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Chat Area */}
         <main ref={containerRef} className="flex-1 h-full w-full flex flex-col overflow-hidden">

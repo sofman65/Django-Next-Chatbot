@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Upload, File, AlertCircle, CheckCircle, X } from "lucide-react";
+import BrandedLoading from "@/components/ui/branded-loading";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -118,14 +119,14 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-space-black min-h-full">
-            <div className="card-space rounded-2xl">
+        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-slate-950 min-h-full">
+            <div className="bg-slate-900/30 border border-white/10 shadow-lg shadow-blue-900/5 rounded-2xl">
                 <div className="p-4 sm:p-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-stellar-white mb-4 sm:mb-6">Upload Documents</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent mb-4 sm:mb-6">Upload Documents</h2>
 
                     {/* Document Set Name */}
                     <div className="mb-6">
-                        <label htmlFor="documentSetName" className="block text-sm font-medium text-lunar-grey mb-2">
+                        <label htmlFor="documentSetName" className="block text-sm font-medium text-blue-300 mb-2">
                             Document Set Name
                         </label>
                         <input
@@ -133,7 +134,7 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                             id="documentSetName"
                             value={documentSetName}
                             onChange={(e) => setDocumentSetName(e.target.value)}
-                            className="w-full px-3 py-2 glass border border-white/10 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-stellar-white placeholder-lunar-grey transition-all duration-200"
+                            className="w-full px-3 py-2 bg-slate-800/70 border border-slate-700/50 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-white placeholder-slate-400 transition-all duration-200"
                             placeholder="Enter a name for this document set (e.g., 'Q1 Financial Reports')"
                             disabled={uploading}
                         />
@@ -141,18 +142,18 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
 
                     {/* File Upload Area */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-lunar-grey mb-2">
+                        <label className="block text-sm font-medium text-blue-300 mb-2">
                             PDF Documents
                         </label>
                         <div
-                            className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-blue-400 hover:bg-blue-400/5 transition-all duration-300 cursor-pointer glass-dark"
+                            className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-blue-400 hover:bg-blue-400/5 transition-all duration-300 cursor-pointer bg-slate-800/70"
                             onClick={() => fileInputRef.current?.click()}
                         >
                             <Upload className="mx-auto h-12 w-12 text-blue-400 mb-4 animate-float" />
-                            <p className="text-sm text-stellar-white mb-2">
+                            <p className="text-sm text-white mb-2">
                                 Click to select PDF files or drag and drop
                             </p>
-                            <p className="text-xs text-lunar-grey">
+                            <p className="text-xs text-slate-400">
                                 Multiple PDF files supported
                             </p>
                             <input
@@ -170,23 +171,23 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                     {/* Selected Files */}
                     {files.length > 0 && (
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-lunar-grey mb-3">
+                            <h3 className="text-sm font-medium text-slate-400 mb-3">
                                 Selected Files ({files.length})
                             </h3>
                             <div className="space-y-2">
                                 {files.map((file, index) => (
-                                    <div key={index} className="flex items-center justify-between p-3 glass rounded-lg border border-white/10">
+                                    <div key={index} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg border border-white/10">
                                         <div className="flex items-center space-x-3">
                                             <File className="h-5 w-5 text-red-400" />
                                             <div>
-                                                <p className="text-sm font-medium text-stellar-white">{file.name}</p>
-                                                <p className="text-xs text-lunar-grey">{formatFileSize(file.size)}</p>
+                                                <p className="text-sm font-medium text-white">{file.name}</p>
+                                                <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
                                             </div>
                                         </div>
                                         {!uploading && (
                                             <button
                                                 onClick={() => removeFile(index)}
-                                                className="p-1 text-lunar-grey hover:text-red-400 transition-colors hover:scale-110"
+                                                className="p-1 text-slate-400 hover:text-red-400 transition-colors hover:scale-110"
                                             >
                                                 <X className="h-4 w-4" />
                                             </button>
@@ -217,12 +218,11 @@ export function DocumentUpload({ fetchWithAuth, onUploadComplete, token }: Docum
                         <button
                             onClick={handleUpload}
                             disabled={uploading || !documentSetName.trim() || files.length === 0}
-                            className="btn-space px-6 py-3 rounded-lg font-medium text-stellar-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 hover:scale-105 flex items-center space-x-2"
+                            className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-6 py-3 rounded-lg font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 hover:scale-105 flex items-center space-x-2"
                         >
                             {uploading ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    <span>Uploading...</span>
+                                    <BrandedLoading minimal text="Uploading..." />
                                 </>
                             ) : (
                                 <>

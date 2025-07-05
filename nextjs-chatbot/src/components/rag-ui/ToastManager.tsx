@@ -42,11 +42,11 @@ export function ToastManager({ toasts, onRemoveToast }: ToastManagerProps) {
     const getStyles = (type: string) => {
         switch (type) {
             case 'success':
-                return 'glass-dark border-green-400/30 text-green-400';
+                return 'bg-slate-800/70 border-green-400/30 text-green-400';
             case 'error':
-                return 'glass-dark border-red-400/30 text-red-400';
+                return 'bg-slate-800/70 border-red-400/30 text-red-400';
             default:
-                return 'glass-dark border-blue-400/30 text-blue-400';
+                return 'bg-slate-800/70 border-blue-400/30 text-blue-400';
         }
     };
 
@@ -60,12 +60,12 @@ export function ToastManager({ toasts, onRemoveToast }: ToastManagerProps) {
                     <div className="flex items-start space-x-3">
                         {getIcon(toast.type)}
                         <div className="flex-1">
-                            <h4 className="font-semibold text-sm text-stellar-white">{toast.title}</h4>
-                            <p className="text-sm mt-1 text-lunar-grey">{toast.message}</p>
+                            <h4 className="font-semibold text-sm text-white">{toast.title}</h4>
+                            <p className="text-sm mt-1 text-slate-400">{toast.message}</p>
                         </div>
                         <button
                             onClick={() => onRemoveToast(toast.id)}
-                            className="text-lunar-grey hover:text-stellar-white transition-colors hover:scale-110"
+                            className="text-slate-400 hover:text-white transition-colors hover:scale-110"
                         >
                             <X className="h-4 w-4" />
                         </button>

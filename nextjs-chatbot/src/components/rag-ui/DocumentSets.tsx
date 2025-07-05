@@ -197,35 +197,35 @@ export function DocumentSets({
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-64 bg-space-black">
+            <div className="flex items-center justify-center h-64 bg-slate-950">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
             </div>
         );
     }
 
     return (
-        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 bg-space-black min-h-full">
-            <div className="card-space rounded-2xl">
+        <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 bg-slate-950 min-h-full">
+            <div className="bg-slate-900/50 border border-white/10 rounded-2xl">
                 <div className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2">
-                        <h2 className="text-xl sm:text-2xl font-bold text-stellar-white">Document Sets</h2>
-                        <div className="text-sm text-lunar-grey">
+                        <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent">Document Sets</h2>
+                        <div className="text-sm text-slate-400">
                             {documentSets.length} document set{documentSets.length !== 1 ? 's' : ''}
                         </div>
                     </div>
 
                     {documentSets.length === 0 ? (
                         <div className="text-center py-12">
-                            <Database className="mx-auto h-12 w-12 text-orbit-grey mb-4 animate-pulse-slow" />
-                            <h3 className="text-lg font-medium text-stellar-white mb-2">No Document Sets</h3>
-                            <p className="text-lunar-grey">Upload some documents to get started.</p>
+                            <Database className="mx-auto h-12 w-12 text-slate-500 mb-4 animate-pulse-slow" />
+                            <h3 className="text-lg font-medium text-white mb-2">No Document Sets</h3>
+                            <p className="text-slate-400">Upload some documents to get started.</p>
                         </div>
                     ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {documentSets.map((docSet) => (
                                 <div
                                     key={docSet.name}
-                                    className={`glass-dark rounded-xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${selectedDocumentSet === docSet.name
+                                    className={`bg-slate-800/70 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${selectedDocumentSet === docSet.name
                                         ? 'border-blue-400 bg-blue-400/10 shadow-lg shadow-blue-400/25'
                                         : 'border-white/10 hover:border-blue-400/50'
                                         }`}
@@ -234,7 +234,7 @@ export function DocumentSets({
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center space-x-2">
                                             {getStatusIcon(docSet.status)}
-                                            <h3 className="font-medium text-stellar-white truncate">
+                                            <h3 className="font-medium text-white truncate">
                                                 {docSet.name}
                                             </h3>
                                         </div>
@@ -243,7 +243,7 @@ export function DocumentSets({
                                         )}
                                     </div>
 
-                                    <div className="space-y-2 text-sm text-lunar-grey">
+                                    <div className="space-y-2 text-sm text-slate-400">
                                         <div className="flex items-center space-x-2">
                                             <FileText className="h-4 w-4" />
                                             <span>{docSet.document_count} document{docSet.document_count !== 1 ? 's' : ''}</span>
@@ -268,23 +268,23 @@ export function DocumentSets({
                                     {/* Progress bar for processing */}
                                     {['processing', 'parsing', 'indexing', 'pending'].includes(docSet.status) && docSet.progress !== undefined && (
                                         <div className="mt-3">
-                                            <div className="w-full bg-charcoal rounded-full h-2 relative overflow-hidden">
+                                            <div className="w-full bg-slate-700 rounded-full h-2 relative overflow-hidden">
                                                 <div
-                                                    className="gradient-space h-2 rounded-full transition-all duration-300 relative animate-pulse-slow"
+                                                    className="bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 h-2 rounded-full transition-all duration-300 relative animate-pulse-slow"
                                                     style={{ width: `${docSet.progress}%` }}
                                                 >
                                                     <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
                                                 </div>
                                             </div>
-                                            <div className="text-xs text-lunar-grey mt-2 space-y-2">
+                                            <div className="text-xs text-slate-400 mt-2 space-y-2">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="font-semibold text-stellar-white">{docSet.progress}% complete</span>
+                                                    <span className="font-semibold text-white">{docSet.progress}% complete</span>
                                                     <span className="text-blue-400">Processing...</span>
                                                 </div>
                                                 {docSet.current_step && (
-                                                    <div className="text-lunar-grey glass rounded border border-white/10 px-3 py-2">
+                                                    <div className="text-slate-400 bg-slate-900/50 rounded border border-white/10 px-3 py-2">
                                                         <div className="font-medium text-xs text-blue-400 mb-1">Current step:</div>
-                                                        <div className="text-xs leading-relaxed text-stellar-white">
+                                                        <div className="text-xs leading-relaxed text-white">
                                                             {docSet.current_step}
                                                         </div>
                                                     </div>
@@ -296,7 +296,7 @@ export function DocumentSets({
                                                             docSet.progress < 80 ? 'bg-green-400' :
                                                                 'bg-purple-400'
                                                         }`}></div>
-                                                    <span className="text-lunar-grey font-medium">
+                                                    <span className="text-slate-400 font-medium">
                                                         {docSet.progress < 20 ? 'Preparing documents' :
                                                             docSet.progress < 60 ? 'Parsing PDFs with Docling' :
                                                                 docSet.progress < 80 ? 'Processing text' :
@@ -316,7 +316,7 @@ export function DocumentSets({
                                                         <CheckCircle className="h-3 w-3" />
                                                         <span>Ready for Chat</span>
                                                     </div>
-                                                    <div className="text-xs text-lunar-grey">
+                                                    <div className="text-xs text-slate-400">
                                                         Fully indexed
                                                     </div>
                                                 </div>
@@ -326,7 +326,7 @@ export function DocumentSets({
                                                         handleRebuildPipeline(docSet.name);
                                                     }}
                                                     disabled={rebuildingPipeline === docSet.name}
-                                                    className="flex items-center space-x-1 text-xs btn-space px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all w-full justify-center"
+                                                    className="flex items-center space-x-1 text-xs bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all w-full justify-center"
                                                 >
                                                     {rebuildingPipeline === docSet.name ? (
                                                         <>
@@ -353,7 +353,7 @@ export function DocumentSets({
                                                                         'Processing documents...'}
                                                         </span>
                                                     </div>
-                                                    <div className="text-xs text-lunar-grey">
+                                                    <div className="text-xs text-slate-400">
                                                         {docSet.progress && docSet.progress < 60 ? 'Please wait' : 'Almost done'}
                                                     </div>
                                                 </div>
@@ -397,7 +397,7 @@ export function DocumentSets({
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
-                                                <div className="text-xs text-lunar-grey font-medium">
+                                                <div className="text-xs text-slate-400 font-medium">
                                                     Ready to process
                                                 </div>
                                                 <button
@@ -406,7 +406,7 @@ export function DocumentSets({
                                                         handleStartPipeline(docSet.name);
                                                     }}
                                                     disabled={startingPipeline === docSet.name}
-                                                    className="flex items-center space-x-1 text-xs btn-space px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
+                                                    className="flex items-center space-x-1 text-xs bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-3 py-1 rounded-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
                                                 >
                                                     {startingPipeline === docSet.name ? (
                                                         <>
