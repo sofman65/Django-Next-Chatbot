@@ -57,11 +57,11 @@ export default function LoginPage() {
                 <h1 className={`${orbitron.className} text-5xl lg:text-7xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent`}>
                   DoChat.ai
                 </h1>
-                <div className="text-lg lg:text-xl text-slate-300 min-h-[3rem]">
+                <div className="text-lg lg:text-xl text-slate-300">
                   <StreamingTextEffect
                     text="Your intelligent AI assistant for seamless conversations."
                     className="text-lg lg:text-xl text-slate-300"
-                    duration={0.03}
+                    duration={3}
                   />
                 </div>
               </div>
