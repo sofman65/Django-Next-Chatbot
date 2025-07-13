@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <WavyBackground
       className="w-full min-h-screen"
-      containerClassName="min-h-screen"
+      containerClassName="min-h-screen flex flex-col"
       colors={["#2563EB", "#14B8A6", "#10B981", "#0F172A", "#64748B"]}
       waveWidth={60}
       backgroundFill="#0F172A"
@@ -47,17 +47,17 @@ export default function LoginPage() {
       speed="slow"
       waveOpacity={0.4}
     >
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div className="relative z-10 flex flex-1 items-center justify-center p-4 py-10">
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
           {/* Left Column: Brand & Messaging */}
-          <div className="text-center lg:text-left">
+          <div className="text-center lg:text-left mb-8 lg:mb-0">
             <div className="flex flex-col items-center lg:items-start space-y-8">
-              <div className="space-y-4">
-                <h1 className={`${orbitron.className} text-5xl lg:text-7xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent`}>
+              <div className="space-y-6">
+                <h1 className={`${orbitron.className} text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent`}>
                   DoChat.ai
                 </h1>
-                <div className="text-lg lg:text-xl text-slate-300">
+                <div className="text-lg lg:text-xl text-slate-300 h-16"> {/* Fixed height for text */}
                   <StreamingTextEffect
                     text="Your intelligent AI assistant for seamless conversations."
                     className="text-lg lg:text-xl text-slate-300"

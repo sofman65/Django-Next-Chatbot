@@ -11,7 +11,7 @@ interface DocumentSet {
 }
 
 interface DocumentSetSelectorProps {
-    fetchWithAuth: (input: RequestInfo, init?: RequestInit) => Promise<Response>
+    fetchWithAuth?: (input: RequestInfo, init?: RequestInit) => Promise<Response>
     selectedDocumentSet: string | null
     onSelectDocumentSet: (name: string | null) => void
 }
@@ -28,6 +28,8 @@ export function DocumentSetSelector({
     const [loading, setLoading] = useState(false)
 
     const fetchDocumentSets = useCallback(async () => {
+        if (!fetchWithAuth) return;
+
         setLoading(true)
         try {
             const response = await fetchWithAuth(`${BACKEND_URL}/api/rag/document-sets/`)
@@ -64,8 +66,8 @@ export function DocumentSetSelector({
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`flex items-center space-x-3 px-4 py-2 rounded-full border transition-all ${selectedDocumentSet
-                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25"
-                        : "bg-gray-900/50 text-gray-300 border-gray-700 hover:bg-gray-800/50 hover:border-gray-600"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/25"
+                    : "bg-gray-900/50 text-gray-300 border-gray-700 hover:bg-gray-800/50 hover:border-gray-600"
                     }`}
             >
                 <Database className="w-4 h-4" />
@@ -110,8 +112,8 @@ export function DocumentSetSelector({
                                         key={set.name}
                                         onClick={() => handleSelect(set.name)}
                                         className={`w-full text-left p-4 rounded-xl hover:bg-gray-800/50 transition-all duration-200 ${selectedDocumentSet === set.name
-                                                ? "bg-blue-500/20 border border-blue-500/30"
-                                                : "border border-transparent"
+                                            ? "bg-blue-500/20 border border-blue-500/30"
+                                            : "border border-transparent"
                                             }`}
                                     >
                                         <div className="flex items-start justify-between">

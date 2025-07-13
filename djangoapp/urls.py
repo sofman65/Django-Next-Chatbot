@@ -1,6 +1,7 @@
 # djangoapp/urls.py
 from django.urls import path
 from . import views
+from .views_rag import rag_chat_by_set
 from djangoapp.views import SignupView, LoginView, LogoutView, UserView, TokenRefreshView
 
 urlpatterns = [
@@ -20,7 +21,7 @@ urlpatterns = [
     path('api/db/build/',  views.build_db,  name='build_db'),
 
     # Advanced RAG endpoints
-    path('api/rag/chat/', views.rag_chat, name='rag_chat'),
+    path('api/rag/chat/<str:document_set_name>/', rag_chat_by_set, name='rag_chat_by_set'),
     path('api/rag/upload/', views.upload_document, name='upload_document'),
     path('api/rag/pipeline/start/', views.start_pipeline, name='start_pipeline'),
     path('api/rag/pipeline/rebuild/<str:document_set_name>/', views.rebuild_document_set, name='rebuild_document_set'),

@@ -122,8 +122,8 @@ export function DocumentSelectorModal({
                                         key={set.name}
                                         onClick={() => handleSelect(set.name)}
                                         className={`w-full text-left p-4 rounded-xl hover:bg-gray-800/50 transition-all duration-200 ${selectedDocumentSet === set.name
-                                                ? "bg-blue-500/20 border border-blue-500/30"
-                                                : "border border-gray-700/50"
+                                            ? "bg-blue-500/20 border border-blue-500/30"
+                                            : "border border-gray-700/50"
                                             }`}
                                     >
                                         <div className="flex items-start justify-between">

@@ -1,12 +1,15 @@
 from django.db import models
 from django.utils import timezone
-
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
 
 class CustomUserManager(BaseUserManager):
     """Custom user manager for creating users and superusers."""
@@ -41,9 +44,13 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='users')
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='users', null=True, blank=True)
 
     objects = CustomUserManager()
+
+    def __str__(self):
+        return self.username
+
 
 class DocumentSet(models.Model):
     """Groups of documents that form a knowledge base."""
@@ -55,6 +62,7 @@ class DocumentSet(models.Model):
     
     def __str__(self):
         return self.name
+
 
 class DocumentAccess(models.Model):
     """Controls which roles can access which document sets."""
@@ -70,6 +78,7 @@ class DocumentAccess(models.Model):
     def __str__(self):
         return f"{self.role.name} -> {self.document_set.name}"
 
+
 class Conversation(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
@@ -77,6 +86,10 @@ class Conversation(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
 
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)
@@ -86,6 +99,10 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.role}: {self.content[:50]}..."
+
 
 class Document(models.Model):
     """Stores uploaded knowledge base documents for RAG."""
@@ -118,6 +135,7 @@ class Document(models.Model):
     def __str__(self):
         return f"{self.title} ({self.status})"
 
+
 class ProcessingPipeline(models.Model):
     """Tracks the processing pipeline status for document sets."""
     STATUS_CHOICES = [
@@ -146,6 +164,7 @@ class ProcessingPipeline(models.Model):
     
     def __str__(self):
         return f"{self.document_set.name} - {self.status}"
+
 
 class Chunk(models.Model):
     """Stores chunked text from documents, used in vector search."""

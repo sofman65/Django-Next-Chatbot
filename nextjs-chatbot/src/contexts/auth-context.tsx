@@ -32,7 +32,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (creds: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
-  refreshToken: () => Promise<void>;
+  refreshToken: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -80,18 +80,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Refresh token flow
-  const refreshToken = useCallback(async () => {
+  const refreshToken = useCallback(async (): Promise<string | null> => {
     const refresh = localStorage.getItem("refresh");
-    if (!refresh) throw new Error("No refresh token");
-    const res = await fetch(`${API_BASE}/api/auth/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh }),
-    });
-    if (!res.ok) throw new Error("Refresh failed");
-    const { access } = await res.json();
-    persistTokens(access, refresh);
-  }, []);
+    if (!refresh) {
+      // If no refresh token, clear state and force re-login
+      setAuthState({ accessToken: null, user: null });
+      return null;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+      if (!res.ok) throw new Error("Refresh failed");
+      const { access } = await res.json();
+      persistTokens(access, refresh);
+      return access;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      // On failure, clear tokens and user state
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      setAuthState({ accessToken: null, user: null });
+      router.push("/login"); // Redirect to login page
+      return null;
+    }
+  }, [router]);
 
   // login()
   const login = useCallback(
@@ -137,28 +152,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("refresh");
     setAuthState({ accessToken: null, user: null });
     setIsLoading(false);
+    router.push("/login");
   }, [router]);
 
-  const isAuthenticated = !!authState.accessToken && !!authState.user;
+  const value = {
+    authState,
+    isAuthenticated: !!authState.accessToken,
+    isLoading,
+    login,
+    logout,
+    refreshToken,
+  };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        authState,
-        isAuthenticated,
-        isLoading,
-        login,
-        logout,
-        refreshToken,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be inside AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }

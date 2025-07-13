@@ -12,8 +12,22 @@ import { ToastManager, useToasts } from "./ToastManager";
 import { useSidebar } from "@/components/ui/sidebar";
 import { AdminActions } from "./AdminActions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useInterval } from 'usehooks-ts';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!BACKEND_URL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined. Please check your environment variables.");
+}
+
+const TABS = [
+    { id: 'upload', label: 'Upload' },
+    { id: 'documents', label: 'Documents' },
+    { id: 'chat', label: 'Chat' },
+    { id: 'admin', label: 'Admin' },
+];
+
+const POLLING_INTERVAL = 5000; // 5 seconds
 
 export type DocumentSet = {
     name: string;
@@ -39,11 +53,16 @@ export default function RAGLayout() {
     const token = authState.accessToken;
     const { toasts, addToast, removeToast } = useToasts();
 
-    const [activeTab, setActiveTab] = useState<'upload' | 'documents' | 'chat' | 'admin'>('upload');
+    const [activeTab, setActiveTab] = useState<string>('upload');
     const [selectedDocumentSet, setSelectedDocumentSet] = useState<string>('');
     const [documentSets, setDocumentSets] = useState<DocumentSet[]>([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [prevProcessingCount, setPrevProcessingCount] = useState(0);
+    const documentSetsRef = useRef<DocumentSet[]>([]);
+
+    useEffect(() => {
+        documentSetsRef.current = documentSets;
+    }, [documentSets]);
 
     // fetchWithAuth helper (similar to ChatLayout)
     const fetchWithAuth = useCallback(
@@ -108,6 +127,19 @@ export default function RAGLayout() {
             setDocumentSets([]);
         }
     }, [fetchWithAuth]);
+
+    // Use a hook for polling to ensure it's managed correctly
+    useInterval(
+        () => {
+            const isProcessing = documentSetsRef.current.some(ds =>
+                ['processing', 'parsing', 'indexing', 'pending'].includes(ds.status)
+            );
+            if (isProcessing) {
+                fetchDocumentSets();
+            }
+        },
+        POLLING_INTERVAL
+    );
 
     // Initial load and refresh trigger handling
     useEffect(() => {
@@ -174,57 +206,24 @@ export default function RAGLayout() {
                     <div className="bg-slate-900/50 border-b border-white/10">
                         <div className="px-4 sm:px-6">
                             <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto custom-scrollbar">
-                                <button
-                                    onClick={() => setActiveTab('upload')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'upload'
-                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
-                                        }`}
-                                >
-                                    Upload
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('documents')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'documents'
-                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
-                                        }`}
-                                >
-                                    Documents
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('chat')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'chat'
-                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
-                                        }`}
-                                    disabled={!selectedDocumentSet}
-                                >
-                                    <span className="hidden sm:inline">RAG Chat</span>
-                                    <span className="sm:hidden">Chat</span>
-                                    {selectedDocumentSet && (
-                                        <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-1 text-xs bg-gradient-to-r from-blue-400 via-teal-400 to-emerald-400 text-white rounded-full animate-pulse-slow">
-                                            <span className="hidden sm:inline">{selectedDocumentSet}</span>
-                                            <span className="sm:hidden">•</span>
-                                        </span>
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('admin')}
-                                    className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === 'admin'
-                                        ? 'border-blue-400 text-blue-400 bg-blue-400/10'
-                                        : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
-                                        }`}
-                                >
-                                    <span className="hidden sm:inline">Admin</span>
-                                    <span className="sm:hidden">Admin</span>
-                                </button>
+                                {TABS.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-all duration-200 ${activeTab === tab.id
+                                            ? 'border-blue-400 text-blue-400 bg-blue-400/10'
+                                            : 'border-transparent text-slate-400 hover:text-white hover:border-blue-400/50'
+                                            }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
                             </nav>
                         </div>
                     </div>
 
                     {/* Tab Content */}
-                    <div className="flex-1 overflow-auto bg-slate-950">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         {activeTab === 'upload' && (
                             <DocumentUpload
                                 fetchWithAuth={fetchWithAuth}
@@ -232,72 +231,32 @@ export default function RAGLayout() {
                                 token={token || ''}
                             />
                         )}
-
                         {activeTab === 'documents' && (
                             <DocumentSets
-                                fetchWithAuth={fetchWithAuth}
-                                refreshTrigger={refreshTrigger}
-                                selectedDocumentSet={selectedDocumentSet}
-                                onSelectDocumentSet={setSelectedDocumentSet}
                                 documentSets={documentSets}
-                                setDocumentSets={setDocumentSets}
-                                fetchDocumentSets={fetchDocumentSets}
-                            />
-                        )}
-
-                        {activeTab === 'chat' && selectedDocumentSet && (
-                            <RAGChat
+                                onSelectSet={setSelectedDocumentSet}
+                                onRefresh={refreshData}
                                 fetchWithAuth={fetchWithAuth}
-                                documentSetName={selectedDocumentSet}
+                                addToast={addToast}
                             />
                         )}
-
-                        {activeTab === 'chat' && !selectedDocumentSet && (
-                            <div className="flex items-center justify-center h-full bg-slate-950">
-                                <div className="text-center p-8">
-                                    <div className="bg-slate-900/50 border border-white/10 rounded-2xl p-8 max-w-md mx-auto">
-                                        <h3 className="text-lg font-medium text-white mb-2">
-                                            Select a Document Set
-                                        </h3>
-                                        <p className="text-slate-400 mb-6">
-                                            Choose a processed document set to start chatting.
-                                        </p>
-                                        <button
-                                            onClick={() => setActiveTab('documents')}
-                                            className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 px-6 py-3 rounded-lg font-medium text-white transition-all duration-200 hover:scale-105"
-                                        >
-                                            View Document Sets
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        {activeTab === 'chat' && (
+                            <RAGChat
+                                selectedDocumentSet={selectedDocumentSet}
+                                fetchWithAuth={fetchWithAuth}
+                                addToast={addToast}
+                            />
                         )}
-
                         {activeTab === 'admin' && (
-                            <div className="p-6 bg-slate-950">
-                                <AdminActions
-                                    fetchWithAuth={fetchWithAuth}
-                                    onRefresh={fetchDocumentSets}
-                                />
-                            </div>
+                            <AdminActions
+                                fetchWithAuth={fetchWithAuth}
+                                onRefresh={refreshData}
+                            />
                         )}
                     </div>
                 </div>
-
-                {/* Pipeline Status (floating) */}
-                <PipelineStatus
-                    fetchWithAuth={fetchWithAuth}
-                    documentSets={documentSets}
-                    refreshTrigger={refreshTrigger}
-                    onStatusUpdate={refreshData}
-                />
-
-                {/* Toast Notifications */}
-                <ToastManager
-                    toasts={toasts}
-                    onRemoveToast={removeToast}
-                />
             </div>
+            <ToastManager toasts={toasts} onRemoveToast={removeToast} />
         </div>
     );
 }

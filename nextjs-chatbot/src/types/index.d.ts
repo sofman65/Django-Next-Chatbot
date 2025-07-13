@@ -13,6 +13,7 @@ export type Message = {
   role: MessageRole;
   message: string;
   userInfo?: User;
+  isStreaming?: boolean;
 };
 
 export type Conversations = Array<Message>;

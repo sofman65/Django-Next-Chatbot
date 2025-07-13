@@ -16,17 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from djangoapp.views import SignupView, LoginView, LogoutView, UserView, TokenRefreshView 
 
 urlpatterns = [
-   
     path('admin/', admin.site.urls),
-    path('api/auth/', include([
-        path('logout/', LogoutView.as_view(), name='logout'),
-        path('signup/', SignupView.as_view()),
-        path('login/', LoginView.as_view(), name='login'),
-        path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    ])),
-    path('api/auth/user/', UserView.as_view(), name='user-info'),
-    path('', include('djangoapp.urls')),
+    
+    # New modular app URLs
+    path('api/auth/', include('apps.authapp.urls')),
+    path('api/rag/', include('apps.rag.urls')),
+    path('', include('apps.documents.urls')),
+    
+    # Legacy djangoapp URLs (temporarily disabled during migration)
+    # path('legacy/', include('djangoapp.urls')),
 ]
